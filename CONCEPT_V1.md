@@ -1,7 +1,7 @@
 # KasiPool – Concept V1
 
 **Venture:** KasiPool
-**Team:** KasiPool – Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi
+**Team:** KasiPool – Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi, Chris Mabhele
 **Programme:** UCT MakersForge, VentureVerse, October 2026
 **Date:** [DATE]
 

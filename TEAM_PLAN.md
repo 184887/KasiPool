@@ -1,11 +1,13 @@
 # KasiPool – Team plan, week of 21 Oct 2026
 
+> **Replaced** by the home-task plan with six roles and the Saturday 24 Oct agenda: https://claude.ai/artifact/1U61mwoNSt1mUEJ6jJuwTW (ask Magnus to share it). This file is kept for reference.
+
 **Goal this week:** finish Concept V1 and upload it to VentureVerse.
 **Target:** V1 ready Friday 23 Oct. Person 5 confirms the real deadline today and we adjust if needed.
 
-**Team KasiPool:** Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi.
+**Team KasiPool:** Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi, Chris Mabhele.
 
-Five people, five roles. Desk research is already done (`DESK_RESEARCH.md`), so the Numbers person checks it instead of a separate role. Put your name next to a role.
+Six people. Desk research is already done (`DESK_RESEARCH.md`), so the Numbers person checks it instead of a separate role. Put your name next to a role.
 
 | # | Role | Name |
 |---|------|------|
@@ -58,7 +60,7 @@ Turn everything into one V1 document.
 ## 5. Platform and coordination
 Make sure we can actually submit, and keep everyone on track.
 - [ ] **Today:** check the V1 deadline on VentureVerse and tell the group
-- [ ] Check all five have a VentureVerse account and the team leader has applied to the cohort (venture name, team name, every member's name and email)
+- [ ] Check all six have a VentureVerse account and the team leader has applied to the cohort (venture name, team name, every member's name and email)
 - [ ] Check everyone's progress on the Sunrise course and the Venture Creation course
 - [ ] Short check-in with the group Thursday evening: what's done, what's blocked
 - [ ] Review the final draft, then upload V1
