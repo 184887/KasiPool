@@ -1,30 +1,31 @@
 # KasiPool – Team plan, week of 21 Oct 2026
 
 **Goal this week:** finish Concept V1 and upload it to VentureVerse.
-**Target:** V1 ready Friday 23 Oct. Person 6 confirms the real deadline today and we adjust if needed.
+**Target:** V1 ready Friday 23 Oct. Person 5 confirms the real deadline today and we adjust if needed.
 
-Six people, six roles. Put your name next to a role.
+**Team KasiPool:** Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi.
+
+Five people, five roles. Desk research is already done (`DESK_RESEARCH.md`), so the Numbers person checks it instead of a separate role. Put your name next to a role.
 
 | # | Role | Name |
 |---|------|------|
-| 1 | Field research: spaza owners | |
-| 2 | Field research: wholesalers | |
-| 3 | Numbers | |
-| 4 | Desk research | |
-| 5 | Writer / editor | |
-| 6 | Platform and coordination | |
+| 1 | Field research: township business owners (spazas, taverns, salons, food sellers) | |
+| 2 | Field research: wholesalers and suppliers | |
+| 3 | Numbers (+ check desk research) | |
+| 4 | Writer / editor | |
+| 5 | Platform and coordination | |
 
 ---
 
-## 1. Field research: spaza owners
+## 1. Field research: township business owners
 Test the biggest open risks with the people who would use KasiPool.
-- [ ] Talk to **at least 5 local spaza owners** (not foreign-owned shops)
+- [ ] Talk to **at least 5 local township business owners** (not foreign-owned shops), mostly spazas plus a few taverns, salons or food sellers
 - [ ] Ask about trust (A5): would you pay upfront in an app? What would make you trust it?
-- [ ] Ask about the delivery fee (A3): how do you get stock today, what does a trip cost (taxi/bakkie, time)?
+- [ ] Ask how they get stock today and what a trip costs (taxi/bakkie, time). Ask if they would open a group bank account with nearby businesses, and who should be signatory
 - [ ] Ask what happens when informal group buys go wrong
 - [ ] Record each one: who, where, date, key quotes, permission to quote
 - [ ] Add every interview to `PROBLEM_TESTING.md` (see the "Next questions" list there)
-- **Gives to:** Person 3 (trip costs, spend), Person 5 (quotes)
+- **Gives to:** Person 3 (trip costs, spend), Person 4 (quotes)
 - **Done by:** Thursday evening
 
 ## 2. Field research: wholesalers
@@ -39,34 +40,25 @@ Find out whether wholesalers would work with us and on what terms.
 
 ## 3. Numbers
 Show whether the model works for one typical spaza. This is V1's biggest gap.
-- [ ] Build one worked example: monthly stock spend → bulk saving (2.5–5%) + transport saving → minus KasiPool fee = net saving
+- [ ] Build one worked example: monthly stock spend → bulk saving (2.5–5%) + transport saving → minus delivery cost (if shops pay it) = net saving
 - [ ] Use specials as a second scenario (e.g. R50 instead of R70)
-- [ ] Propose how KasiPool makes money: delivery fee, wholesaler commission, or both
-- [ ] Start with estimates from the reports (Person 4) and update with field numbers (Persons 1 and 2)
-- **Gives to:** Person 5
+- [ ] Check the wholesaler commission model: what % makes KasiPool work, and who covers delivery
+- [ ] Start with the estimates in `NUMBERS.md` and the facts in `DESK_RESEARCH.md` (check the page references), and update with field numbers (Persons 1 and 2)
+- **Gives to:** Person 4
 - **Done by:** Friday morning
 
-## 4. Desk research
-Back up the problem and the market with sources.
-- [ ] Go through the Standard Bank 2025 report, the Philippi booklet and REDI3x3 paper
-- [ ] Pull out: number of spazas (in our area and nationally), typical monthly stock spend, share of foreign-owned vs local shops, main costs and challenges
-- [ ] Note each fact with its source and page number
-- [ ] Define the target customer: local spaza owners in [area], roughly how many
-- **Gives to:** Person 3 (spend figures) by Thursday midday, Person 5 (market facts)
-- **Done by:** Thursday evening
-
-## 5. Writer / editor
+## 4. Writer / editor
 Turn everything into one V1 document.
-- [ ] Set up the V1 outline now: problem, target customer, solution, how it works, evidence, business model, key assumptions and risks, next steps
+- [ ] Review the V1 draft in `CONCEPT_V1.md` and fill the [TODO]s with the team
 - [ ] Fill in what we already have: problem and solution (`PROBLEM.md`), MVP workflow, evidence (`PROBLEM_TESTING.md`)
 - [ ] Add new interviews, numbers and market facts as they come in
 - [ ] Share a full draft with the team **Friday midday**
 - **Done by:** Friday afternoon (final version)
 
-## 6. Platform and coordination
+## 5. Platform and coordination
 Make sure we can actually submit, and keep everyone on track.
 - [ ] **Today:** check the V1 deadline on VentureVerse and tell the group
-- [ ] Check all six have a VentureVerse account and the team leader has applied to the cohort (venture name, team name, every member's name and email)
+- [ ] Check all five have a VentureVerse account and the team leader has applied to the cohort (venture name, team name, every member's name and email)
 - [ ] Check everyone's progress on the Sunrise course and the Venture Creation course
 - [ ] Short check-in with the group Thursday evening: what's done, what's blocked
 - [ ] Review the final draft, then upload V1
@@ -79,13 +71,13 @@ Make sure we can actually submit, and keep everyone on track.
 
 | When | What |
 |------|------|
-| Wed 21 (today) | Pick roles. Person 6 checks the deadline. Person 5 sets up the outline. |
-| Thu 22 | Field interviews (1, 2). Desk research (4). Numbers draft from report figures (3). Check-in in the evening. |
+| Wed 21 (today) | Pick roles. Person 5 checks the deadline. Person 4 reviews the V1 draft (`CONCEPT_V1.md`). |
+| Thu 22 | Field interviews (1, 2). Numbers draft from report figures (3). Check-in in the evening. |
 | Fri 23 morning | Numbers updated with field data (3). |
-| Fri 23 midday | Full draft shared (5). Everyone reviews. |
-| Fri 23 afternoon | Final edits, upload V1 (6). |
+| Fri 23 midday | Full draft shared (4). Everyone reviews. |
+| Fri 23 afternoon | Final edits, upload V1 (5). |
 
 ## How work flows between roles
-- Persons 1, 2, 4 → **Person 3** (numbers) → **Person 5** (document)
-- Persons 1, 2, 4 → **Person 5** (quotes, evidence, market facts)
-- **Person 6** checks everything and uploads
+- Persons 1, 2 → **Person 3** (numbers) → **Person 4** (document)
+- Persons 1, 2 → **Person 4** (quotes, evidence, market facts)
+- **Person 5** checks everything and uploads

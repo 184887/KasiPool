@@ -1,7 +1,7 @@
 # KasiPool – Concept V1
 
 **Venture:** KasiPool
-**Team:** [TEAM NAME] – [6 member names]
+**Team:** KasiPool – Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi
 **Programme:** UCT MakersForge, VentureVerse, October 2026
 **Date:** [DATE]
 
@@ -11,7 +11,7 @@
 
 ## 1. One-liner
 
-KasiPool lets local spaza owners pool their stock orders into bulk purchases, so they get the wholesale prices and delivery that organised shop networks already enjoy.
+KasiPool helps small township businesses buy stock together, so they get bulk prices without trusting anyone with their money.
 
 ## 2. The problem
 
@@ -26,14 +26,15 @@ This has three costs:
 
 ## 3. Target customer
 
-**Primary:** South African-owned spaza shops in a single township cluster, starting with **[AREA, e.g. Philippi]**.
-- Roughly 4–7 spaza shops per 1,000 people in Cape Town townships. Browns Farm in Philippi alone has around 170 (REDI3x3, 2014; to be rechecked).
+**Primary:** small, South African-owned township businesses that buy the same kinds of stock, in a single township cluster, starting with **[AREA, e.g. Philippi]**. This includes spaza shops, taverns and liquor sellers, salons and barbers, takeaways and food sellers.
+- Spaza shops are the biggest group and the one we've tested most so far. Roughly 4–7 per 1,000 people in Cape Town townships; Browns Farm in Philippi alone has around 170 (REDI3x3, 2014; to be rechecked).
+- Across five Cape Town townships, liquor sellers (20%), spaza/grocery shops (15%), hair care (6.5%) and takeaways (6%) are the most common micro-enterprises (REDI p. 22). All of them buy stock regularly.
 - Most township businesses turn over R100k–R500k a year (SB p. 6). Margins are thin and competition is intense.
 - Owners already use WhatsApp heavily (74% of township businesses, SB p. 23) and many pay for stock by EFT (SB p. 18).
 
 **Not our first customer:** foreign-owned shop networks. They already buy together with no friction, so they have little reason to switch.
 
-**Partner customer:** wholesalers and cash and carries, who gain new bulk customers they currently don't reach.
+**Partner customer:** wholesalers and suppliers, who gain new bulk customers they currently don't reach.
 
 ## 4. What we learned from problem testing
 
@@ -50,21 +51,23 @@ We spoke to [TODO: number] people outside a cash and carry in [TODO: area] on 21
 
 ## 5. The solution
 
-KasiPool is an app that turns the trust-based group buying locals already do into safe, organised bulk orders.
+KasiPool turns the trust-based group buying locals already do into organised bulk orders, without asking anyone to hand their money to a stranger.
 
-Owners reserve the staples they need within a short campaign window and pay upfront through the app. KasiPool combines the orders into one bulk order with a partner wholesaler and has it delivered directly to each shop. Delivery is confirmed by scanning a QR code.
+Nearby township businesses (spaza shops, taverns, salons, food sellers) order through **WhatsApp**, the tool they already use. Each business pays its share into a **group bank account that the businesses own themselves**, not KasiPool. KasiPool combines the orders into one bulk order with a partner wholesaler, and the group gets **one bulk order delivered**.
 
-KasiPool keeps the existing habit and adds the structure that's missing: payments held safely, verified orders, confirmed delivery and an in-app way to sort out problems.
+This answers the biggest problem we found: local group buying stays small because it runs on personal trust. With KasiPool, the money stays with the group, and KasiPool organises the order.
 
 ## 6. How it works (MVP)
 
-1. **Register:** spaza owners sign up and upload a permit or trade proof. We start with one cluster.
-2. **Reserve:** owners browse focus staples (e.g. 10 kg maize meal, 5 L cooking oil) and book quantities within campaign caps.
-3. **Pay upfront:** owners pay in advance plus a small delivery fee, in-app (Instant EFT/payment gateway), within a 24-hour window.
-4. **Pool and order:** KasiPool checks the combined order meets the bulk minimum (e.g. 8 tons) and places one consolidated order with the wholesaler. A logistics partner is booked.
-5. **Transport:** independent drivers load the order directly at the supplier's depot. No warehouse needed.
-6. **Deliver to the shop:** the driver delivers to each shop. Handover is verified by scanning the shop's QR code.
-7. **Claims and settlement:** any problem is logged in-app with a photo. Final payment goes to partners.
+1. **Form a pool:** a group of nearby businesses that buy similar stock joins a KasiPool WhatsApp group (e.g. a spaza pool, a tavern pool). [TODO: how many businesses per pool?]
+2. **Open a group account:** the shops open a bank account the group owns. [TODO: who are the signatories? which bank or account type?]
+3. **Order:** each week, businesses send their orders on WhatsApp (e.g. maize meal and cooking oil for spazas, drinks for taverns, hair products for salons). KasiPool adds them up.
+4. **Pay their share:** each shop pays its share into the group account.
+5. **Bulk order:** KasiPool places one combined bulk order with a partner wholesaler, and the group account pays the wholesaler.
+6. **Delivery:** the bulk order is delivered. [TODO: to one drop point or to each shop? who pays for delivery?]
+7. **Split and check:** each shop collects or receives its share, and problems are reported in the WhatsApp group. [TODO: how are shares split and checked?]
+
+A full app with in-app payments and QR-confirmed delivery is a possible later version, once pools are working on WhatsApp.
 
 **Opportunity found in testing:** wholesalers post weekly specials (e.g. R50 instead of R70) in WhatsApp groups for business customers. KasiPool can pool orders around specials for a much bigger saving.
 
@@ -76,7 +79,7 @@ Worked example for one typical spaza (draft, full detail in `NUMBERS.md`):
 |---|---|---|
 | Bulk saving on R12,000/month of staples [A] | R300 | R600 |
 | Transport saved (2 fewer trips) [A] | R520 | R520 |
-| KasiPool delivery fee [A] | −R200 | −R200 |
+| Delivery cost per shop, if the shops pay it [A] [TODO] | −R200 | −R200 |
 | **Net saving per month** | **R620** | **R920** |
 | **Extra profit for the owner** | **+12%** | **+18%** |
 
@@ -96,25 +99,28 @@ Worked example for one typical spaza (draft, full detail in `NUMBERS.md`):
 
 ## 9. Business model (first idea)
 
-- **Delivery fee** paid by the owner (~R100 per delivery [A]), roughly covering delivery cost.
-- **Commission from wholesalers** (~1.5% of order value [A]) for bringing pooled bulk orders.
+- **Wholesalers pay KasiPool a small commission** for bringing them a steady weekly order (~1.5% of order value [A]).
+- Shops pay KasiPool nothing, so their whole saving stays with them.
 - At 100 shops: ~R1.2m/month pooled volume and ~R18,000/month commission [A].
+- [TODO: who covers delivery cost: the wholesaler, the group, or KasiPool?]
 
 ## 10. Key assumptions and risks to test next
 
 | # | Assumption | Status | Why it matters |
 |---|------------|--------|----------------|
-| A5 | Owners will trust an app with money upfront | **Untested – biggest risk** | Informal buying runs on personal trust. Without trust, no advance payments. |
-| A3 | Owners will pay a delivery fee | Untested | Fee must stay below the saving. |
+| A5 | Owners will trust a group account they own together | **Untested – biggest risk** | The group account removes the need to trust KasiPool, but owners still have to trust each other and the signatories. |
+| – | Shops are willing and able to open a joint group bank account | Untested | Only 20% of Philippi businesses had opened a bank account (HSRC p. 3). Opening a group account may be hard. |
 | – | Wholesalers will give pooled groups the bulk price and pay commission | Untested | Core of the business model. |
-| – | Direct-to-shop delivery is safe | Risk | Crime affects 53% of Philippi businesses (HSRC p. 8). Wholesaler raised security too. |
-| – | Owners can pay digitally | Partly supported | 56% prefer EFT (SB), but only 20% of Philippi businesses had a bank account (HSRC). May need a cash option. |
+| – | Delivery is affordable and safe | Risk | Crime affects 53% of Philippi businesses (HSRC p. 8). Wholesaler raised security too. |
+| – | WhatsApp is enough to run a pool | Likely | 74% of township businesses use WhatsApp (SB p. 23). |
 
 ## 11. Next steps
 
 - Interview at least 5 more local spaza owners about trust, fees and trip costs
 - Visit 2 more wholesalers about pooled pricing, minimums and commission
 - Replace assumptions in the numbers with field data
+- Ask owners and a bank how a group bank account would work: signatories, cost, documents needed
+- Run one test pool on WhatsApp with a few nearby shops
 - Explore building trust through people owners already know, e.g. a local "pool captain" per cluster [idea to test]
 
 ---
