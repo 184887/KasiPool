@@ -3,9 +3,9 @@
 **Venture:** KasiPool
 **Team:** KasiPool – Magnus Fondenes, Levi Anastasis-Lan, Valerie Kyolaba, Biggie Muchabwera, Fulufhelo Mulaudzi, Chris Mabhele
 **Programme:** UCT MakersForge, VentureVerse, October 2026
-**Date:** [DATE]
+**Date:** [TODO: upload date]
 
-> **Draft status.** Text marked **[TODO]** or **[A]** still needs real input from the team. Numbers marked [A] are assumptions to be replaced with field data (see `NUMBERS.md`).
+> **Draft status (remove before upload).** **[TODO]** = facts only the team knows. **[PROPOSAL]** = a suggested answer for the team to accept or change on Saturday. **[A]** = an estimate to replace with field data (see `NUMBERS.md`); [A] labels can stay in the final V1, since they show which assumptions we still need to test.
 
 ---
 
@@ -26,7 +26,7 @@ This has three costs:
 
 ## 3. Target customer
 
-**Primary:** small, South African-owned township businesses that buy the same kinds of stock, in a single township cluster, starting with **[AREA, e.g. Philippi]**. This includes spaza shops, taverns and liquor sellers, salons and barbers, takeaways and food sellers.
+**Primary:** small, South African-owned township businesses that buy the same kinds of stock, in a single township cluster, starting with **Philippi, Cape Town** [PROPOSAL: our desk research and business counts are from Philippi; change if our test area is different]. This includes spaza shops, taverns and liquor sellers, salons and barbers, takeaways and food sellers.
 - Spaza shops are the biggest group and the one we've tested most so far. Roughly 4–7 per 1,000 people in Cape Town townships; Browns Farm in Philippi alone has around 170 (REDI3x3, 2014; to be rechecked).
 - Across five Cape Town townships, liquor sellers (20%), spaza/grocery shops (15%), hair care (6.5%) and takeaways (6%) are the most common micro-enterprises (REDI p. 22). All of them buy stock regularly.
 - Most township businesses turn over R100k–R500k a year (SB p. 6). Margins are thin and competition is intense.
@@ -61,13 +61,13 @@ This answers the biggest problem we found: local group buying stays small becaus
 
 ## 6. How it works (MVP)
 
-1. **Form a pool:** a group of nearby businesses that buy similar stock joins a KasiPool WhatsApp group (e.g. a spaza pool, a tavern pool). [TODO: how many businesses per pool?]
+1. **Form a pool:** about **10 nearby businesses** that buy similar stock join a KasiPool WhatsApp group (e.g. a spaza pool, a tavern pool). Small enough that members can know each other, big enough to fill a pallet when ordering every two weeks or monthly (see section 7). [PROPOSAL]
 2. **Open a group account:** the pool opens a **stokvel account**, a product every big SA bank already offers for groups. For example, FNB's needs 3 members and 3 signatories, has no monthly fee and opens online; at Standard Bank every payment needs approval from 3 signatories, so nobody can take the money alone. KasiPool gives each pool a simple constitution template. (Details: `BANK_ACCOUNTS.md`.) [TODO: confirm with a bank that a group of business owners may use one to buy stock]
-3. **Order:** each week, businesses send their orders on WhatsApp (e.g. maize meal and cooking oil for spazas, drinks for taverns, hair products for salons). KasiPool adds them up.
+3. **Order:** every two weeks, businesses send their orders on WhatsApp (e.g. maize meal and cooking oil for spazas, drinks for taverns, hair products for salons). KasiPool adds them up.
 4. **Pay their share:** each shop pays its share into the group account.
 5. **Bulk order:** KasiPool places one combined bulk order with a partner wholesaler, and the group account pays the wholesaler.
-6. **Delivery:** the bulk order is delivered. [TODO: to one drop point or to each shop? who pays for delivery?]
-7. **Split and check:** each shop collects or receives its share, and problems are reported in the WhatsApp group. [TODO: how are shares split and checked?]
+6. **Delivery:** first choice, the **wholesaler delivers free** because the pooled order is above its minimum. Fallback: the group shares the cost of a bakkie to **one drop point** in the cluster, such as a member's shop. [PROPOSAL]
+7. **Split and check:** the wholesaler packs and labels each business's share separately, so nobody has to divide bulk stock. A **pool captain** (a trusted member) checks each share against the order list at the drop point, and members confirm collection in the WhatsApp group. Problems are reported there with a photo. [PROPOSAL]
 
 A full app with in-app payments and QR-confirmed delivery is a possible later version, once pools are working on WhatsApp.
 
@@ -107,12 +107,12 @@ So we will (1) negotiate free delivery as part of the wholesaler deal, (2) order
 
 ## 9. Business model (first idea)
 
-- **Wholesalers pay KasiPool a small commission** for bringing them a steady weekly order (~1.5% of order value [A]).
+- **Wholesalers pay KasiPool a small commission** for bringing them a steady, predictable order every two weeks (~1.5% of order value [A]).
 - Shops pay KasiPool nothing, so their whole saving stays with them.
 - At 100 shops: ~R1.2m/month pooled volume and ~R18,000/month commission [A].
 - Costs stay low: no warehouse, no stock, mainly people time to run pools on WhatsApp.
 - If wholesalers won't pay 1.5% (their margins are thin), fallbacks are a share of the discount, a small monthly fee per pool, or payment from brands for promoting their products in pools.
-- [TODO: who covers delivery cost: ideally the wholesaler, as free delivery above a minimum order]
+- Delivery is ideally covered by the wholesaler (free above a minimum order) as part of the deal. Otherwise the pool shares the cost of one drop point. KasiPool doesn't pay for delivery. [PROPOSAL]
 
 ## 10. Key assumptions and risks to test next
 
