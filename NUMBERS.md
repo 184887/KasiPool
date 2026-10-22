@@ -1,67 +1,105 @@
-# KasiPool – Numbers (first draft)
+# KasiPool – Numbers (draft 2: WhatsApp + group account model)
 
-One worked example for a typical local spaza, plus a first look at how KasiPool makes money.
+Updated 22 Oct 2026 for the current model: **businesses pay KasiPool nothing**, the money sits in a **group bank account the pool owns**, and **KasiPool earns a commission from wholesalers**.
 
-**This is a draft built on estimates.** Every number is marked:
-- **[S]** = from a source (wholesaler interview or reports, see `DESK_RESEARCH.md`)
-- **[A]** = our assumption, **must be checked in the field** (Persons 1 and 2)
+Every number is marked:
+- **[S]** = from a source (wholesaler interview, reports, bank research; see `DESK_RESEARCH.md`, `BANK_ACCOUNTS.md`)
+- **[A]** = our assumption, **must be checked** (Roles 2 and 3 are collecting real figures)
 
 ---
 
-## 1. A typical local spaza today
+## 1. Example A: a typical spaza
+
+### Today
+| Item | Value | |
+|------|-------|---|
+| Monthly turnover | R25,000 | [A] inside the R8k–R42k/month most township businesses report [S: SB p. 6] |
+| Gross margin | 20% | [A] |
+| **Monthly profit** | **R5,000** | |
+| Monthly stock spend | R20,000 | |
+| Cash and carry trips | 4 a month | [A] |
+| Cost per trip (fare + goods + ~3 h shop closed) | R260 | [A] R200 transport + R60 lost profit |
+| **Transport cost per month** | **R1,040** | |
+
+### With a KasiPool pool
+Staples (about 60% of stock spend = **R12,000/month** [A]) go through the pool. The owner still makes 2 trips a month for everything else.
+
+| Item | Per month | |
+|------|-----------|---|
+| Bulk saving on R12,000 | +R300 to +R600 | 2.5–5% [S: Wholesaler 1] |
+| Trips saved (4 → 2) | +R520 | |
+| KasiPool fee | R0 | wholesaler pays us |
+| Bank fee for paying in by EFT/app | ~R0 | [A] check with bank |
+| *If paying in cash at an ATM instead* | *−R130* | *~1.1% of R12,000 [S: FNB 2020–21 pricing, may be outdated]* |
+
+**Delivery decides the result.** Three options:
+
+| Delivery option | Delivery cost per spaza/month | **Net saving/month** | **Extra profit** |
+|---|---|---|---|
+| **1. Wholesaler delivers free** above a minimum order | R0 | **R820 – R1,120** | **+16% to +22%** |
+| **2. One drop point**, group hires a bakkie (R1,500/trip [A], 10 shops, weekly) | −R600 | **R220 – R520** | +4% to +10% |
+| **3. To each shop**, group hires a bakkie (R2,000/trip [A], 10 shops, weekly) | −R800 | **R20 – R320** | +0% to +6% |
+
+**What this tells us**
+- **Free wholesaler delivery is worth fighting for.** It doubles the saving. Role 2 should ask every wholesaler: "From what order size do you deliver for free?"
+- **Weekly delivery paid by the group is expensive.** Ordering **every two weeks** halves the delivery cost per shop (option 2 becomes R520–R820 net).
+- **Pay in by EFT, not cash.** Cash deposit fees could take a quarter to half of the bulk saving.
+
+## 2. Example B: a tavern
 
 | Item | Value | |
 |------|-------|---|
-| Monthly turnover | R25,000 | [A] inside the R8k–R42k/month range most township businesses report [S: SB p. 6] |
-| Gross margin | 20% | [A] ask owners |
-| Monthly profit before other costs | R5,000 | 20% × R25,000 |
-| Monthly stock spend | R20,000 | turnover − margin |
-| Trips to the cash and carry | 4 a month | [A] ask owners |
-| Cost per trip (taxi fare + extra for goods) | R200 | [A] ask owners |
-| Lost profit from closing the shop ~3 hours per trip | R60 | ~R830 sales/day; 3 hours ≈ R300 lost sales × 20% margin [A] |
-| **Transport cost per month** | **~R1,040** | 4 × (R200 + R60) |
+| Monthly turnover | R40,000 | [A] |
+| Gross margin | 25% | [A] |
+| **Monthly profit** | **R10,000** | |
+| Pooled stock (soft drinks, mixers, snacks, some liquor) | R21,000/month | [A] |
+| Bulk saving 2.5–5% | +R525 to +R1,050 | [A] same % as groceries, check |
+| Trips saved (crates are heavy: 4 trips at R400 → 2) | +R800 | [A] |
+| Delivery (option 2, R1,500/trip ÷ 10 taverns, weekly) | −R600 | [A] |
+| **Net saving/month** | **R725 – R1,250** | **+7% to +13% profit** |
 
-## 2. The same spaza with KasiPool
+**Check before relying on this:** big beer brands often deliver directly to licensed taverns already, and liquor can only be bought from licensed suppliers. The tavern case may be strongest for **non-beer stock** (soft drinks, snacks, spirits). Role 3 should ask tavern owners how they buy today.
 
-Assume the owner buys their **staples** (maize meal, oil, sugar, rice, flour) through KasiPool, about **60% of stock spend = R12,000/month** [A], and still makes 2 of their own trips for everything else.
+*Salons:* stock spend is smaller (maybe R8,000/month [A]), so a 2.5–5% saving is only R100–R200. Salons are worth it only if hair-product suppliers give bigger group discounts than grocery wholesalers. Ask a salon owner.
 
-| Item | Low case | High case | |
-|------|---------|----------|---|
-| Bulk price saving on R12,000 | R300 (2.5%) | R600 (5%) | [S: Wholesaler 1] |
-| Trips saved (4 → 2) | R520 | R520 | 2 × R260 |
-| KasiPool delivery fee (2 deliveries × R100) | −R200 | −R200 | [A] |
-| **Net saving per month** | **R620** | **R920** | |
-| **As % of the owner's monthly profit (R5,000)** | **+12%** | **+18%** | |
+## 3. How big does a pool need to be?
 
-**Specials bonus (scenario):** if 10% of pooled orders can be bought on wholesaler specials averaging 15% off (they mentioned R50 instead of R70, which is 29% off) [A], that adds about **R180/month**.
+Wholesaler 1 gives the bulk price on **full pallets**. So pool size depends on how much each business buys of one product:
 
-### What this tells us
-- A 2.5–5% saving sounds small, but **for a spaza it's 12–18% more profit**, because their margins are thin.
-- **Transport savings matter as much as the price saving.** We should pitch both.
-- **The fee is the danger zone.** If the owner still makes all 4 trips (no transport saving), the net saving drops to R100–R400. If our fee is R150 per delivery instead of R100, the low case is zero. **The delivery fee should stay at or below ~R100 per delivery.**
+> **Businesses needed = units on a pallet ÷ units one business buys per order**
 
-## 3. How KasiPool makes money
+| Example: 10 kg maize meal | Units |
+|---|---|
+| Bags on a pallet | ~100 [A] |
+| One spaza buys per **week** | ~3 bags [A] → **~34 spazas** for a weekly pallet |
+| One spaza buys per **month** | ~12 bags [A] → **~9 spazas** for a monthly pallet |
 
-Delivery fees alone won't make a profit: a hired bakkie/truck with driver might cost ~R2,000/day for ~20 drops, ~R100 per drop [A], about the same as the fee. So:
+**What this tells us**
+- **Weekly pools need to be big (30+ shops) or stick to a few fast-selling products.**
+- **Monthly or two-weekly orders work with small pools (about 10 shops)**, which is easier to trust and organise. But each owner has to pay more upfront at once.
+- **Key question for Role 2:** is the bulk price per **product pallet**, or per **total order value**? If it's per order value, small pools are much easier.
 
-| Revenue stream | Assumption | Per shop/month |
-|----------------|-----------|----------------|
-| Delivery fee | Covers delivery cost, roughly break-even | ~R0 margin |
-| Commission from wholesaler | 1.5% of order value [A], paid by the wholesaler for bringing new bulk customers | R180 (1.5% × R12,000) |
+## 4. How KasiPool makes money
 
-**At 100 shops** (a realistic start: Browns Farm alone has ~170 spazas [S: REDI]):
-- Pooled volume: 100 × R12,000 = **R1.2 million/month** through partner wholesalers
-- KasiPool commission: **~R18,000/month**
+| Revenue | Assumption | Per business/month |
+|---|---|---|
+| Commission from wholesaler | 1.5% of pooled order value [A] | Spaza: R180 · Tavern: R315 |
+| Fees from businesses | none | R0 |
 
-That's not a big business yet, but it shows the model can stand on its own once it grows to several clusters.
+| Scale | Pooled volume/month | KasiPool commission/month |
+|---|---|---|
+| 1 pool of 10 spazas | R120,000 | R1,800 |
+| 10 pools (100 spazas) | R1.2 million | R18,000 |
+| 50 pools (500 businesses, mixed) | ~R7 million [A] | ~R105,000 |
 
-## 4. Numbers we need from the field (Persons 1 and 2)
+**Costs for KasiPool** are low because there's no warehouse and no stock: mostly people time to run the WhatsApp pools, plus onboarding (help opening accounts, a pool constitution template). One person might manage ~10–20 pools [A].
 
-1. Real monthly turnover and stock spend of 5+ local spazas
-2. How many cash and carry trips a month, and what each trip costs (fare, goods, time)
-3. The wholesaler's real bulk discount and minimum order (confirm the 2.5–5% in the recording)
-4. Would a wholesaler pay a commission, or give a better price, for pooled orders?
-5. What a local bakkie/truck hire with driver costs per day
-6. What delivery fee owners say is OK
+**The big question:** will wholesalers pay 1.5%? Wholesaler 1 said margins are thin. If they won't, alternatives are: a share of the discount (e.g. the pool keeps 4%, KasiPool gets 1%), a small monthly fee per pool, or getting paid by brands for promoting their products in pools.
 
-When these come in, replace the [A] numbers above and rerun the table.
+## 5. Numbers we still need from the field
+1. Real monthly stock spend and trip costs of 5+ owners (spaza, tavern, salon) → Role 3
+2. Bulk price rule: per pallet or per order value? Minimum order? → Role 2
+3. Free delivery threshold, or delivery cost per trip → Role 2
+4. Would a wholesaler pay commission, and how much? → Role 2
+5. Bakkie hire with driver per trip in our area → anyone
+6. Bank fees for paying in by EFT vs cash → Role 1 / bank call
