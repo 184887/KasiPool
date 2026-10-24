@@ -562,6 +562,7 @@ export type Database = {
           max_per_customer: number | null;
           max_distance_km: number;
           is_private: boolean;
+          is_sample: boolean;
           invite_code: string | null;
           max_qty: number | null;
           min_per_customer: number;
@@ -599,6 +600,7 @@ export type Database = {
           max_per_customer?: number | null;
           max_distance_km?: number;
           is_private?: boolean;
+          is_sample?: boolean;
           invite_code?: string | null;
           max_qty?: number | null;
           min_per_customer?: number;
@@ -636,6 +638,7 @@ export type Database = {
           max_per_customer?: number | null;
           max_distance_km?: number;
           is_private?: boolean;
+          is_sample?: boolean;
           invite_code?: string | null;
           max_qty?: number | null;
           min_per_customer?: number;
