@@ -26,10 +26,10 @@ export function whatsappShareUrl(p: PoolWithProduct) {
   const link =
     typeof window !== "undefined" ? `${window.location.origin}/offers/${p.id}` : `/offers/${p.id}`;
   const msg = [
-    `KasiPool offer: ${p.products?.name ?? ""}.`,
+    `KasiPool deal: ${p.products?.name ?? ""}.`,
     `${money(p.price)} per ${p.unit}${s ? ` (potential saving ${money(s.amount)} vs reference price)` : ""}.`,
     `Pool closes ${dateTime(p.closes_at)}.`,
-    `Pool with other local businesses to get a better bulk price. View the offer: ${link}`,
+    `Pool with other local businesses to get a better bulk price. View the deal: ${link}`,
   ].join(" ");
   return `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }

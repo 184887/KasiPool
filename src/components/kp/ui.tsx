@@ -99,7 +99,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-dashed bg-card px-6 py-10 text-center">
+    <div className="flex flex-col items-center rounded-md border-2 border-dashed border-ink/30 bg-card px-6 py-10 text-center">
       <Inbox className="mb-3 size-8 text-muted-foreground" />
       <p className="font-display text-lg font-semibold">{title}</p>
       {body && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{body}</p>}
@@ -122,7 +122,7 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
 export function ErrorBox({ message }: { message: string }) {
   return (
     <div
-      className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive-soft p-4 text-sm text-destructive"
+      className="flex items-start gap-2 rounded-md border-2 border-destructive/40 bg-destructive-soft p-4 text-sm text-destructive"
       role="alert"
     >
       <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {message}
@@ -142,12 +142,12 @@ export function MetricCard({
   tone?: Tone;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-card">
+    <div className="rounded-md border-2 border-ink bg-card p-4">
       <p className="text-sm font-medium text-muted-foreground">{label}</p>
       <p
         className={cn(
-          "mt-1 font-display text-2xl font-bold tabular",
-          tone === "gold" && "text-gold-foreground",
+          "mt-1 font-headline text-3xl tabular",
+          tone === "gold" && "text-ember",
           tone === "success" && "text-success",
         )}
       >
@@ -170,10 +170,20 @@ export function PageHeader({
   return (
     <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="font-display text-[26px] font-bold leading-[30px] sm:text-3xl">{title}</h1>
+        <h1 className="font-headline text-4xl sm:text-5xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
       {actions}
+    </div>
+  );
+}
+
+/** Big Anton section heading over a thick ink rule, as in the pitch deck. */
+export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
+  return (
+    <div className="mb-4 flex items-end justify-between gap-4 border-b-4 border-ink pb-2">
+      <h2 className="font-headline text-3xl">{children}</h2>
+      {action}
     </div>
   );
 }
@@ -190,10 +200,10 @@ export function Section({
   action?: ReactNode;
 }) {
   return (
-    <section className={cn("rounded-2xl border bg-card p-4 shadow-card sm:p-5", className)}>
+    <section className={cn("rounded-md border-2 border-ink bg-card p-4 sm:p-5", className)}>
       {(title || action) && (
         <div className="mb-3 flex items-center justify-between gap-2">
-          {title && <h2 className="font-display text-xl font-semibold">{title}</h2>}
+          {title && <h2 className="font-display text-xl font-bold">{title}</h2>}
           {action}
         </div>
       )}

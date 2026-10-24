@@ -11,7 +11,7 @@ export function DataTable({
   empty?: boolean;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card shadow-card">
+    <div className="overflow-x-auto rounded-md border-2 border-ink bg-card">
       <table className="w-full text-sm">
         <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
           <tr>
@@ -35,7 +35,7 @@ export function Td({ children, className }: { children?: ReactNode; className?: 
   );
 }
 
-export const inputCls = "h-10 w-full rounded-md border border-input bg-card px-3 text-sm";
+export const inputCls = "h-11 w-full rounded-md border-2 border-input bg-card px-3 text-base";
 
 export function Field({
   label,
@@ -48,7 +48,7 @@ export function Field({
 }) {
   return (
     <label className="block text-sm">
-      <span className="font-medium">{label}</span>
+      <span className="font-semibold">{label}</span>
       <div className="mt-1">{children}</div>
       {hint && <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>}
     </label>

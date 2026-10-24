@@ -12,7 +12,7 @@ const FAQ = [
   ],
   [
     "What if the pool doesn't reach its target?",
-    "The offer is marked unsuccessful and you owe nothing.",
+    "The deal is marked unsuccessful and you owe nothing.",
   ],
   [
     "Can I change my quantity?",
@@ -28,7 +28,7 @@ const FAQ = [
   ],
   [
     "Where do I collect?",
-    "At the collection point shown on each offer. Bring your collection code.",
+    "At the collection point shown on each deal. Bring your collection code.",
   ],
 ];
 

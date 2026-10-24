@@ -119,13 +119,13 @@ export function AuthPage() {
 
   return (
     <Container className="max-w-md py-10">
-      <div className="rounded-3xl border bg-card p-6 shadow-card">
+      <div className="rounded-md border-2 border-ink bg-card p-6">
         <div className="text-center">
           <Logo />
         </div>
         {sent ? (
           <div className="mt-6 text-center">
-            <h1 className="font-display text-2xl font-bold">Check your email</h1>
+            <h1 className="font-headline text-4xl">Check your email</h1>
             <p className="mt-2 text-muted-foreground">
               We sent a confirmation link to <b>{email}</b>. Click it to finish registering, then
               add your business details.
@@ -133,7 +133,7 @@ export function AuthPage() {
           </div>
         ) : (
           <>
-            <h1 className="mt-4 text-center font-display text-2xl font-bold">
+            <h1 className="mt-4 text-center font-headline text-4xl">
               {mode === "login" ? "Welcome back" : "Register your business"}
             </h1>
             <p className="mt-1 text-center text-sm text-muted-foreground">
@@ -170,12 +170,12 @@ export function AuthPage() {
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     />
                   </div>
-                  <Button type="submit" size="xl" className="w-full" disabled={busy}>
+                  <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
                     {busy ? "Verifying…" : "Verify code"}
                   </Button>
                   <button
                     type="button"
-                    className="w-full text-sm font-semibold text-primary"
+                    className="w-full text-sm font-semibold text-ember underline underline-offset-4"
                     onClick={() => {
                       setOtpSent(false);
                       setOtp("");
@@ -199,7 +199,7 @@ export function AuthPage() {
                       onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
-                  <Button type="submit" size="xl" className="w-full" disabled={busy}>
+                  <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
                     {busy ? "Sending…" : "Send verification code"}
                   </Button>
                 </form>
@@ -231,7 +231,7 @@ export function AuthPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                <Button type="submit" size="xl" className="w-full" disabled={busy}>
+                <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
                   {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
                 </Button>
               </form>
@@ -239,7 +239,7 @@ export function AuthPage() {
             <p className="mt-4 text-center text-sm">
               {mode === "login" ? "New to KasiPool? " : "Already registered? "}
               <button
-                className="font-semibold text-primary"
+                className="font-semibold text-ember underline underline-offset-4"
                 onClick={() => {
                   setMode(mode === "login" ? "register" : "login");
                   setOtpSent(false);
@@ -251,7 +251,7 @@ export function AuthPage() {
             </p>
             <button
               type="button"
-              className="mt-3 w-full text-sm font-semibold text-primary"
+              className="mt-3 w-full text-sm font-semibold text-ember underline underline-offset-4"
               onClick={() => {
                 setPhoneMode(!phoneMode);
                 setOtpSent(false);

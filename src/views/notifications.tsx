@@ -52,8 +52,8 @@ export function Notifications() {
               key={n.id}
               href={n.link ?? "/my-pools"}
               className={cn(
-                "block rounded-xl border bg-card p-4",
-                !n.read_at && "border-primary/40 bg-primary-soft",
+                "block rounded-md border-2 border-ink/20 bg-card p-4",
+                !n.read_at && "border-ink bg-gold-soft",
               )}
             >
               <p className="font-semibold">{n.title}</p>

@@ -72,10 +72,10 @@ export function Offer() {
     return (
       <Container>
         <EmptyState
-          title="Offer not found"
+          title="Deal not found"
           action={
             <Button asChild>
-              <Link href="/offers">Browse offers</Link>
+              <Link href="/offers">See deals</Link>
             </Button>
           }
         />
@@ -123,11 +123,11 @@ export function Offer() {
         href="/offers"
         className="mb-3 inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground"
       >
-        <ArrowLeft className="size-4" /> All offers
+        <ArrowLeft className="size-4" /> All deals
       </Link>
       <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
         <div>
-          <div className="relative overflow-hidden rounded-3xl bg-muted">
+          <div className="relative overflow-hidden rounded-md border-2 border-ink bg-muted">
             <img
               src={pool.products?.image_url ?? ""}
               alt={pool.products?.name ?? ""}
@@ -135,17 +135,15 @@ export function Offer() {
               width={816}
               height={816}
             />
-            <StatusBadge className="absolute right-4 top-4" tone={st.tone}>
+            <StatusBadge className="absolute left-4 top-4" tone={st.tone}>
               {st.customer}
             </StatusBadge>
           </div>
           <div className="mt-4">
             {pool.campaigns?.name && (
-              <p className="text-xs font-semibold uppercase tracking-wide text-gold-foreground">
-                {pool.campaigns.name}
-              </p>
+              <p className="text-sm font-bold text-ember">{pool.campaigns.name}</p>
             )}
-            <h1 className="font-display text-3xl font-bold">{pool.products?.name}</h1>
+            <h1 className="font-headline text-4xl sm:text-5xl">{pool.products?.name}</h1>
             <p className="text-muted-foreground">
               {pool.products?.brand} · {pool.products?.pack_size} · sold per {pool.unit}
             </p>
@@ -156,15 +154,13 @@ export function Offer() {
         <div className="space-y-4">
           <Section>
             <p className="text-sm text-muted-foreground">KasiPool price per {pool.unit}</p>
-            <p className="font-display text-4xl font-extrabold text-primary tabular">
-              {money(pool.price)}
-            </p>
+            <p className="font-headline text-6xl tabular">{money(pool.price)}</p>
             {s ? (
-              <div className="mt-3 rounded-xl bg-gold-soft p-3 text-sm">
+              <div className="mt-3 rounded-md bg-leaf-soft p-3 text-sm">
                 <p>
                   Reference price: <b className="tabular">{money(pool.reference_price)}</b>
                 </p>
-                <p className="font-bold text-gold-foreground">
+                <p className="font-bold text-leaf">
                   Potential saving: {money(s.amount)} per {pool.unit} ({s.pct.toFixed(2)}%)
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -181,7 +177,7 @@ export function Offer() {
             </p>
           </Section>
 
-          <Section className="border-primary/20">
+          <Section>
             <PoolProgress
               pledged={pool.pledged_qty}
               target={pool.min_qty}
@@ -190,37 +186,36 @@ export function Offer() {
               size="lg"
             />
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl bg-muted p-3">
+              <div className="rounded-md bg-muted p-3">
                 <p className="text-muted-foreground">Minimum target</p>
                 <p className="font-bold">
                   {pool.min_qty} {pool.unit}s
                 </p>
               </div>
-              <div className="rounded-xl bg-muted p-3">
+              <div className="rounded-md bg-muted p-3">
                 <p className="text-muted-foreground">Closes</p>
                 <p className="font-bold">{dateTime(pool.closes_at)}</p>
               </div>
             </div>
             {open && (
               <p className="mt-3 flex items-center gap-2 font-semibold">
-                <Clock className="size-4 text-primary" />{" "}
+                <Clock className="size-4" aria-hidden="true" />{" "}
                 <Countdown to={pool.closes_at} className="text-lg" /> left (SAST)
               </p>
             )}
             {pool.pledged_qty >= pool.min_qty && (
-              <p className="mt-3 flex items-start gap-2 rounded-lg bg-info-soft p-3 text-sm text-info">
+              <p className="mt-3 flex items-start gap-2 rounded-md bg-gold-soft p-3 text-sm text-ink">
                 <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>
                   {pool.status === "open"
-                    ? "The requested quantity has reached the target. Joining is still interest, not a payment. KasiPool checks the offer when it closes."
-                    : "The offer has closed at its target. KasiPool is checking the conditions. Nothing has been purchased or charged yet."}
+                    ? "The requested quantity has reached the target. Joining is still interest, not a payment. KasiPool checks the deal when it closes."
+                    : "The deal has closed at its target. KasiPool is checking the conditions. Nothing has been purchased or charged yet."}
                 </span>
               </p>
             )}
             {pool.status === "unsuccessful" && (
-              <p className="mt-3 rounded-lg bg-destructive-soft p-2 text-sm text-destructive">
-                {pool.outcome_note ?? "This offer did not reach its target."} No payment is
-                required.
+              <p className="mt-3 rounded-md bg-destructive-soft p-3 text-sm text-destructive">
+                {pool.outcome_note ?? "This deal did not reach its target."} No payment is required.
               </p>
             )}
           </Section>
@@ -228,12 +223,12 @@ export function Offer() {
           {open && (
             <Section>
               {active && (
-                <p className="mb-3 rounded-lg bg-primary-soft p-2 text-sm font-semibold text-primary">
+                <p className="mb-3 rounded-md bg-leaf-soft p-3 text-sm font-semibold text-leaf">
                   You're in this pool with {active.quantity} {pool.unit}(s). Change your quantity
                   below.
                 </p>
               )}
-              <p className="mb-2 text-sm font-semibold">How many {pool.unit}s?</p>
+              <p className="mb-2 font-display text-lg font-bold">How many {pool.unit}s?</p>
               <div className="flex flex-wrap items-center gap-4">
                 <QuantityStepper
                   value={qty}
@@ -245,7 +240,7 @@ export function Offer() {
                   <p className="text-xs text-muted-foreground">
                     {qty} × {money(pool.price)}
                   </p>
-                  <p className="font-display text-2xl font-bold tabular">
+                  <p className="font-headline text-3xl tabular">
                     {money(qty * Number(pool.price))}
                   </p>
                   <p className="text-xs text-muted-foreground">Potential order value</p>
@@ -258,11 +253,12 @@ export function Offer() {
               )}
               <Button
                 size="xl"
+                variant="gold"
                 className="mt-4 w-full"
                 onClick={join}
                 disabled={busy || businessLoading}
               >
-                {busy ? "Saving…" : active ? "Update My Quantity" : "Join This Pool"}
+                {busy ? "Saving…" : active ? "Update my quantity" : "Join this pool"}
               </Button>
               {active && (
                 <Button variant="ghost" className="mt-2 w-full text-destructive" onClick={withdraw}>
@@ -272,14 +268,14 @@ export function Offer() {
               <p className="mt-3 flex gap-2 text-xs text-muted-foreground">
                 <Info className="size-4 shrink-0" /> Joining only shows interest. No payment is
                 required now. You'll be asked to confirm and pay only if the pool qualifies. Subject
-                to the offer terms and supplier availability.
+                to the deal terms and supplier availability.
               </p>
             </Section>
           )}
 
-          <Section title="Collection">
+          <Section title="How you'll get your stock">
             <p className="flex gap-2 text-sm">
-              <MapPin className="size-4 shrink-0 text-primary" />
+              <MapPin className="size-4 shrink-0" aria-hidden="true" />
               <span>
                 <b>{pool.collection_points?.name}</b>
                 <br />
@@ -290,7 +286,7 @@ export function Offer() {
               {pool.collection_points?.instructions}
             </p>
             {pool.is_private && pool.invite_code && (
-              <div className="mt-2 rounded-lg bg-primary-soft p-3 text-sm">
+              <div className="mt-2 rounded-md bg-muted p-3 text-sm">
                 <p className="font-semibold">Private group, invite code {pool.invite_code}</p>
                 <p className="text-xs text-muted-foreground">
                   Share this link:{" "}
@@ -310,7 +306,7 @@ export function Offer() {
 
           <Button asChild variant="outline" className="w-full" size="lg">
             <a href={whatsappShareUrl(pool)} target="_blank" rel="noopener noreferrer">
-              <Share2 /> Share via WhatsApp
+              <Share2 /> Share on WhatsApp
             </a>
           </Button>
         </div>
@@ -320,9 +316,9 @@ export function Offer() {
         <DialogContent>
           <DialogHeader>
             <div className="mx-auto grid size-14 place-items-center rounded-full bg-gold animate-pop">
-              <PartyPopper className="size-7 text-gold-foreground" />
+              <PartyPopper className="size-7 text-ink" />
             </div>
-            <DialogTitle className="text-center font-display text-2xl">
+            <DialogTitle className="text-center font-headline text-3xl font-normal">
               {success?.updated ? "Quantity updated!" : "You've joined the pool!"}
             </DialogTitle>
             <DialogDescription className="text-center">
@@ -333,10 +329,10 @@ export function Offer() {
           </DialogHeader>
           <DialogFooter className="gap-2 sm:justify-center">
             <Button asChild size="lg">
-              <Link href="/my-pools">View My Pools</Link>
+              <Link href="/my-pools">Open My Pools</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/offers">Browse More Offers</Link>
+              <Link href="/offers">See more deals</Link>
             </Button>
           </DialogFooter>
         </DialogContent>

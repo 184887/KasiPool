@@ -40,7 +40,7 @@ export function Profile() {
           <BusinessForm userId={user.id} existing={business} onDone={() => {}} />
         ) : (
           <p className="text-sm">
-            <Link href="/onboarding" className="font-semibold text-primary underline">
+            <Link href="/onboarding" className="font-semibold text-ember underline">
               Add your business details
             </Link>{" "}
             to start joining pools.

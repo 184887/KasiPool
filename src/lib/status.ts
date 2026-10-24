@@ -23,10 +23,10 @@ export const POOL_STATUS: Record<string, { customer: string; admin: string; tone
     tone: "success",
   },
   completed: { customer: "Completed", admin: "Completed", tone: "success" },
-  unsuccessful: { customer: "Offer unsuccessful", admin: "Unsuccessful", tone: "muted" },
-  cancelled: { customer: "Offer cancelled", admin: "Cancelled", tone: "danger" },
+  unsuccessful: { customer: "Deal unsuccessful", admin: "Unsuccessful", tone: "muted" },
+  cancelled: { customer: "Deal cancelled", admin: "Cancelled", tone: "danger" },
   refund_resolution: {
-    customer: "Offer unsuccessful",
+    customer: "Deal unsuccessful",
     admin: "Refund resolution required",
     tone: "warning",
   },
@@ -48,7 +48,7 @@ export const ORDER_STATUS: Record<string, { label: string; tone: Tone }> = {
   declined: { label: "Declined", tone: "muted" },
   expired: { label: "Expired", tone: "muted" },
   cancelled: { label: "Cancelled", tone: "danger" },
-  failed: { label: "Offer unsuccessful", tone: "danger" },
+  failed: { label: "Deal unsuccessful", tone: "danger" },
 };
 
 export const FULFIL_STATUS: Record<string, { label: string; tone: Tone }> = {

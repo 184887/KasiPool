@@ -88,9 +88,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 )}
               </Link>
             ) : (
-              <Button asChild size="sm" variant="gold">
-                <Link href="/auth">Log in</Link>
-              </Button>
+              pathname !== "/auth" && (
+                <Button asChild size="sm" variant="gold">
+                  <Link href="/auth">Log in</Link>
+                </Button>
+              )
             )}
           </div>
         </div>

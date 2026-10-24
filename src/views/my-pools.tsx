@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/kp/AppShell";
 import { PoolProgress } from "@/components/kp/pool-bits";
-import { Loading, EmptyState, StatusBadge, PageHeader } from "@/components/kp/ui";
+import { Loading, EmptyState, StatusBadge, PageHeader, SectionTitle } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { settingsQuery, errMsg, myOrdersQuery, type MyOrder } from "@/lib/queries";
@@ -90,7 +90,7 @@ export function MyPools() {
       </div>
       <JoinWithCode />
       {!business && (
-        <div className="mb-4 rounded-xl bg-warning-soft p-4 text-sm">
+        <div className="mb-4 rounded-md bg-warning-soft p-4 text-sm text-warning">
           <Link href="/onboarding" className="font-semibold underline">
             Complete your business profile
           </Link>{" "}
@@ -100,20 +100,24 @@ export function MyPools() {
 
       {action.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-bold">
-            <AlertCircle className="size-5 text-gold" /> Awaiting your action
-          </h2>
+          <SectionTitle>
+            <AlertCircle
+              className="mr-2 inline size-7 align-[-3px] text-ember"
+              aria-hidden="true"
+            />
+            Your next steps
+          </SectionTitle>
           <div className="space-y-3">
             {action.map((o) => (
               <Link
                 key={o.id}
                 href={`/orders/${o.id}`}
-                className="flex items-center gap-3 rounded-2xl border-2 border-gold bg-gold-soft p-3 shadow-card"
+                className="flex items-center gap-3 rounded-md border-2 border-ink bg-gold-soft p-3"
               >
                 <img
                   src={o.pools?.products?.image_url ?? ""}
                   alt=""
-                  className="size-14 rounded-xl object-cover"
+                  className="size-14 rounded-sm object-cover"
                   width={56}
                   height={56}
                 />
@@ -128,7 +132,7 @@ export function MyPools() {
                     </p>
                   )}
                 </div>
-                <span className="rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground">
+                <span className="rounded-md bg-ink px-3 py-2 text-sm font-bold text-paper">
                   {nextAction(o, payCfg)}
                 </span>
               </Link>
@@ -138,12 +142,12 @@ export function MyPools() {
       )}
 
       <section className="mb-8">
-        <h2 className="mb-3 font-display text-xl font-bold">Active pools</h2>
+        <SectionTitle>Active pools</SectionTitle>
         {(parts.data ?? []).length === 0 ? (
           <EmptyState
             title="You haven't joined any open pools"
             action={
-              <Button asChild>
+              <Button asChild variant="gold">
                 <Link href="/offers">Find a deal</Link>
               </Button>
             }
@@ -157,13 +161,13 @@ export function MyPools() {
                 <Link
                   key={p.id}
                   href={`/offers/${pool.id}`}
-                  className="block rounded-2xl border bg-card p-4 shadow-card"
+                  className="block rounded-md border-2 border-ink bg-card p-4"
                 >
                   <div className="flex gap-3">
                     <img
                       src={pool.products?.image_url ?? ""}
                       alt=""
-                      className="size-16 rounded-xl object-cover"
+                      className="size-16 rounded-sm object-cover"
                       width={64}
                       height={64}
                     />
@@ -207,13 +211,13 @@ export function MyPools() {
 
       {inProgress.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-3 font-display text-xl font-bold">Orders in progress</h2>
+          <SectionTitle>Orders in progress</SectionTitle>
           <OrderList list={inProgress} />
         </section>
       )}
 
       <section>
-        <h2 className="mb-3 font-display text-xl font-bold">Previous orders</h2>
+        <SectionTitle>Previous orders</SectionTitle>
         {previous.length === 0 ? (
           <p className="text-sm text-muted-foreground">No previous orders yet.</p>
         ) : (
@@ -226,7 +230,7 @@ export function MyPools() {
 
 function OrderList({ list }: { list: MyOrder[] }) {
   return (
-    <div className="divide-y rounded-2xl border bg-card shadow-card">
+    <div className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink bg-card">
       {list.map((o) => {
         const label =
           o.fulfilment_status !== "none"

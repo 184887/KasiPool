@@ -223,7 +223,7 @@ export function StartPool() {
               or code with can join, wherever they are.
             </span>
           </label>
-          <Button onClick={submit} disabled={busy}>
+          <Button variant="gold" size="lg" onClick={submit} disabled={busy}>
             {busy ? "Submitting…" : "Submit for review"}
           </Button>
         </div>

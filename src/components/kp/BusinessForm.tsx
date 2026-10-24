@@ -189,7 +189,7 @@ export function BusinessForm({
           </span>
         </label>
       )}
-      <Button type="submit" size="xl" className="w-full" disabled={busy}>
+      <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
         {busy ? "Saving…" : existing ? "Save changes" : "Finish registration"}
       </Button>
     </form>

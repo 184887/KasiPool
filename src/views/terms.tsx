@@ -25,12 +25,12 @@ export function Terms() {
       </p>
       <h2>4. Funding and procurement</h2>
       <p>
-        Stock is ordered only if fully paid orders meet the supplier minimum. If not, the offer
-        fails and payments received are refunded.
+        Stock is ordered only if fully paid orders meet the supplier minimum. If not, the deal fails
+        and payments received are refunded.
       </p>
       <h2>5. Supplier availability</h2>
       <p>
-        Offers are subject to supplier availability. If a supplier delivers less than ordered,
+        Deals are subject to supplier availability. If a supplier delivers less than ordered,
         affected quantities are refunded.
       </p>
       <h2>6. Collection</h2>

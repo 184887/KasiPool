@@ -150,7 +150,7 @@ export function QuantityStepper({
   max?: number;
 }) {
   return (
-    <div className="flex items-center rounded-xl border bg-card">
+    <div className="flex items-center rounded-md border-2 border-ink bg-card">
       <button
         type="button"
         aria-label="Decrease quantity"
@@ -163,7 +163,7 @@ export function QuantityStepper({
       <input
         aria-label="Quantity"
         inputMode="numeric"
-        className="h-14 w-16 border-x bg-transparent text-center font-display text-2xl font-bold tabular outline-none"
+        className="h-14 w-16 border-x-2 border-ink bg-transparent text-center font-headline text-3xl tabular outline-none"
         value={value}
         onChange={(e) => {
           const n = parseInt(e.target.value.replace(/\D/g, "") || "0", 10);
