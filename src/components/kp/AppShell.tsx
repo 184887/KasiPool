@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Home, LayoutGrid, Tag, Layers, User, Shield, LogIn } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,23 +38,22 @@ export function useUnreadCount() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, isAdmin } = useAuth();
-  const loc = useLocation();
+  const pathname = usePathname();
   const unread = useUnreadCount();
-  const isActive = (to: string) =>
-    to === "/" ? loc.pathname === "/" : loc.pathname.startsWith(to);
+  const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
 
   return (
     <div className="min-h-screen pb-20 md:pb-0">
       <header className="sticky top-0 z-40 border-b bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-          <Link to="/" aria-label="KasiPool home">
+          <Link href="/" aria-label="KasiPool home">
             <Logo />
           </Link>
           <nav className="ml-6 hidden items-center gap-1 md:flex">
             {NAV.slice(1).map((n) => (
               <Link
                 key={n.to}
-                to={n.to}
+                href={n.to}
                 aria-current={isActive(n.to) ? "page" : undefined}
                 className={cn(
                   "border-b-2 border-transparent rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
@@ -67,14 +69,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="ml-auto flex items-center gap-1">
             {isAdmin && (
               <Button asChild variant="ghost" size="sm">
-                <Link to="/admin">
+                <Link href="/admin">
                   <Shield /> <span className="hidden sm:inline">Admin</span>
                 </Link>
               </Button>
             )}
             {user ? (
               <Link
-                to="/notifications"
+                href="/notifications"
                 className="relative grid size-10 place-items-center rounded-full hover:bg-muted"
                 aria-label={`Notifications (${unread.data ?? 0} unread)`}
               >
@@ -87,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             ) : (
               <Button asChild size="sm">
-                <Link to="/auth">
+                <Link href="/auth">
                   <LogIn /> Log in / Register
                 </Link>
               </Button>
@@ -106,19 +108,22 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="space-y-1.5">
             <p className="font-semibold">KasiPool</p>
-            <Link to="/how-it-works" className="block text-muted-foreground hover:text-foreground">
+            <Link
+              href="/how-it-works"
+              className="block text-muted-foreground hover:text-foreground"
+            >
               How it works
             </Link>
-            <Link to="/help" className="block text-muted-foreground hover:text-foreground">
+            <Link href="/help" className="block text-muted-foreground hover:text-foreground">
               Help & contact
             </Link>
           </div>
           <div className="space-y-1.5">
             <p className="font-semibold">Legal (draft)</p>
-            <Link to="/terms" className="block text-muted-foreground hover:text-foreground">
+            <Link href="/terms" className="block text-muted-foreground hover:text-foreground">
               Terms of use
             </Link>
-            <Link to="/privacy" className="block text-muted-foreground hover:text-foreground">
+            <Link href="/privacy" className="block text-muted-foreground hover:text-foreground">
               Privacy notice
             </Link>
           </div>
@@ -131,7 +136,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {MOBILE_NAV.map((n) => (
           <Link
             key={n.to}
-            to={n.to}
+            href={n.to}
             aria-current={isActive(n.to) ? "page" : undefined}
             className={cn(
               "relative flex min-h-14 flex-col items-center justify-center gap-0.5 py-2 text-xs font-semibold",
