@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Terms } from "@/views/terms";
 
 export const metadata: Metadata = {
-  title: "Terms of use (draft) — KasiPool",
+  title: "Terms of use (draft)",
   description:
     "Draft KasiPool terms covering pools, confirmations, payments, refunds and collection.",
   openGraph: {

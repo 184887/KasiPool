@@ -92,7 +92,6 @@ supabase/
   functions/               Edge Functions (Yoco checkout/webhook, SMS hook, WhatsApp)
   config.toml              Supabase CLI config
 public/                    Static assets (logo, product images)
-branding/                  Brand manual and logo source
 ```
 
 ## How it works

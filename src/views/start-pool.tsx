@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { sastLocalToIso, isoToSastLocal } from "@/lib/format";
 
 export function StartPool() {
   const nav = useRouter();
+  // "Suggest a pool" on the Deals page links here with ?product=<id>
+  const suggested = useSearchParams().get("product") ?? "";
   const { business } = useAuth();
   const ref = useQuery({
     queryKey: ["start-pool-refs"],
@@ -29,7 +31,7 @@ export function StartPool() {
   });
   const now = new Date();
   const [f, setF] = useState({
-    product_id: "",
+    product_id: suggested,
     unit: "",
     price: "",
     min_qty: "",
@@ -43,6 +45,12 @@ export function StartPool() {
     is_private: false,
   });
   const [busy, setBusy] = useState(false);
+  const products = ref.data?.products;
+  useEffect(() => {
+    // Fill the unit for a suggested product once the product list arrives
+    const unit = products?.find((p) => p.id === suggested)?.unit;
+    if (unit) setF((prev) => (prev.unit ? prev : { ...prev, unit }));
+  }, [products, suggested]);
   if (ref.isLoading || !ref.data) return <Loading />;
 
   const set =
@@ -111,7 +119,7 @@ export function StartPool() {
               <option value="">Select…</option>
               {ref.data.products.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} — {p.pack_size}
+                  {p.name} · {p.pack_size}
                 </option>
               ))}
             </select>
@@ -211,11 +219,11 @@ export function StartPool() {
               onChange={(e) => setF({ ...f, is_private: e.target.checked })}
             />
             <span>
-              <b>Private group</b> — hidden from the public catalogue. Only people you share the
-              invite link or code with can join, wherever they are.
+              <b>Private group:</b> hidden from public Deals. Only people you share the invite link
+              or code with can join, wherever they are.
             </span>
           </label>
-          <Button onClick={submit} disabled={busy}>
+          <Button variant="gold" size="lg" onClick={submit} disabled={busy}>
             {busy ? "Submitting…" : "Submit for review"}
           </Button>
         </div>

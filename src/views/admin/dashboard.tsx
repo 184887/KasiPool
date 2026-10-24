@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,23 +110,20 @@ export function Dashboard() {
         title="Dashboard"
         subtitle="Live operations overview"
         actions={
-          <Link
-            href="/admin/pools/new"
-            className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-          >
-            + New pool
-          </Link>
+          <Button asChild variant="gold">
+            <Link href="/admin/pools/new">+ New pool</Link>
+          </Button>
         }
       />
-      <Section title="Work queue" className="mb-6 border-gold/50">
+      <Section title="Work queue" className="mb-6 border-4">
         {queue.length === 0 ? (
           <p className="text-sm text-muted-foreground">Nothing needs attention right now.</p>
         ) : (
-          <ul className="divide-y">
+          <ul className="divide-y-2 divide-ink/10">
             {queue.map((q) => (
               <li key={q.text}>
-                <Link href={q.to} className="flex items-center gap-3 py-3 hover:text-primary">
-                  <span className="grid size-9 place-items-center rounded-lg bg-gold font-display font-bold text-gold-foreground">
+                <Link href={q.to} className="flex items-center gap-3 py-3 hover:text-ember">
+                  <span className="grid size-10 place-items-center rounded-sm bg-gold font-headline text-xl text-ink">
                     {q.n}
                   </span>
                   <span className="flex-1 text-sm font-medium">{q.text}</span>

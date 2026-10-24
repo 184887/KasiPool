@@ -4,18 +4,37 @@ import { cn } from "@/lib/utils";
 import { pct } from "@/lib/format";
 import { TIMELINE } from "@/lib/status";
 
+/** The deck's two interlocking rings: orange passes over green at the top crossing. */
+export function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 400 260" aria-hidden="true" className={className}>
+      <circle cx="130" cy="130" r="105" fill="none" stroke="#F2892B" strokeWidth="36" />
+      <circle cx="270" cy="130" r="105" fill="none" stroke="#3E9A62" strokeWidth="36" />
+      <path
+        d="M174.4,34.8 A105,105 0 0 1 220.9,77.5"
+        fill="none"
+        stroke="#F2892B"
+        strokeWidth="36"
+      />
+    </svg>
+  );
+}
+
+/** Rings mark + "KasiPool" wordmark. Use `light` on ink backgrounds. */
 export function Logo({ light, className }: { light?: boolean; className?: string }) {
   return (
     <span
-      className={cn("inline-flex items-center bg-[#F5F4EF] p-1", light && "rounded-sm", className)}
+      role="img"
+      aria-label="KasiPool"
+      className={cn("inline-flex items-center gap-2", light ? "text-paper" : "text-ink", className)}
     >
-      <img
-        src="/branding/kasipool-logo.jpg"
-        alt="KasiPool"
-        className="h-auto w-[124px] sm:w-40"
-        width={160}
-        height={53}
-      />
+      <LogoMark className="h-7 w-auto sm:h-8" />
+      <span
+        aria-hidden="true"
+        className="font-display text-[22px] leading-none font-extrabold tracking-[-0.03em] sm:text-2xl"
+      >
+        Kasi<span className="text-gold">Pool</span>
+      </span>
     </span>
   );
 }
@@ -43,7 +62,6 @@ export function PoolProgress({
     const t = setTimeout(() => setW(p), 50);
     return () => clearTimeout(t);
   }, [p]);
-  const dots = Math.min(participants, size === "sm" ? 5 : 8);
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
@@ -60,8 +78,8 @@ export function PoolProgress({
         </p>
         <span
           className={cn(
-            "rounded-full px-2 py-0.5 text-xs font-bold tabular",
-            reached ? "bg-gold text-gold-foreground animate-pop" : "bg-primary-soft text-primary",
+            "rounded-sm px-1.5 py-0.5 text-xs font-bold tabular",
+            reached ? "bg-gold text-ink animate-pop" : "bg-muted text-ink",
           )}
         >
           {p}%
@@ -69,7 +87,7 @@ export function PoolProgress({
       </div>
       <div
         className={cn(
-          "relative mt-2 overflow-hidden rounded-full bg-muted",
+          "relative mt-2 overflow-hidden rounded-sm bg-muted",
           size === "lg" ? "h-5" : size === "md" ? "h-3.5" : "h-2.5",
         )}
         role="progressbar"
@@ -79,33 +97,13 @@ export function PoolProgress({
         aria-label="Pool progress"
       >
         <div
-          className="relative h-full overflow-hidden rounded-full bg-gold transition-[width] duration-1000 ease-out"
+          className="h-full bg-leaf transition-[width] duration-1000 ease-out"
           style={{ width: `${w}%` }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "repeating-linear-gradient(135deg, transparent 0 6px, rgb(90 36 16 / 18%) 6px 8px)",
-            }}
-          />
-          <span className="absolute inset-y-0 right-0 w-1 bg-umber" />
-        </div>
+        />
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-        <div className="flex -space-x-1.5">
-          {Array.from({ length: dots }).map((_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "grid size-5 place-items-center rounded-full border-2 border-card",
-                i % 3 === 0 ? "bg-gold" : i % 3 === 1 ? "bg-primary" : "bg-umber",
-              )}
-            />
-          ))}
-        </div>
         <span>
-          <Users className="mr-1 inline size-3.5" />
+          <Users className="mr-1 inline size-3.5" aria-hidden="true" />
           {participants} {participants === 1 ? "business" : "businesses"} pooling
         </span>
         {!reached && size !== "sm" && (
@@ -152,7 +150,7 @@ export function QuantityStepper({
   max?: number;
 }) {
   return (
-    <div className="flex items-center rounded-xl border bg-card">
+    <div className="flex items-center rounded-md border-2 border-ink bg-card">
       <button
         type="button"
         aria-label="Decrease quantity"
@@ -165,7 +163,7 @@ export function QuantityStepper({
       <input
         aria-label="Quantity"
         inputMode="numeric"
-        className="h-14 w-16 border-x bg-transparent text-center font-display text-2xl font-bold tabular outline-none"
+        className="h-14 w-16 border-x-2 border-ink bg-transparent text-center font-headline text-3xl tabular outline-none"
         value={value}
         onChange={(e) => {
           const n = parseInt(e.target.value.replace(/\D/g, "") || "0", 10);

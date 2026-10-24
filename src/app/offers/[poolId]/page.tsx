@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Offer } from "@/views/offer";
 
 export const metadata: Metadata = {
-  title: "Offer details — KasiPool",
+  title: "Deal details",
   description: "See price, pool progress and closing time, then join the pool.",
   openGraph: {
     title: "Join this KasiPool deal",

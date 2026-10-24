@@ -17,9 +17,9 @@ export function Onboarding() {
   if (!user || businessLoading) return <Loading />;
   return (
     <Container className="max-w-xl">
-      <div className="rounded-3xl border bg-card p-6 shadow-card">
-        <p className="text-xs font-semibold uppercase tracking-wide text-primary">Step 2 of 2</p>
-        <h1 className="font-display text-2xl font-bold">Tell us about your business</h1>
+      <div className="rounded-md border-2 border-ink bg-card p-6">
+        <p className="text-sm font-bold text-ember">Step 2 of 2</p>
+        <h1 className="font-headline text-4xl">Tell us about your business</h1>
         <p className="mb-5 mt-1 text-sm text-muted-foreground">
           This helps us arrange collection and contact you about your orders.
         </p>

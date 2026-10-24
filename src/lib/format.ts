@@ -10,7 +10,7 @@ export function money(v: number | string | null | undefined): string {
 
 /** 23 Oct 2026 */
 export function date(v: string | Date | null | undefined): string {
-  if (!v) return "—";
+  if (!v) return "-";
   return new Intl.DateTimeFormat("en-GB", {
     timeZone: TZ,
     day: "2-digit",
@@ -21,7 +21,7 @@ export function date(v: string | Date | null | undefined): string {
 
 /** 23 Oct 2026, 18:00 */
 export function dateTime(v: string | Date | null | undefined): string {
-  if (!v) return "—";
+  if (!v) return "-";
   const d = new Date(v);
   const t = new Intl.DateTimeFormat("en-GB", {
     timeZone: TZ,

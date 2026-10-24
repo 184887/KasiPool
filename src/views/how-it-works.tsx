@@ -12,7 +12,7 @@ const FAQ = [
   ],
   [
     "What if the pool doesn't reach its target?",
-    "The offer is marked unsuccessful and you owe nothing.",
+    "The deal is marked unsuccessful and you owe nothing.",
   ],
   [
     "Can I change my quantity?",
@@ -28,33 +28,29 @@ const FAQ = [
   ],
   [
     "Where do I collect?",
-    "At the collection point shown on each offer. Bring your collection code.",
+    "At the collection point shown on each deal. Bring your collection code.",
   ],
 ];
 
 export function HowItWorks() {
   return (
     <Container className="max-w-3xl">
-      <h1 className="font-display text-3xl font-bold">How KasiPool works</h1>
+      <h1 className="font-headline text-5xl">How KasiPool works</h1>
       <p className="mt-2 text-muted-foreground">
         Many businesses. One bulk order. Better prices for everyone.
       </p>
-      <ol className="mt-8 space-y-4">
+      <ol className="mt-8 space-y-6">
         {STEPS.map((s, i) => (
-          <li key={s.title} className="flex gap-4 rounded-2xl border bg-card p-5 shadow-card">
-            <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <s.icon className="size-6" />
-            </span>
+          <li key={s.title} className="flex gap-5 border-t-2 border-ink pt-4">
+            <span className="w-10 shrink-0 font-headline text-5xl text-ember">{i + 1}</span>
             <div>
-              <p className="font-display text-lg font-bold">
-                {i + 1}. {s.title}
-              </p>
+              <p className="font-display text-xl font-bold">{s.title}</p>
               <p className="text-muted-foreground">{s.body}</p>
             </div>
           </li>
         ))}
       </ol>
-      <h2 className="mt-10 font-display text-2xl font-bold">Common questions</h2>
+      <h2 className="mt-12 border-b-4 border-ink pb-2 font-headline text-3xl">Common questions</h2>
       <div className="mt-4 space-y-3">
         {FAQ.map(([q, a]) => (
           <details key={q} className="rounded-xl border bg-card p-4">
@@ -63,8 +59,8 @@ export function HowItWorks() {
           </details>
         ))}
       </div>
-      <Button asChild size="lg" className="mt-8">
-        <Link href="/offers">See active offers</Link>
+      <Button asChild size="lg" variant="gold" className="mt-8">
+        <Link href="/offers">See deals</Link>
       </Button>
     </Container>
   );

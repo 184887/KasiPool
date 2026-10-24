@@ -4,7 +4,7 @@ import { Loading } from "@/components/kp/ui";
 import { AuthPage } from "@/views/auth";
 
 export const metadata: Metadata = {
-  title: "Log in or register — KasiPool",
+  title: "Log in or register",
   description: "Sign in to KasiPool or register your business to start pooling.",
   openGraph: {
     title: "Log in to KasiPool",

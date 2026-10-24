@@ -88,7 +88,7 @@ export function PoolsAdmin() {
                   {p.products?.name}
                 </Link>
               </Td>
-              <Td className="text-muted-foreground">{p.campaigns?.name ?? "—"}</Td>
+              <Td className="text-muted-foreground">{p.campaigns?.name ?? "-"}</Td>
               <Td>
                 <StatusBadge tone={POOL_STATUS[p.status].tone}>
                   {POOL_STATUS[p.status].admin}

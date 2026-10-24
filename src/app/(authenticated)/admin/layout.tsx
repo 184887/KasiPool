@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { AdminLayout } from "@/views/admin/layout";
 
 export const metadata: Metadata = {
-  title: "Admin — KasiPool",
+  title: "Admin",
   robots: { index: false },
 };
 

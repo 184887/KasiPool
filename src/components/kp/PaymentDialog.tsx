@@ -42,7 +42,7 @@ export function PaymentDialog({
       kind === "issue"
         ? await supabase.rpc("admin_flag_payment_issue", {
             _order: order.id,
-            _note: note || "Payment issue — please contact KasiPool",
+            _note: note || "Payment issue: please contact KasiPool",
           })
         : await supabase.rpc("admin_record_payment", {
             _order: order.id,
@@ -71,7 +71,7 @@ export function PaymentDialog({
     <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Record payment — {order?.ref}</DialogTitle>
+          <DialogTitle>Record payment: {order?.ref}</DialogTitle>
           <DialogDescription>
             Only record money you have verified in the KasiPool business account. Customer
             screenshots are not proof of settlement.

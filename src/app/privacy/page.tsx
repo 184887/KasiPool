@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Privacy } from "@/views/privacy";
 
 export const metadata: Metadata = {
-  title: "Privacy notice (draft) — KasiPool",
+  title: "Privacy notice (draft)",
   description:
     "How KasiPool collects and uses business information, in line with POPIA principles (draft).",
   openGraph: {

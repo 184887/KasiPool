@@ -172,13 +172,13 @@ export function NewPool() {
   const spread = +f.price - +f.supplier_cost;
   return (
     <>
-      <PageHeader title="New pool" subtitle="Create a time-limited purchasing offer" />
+      <PageHeader title="New pool" subtitle="Create a time-limited deal" />
       <ol className="mb-5 flex gap-1 overflow-x-auto">
         {STEPS.map((s, i) => (
           <li key={s}>
             <button
               onClick={() => i < step && setStep(i)}
-              className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-primary-soft text-primary" : "bg-muted text-muted-foreground"}`}
+              className={`shrink-0 whitespace-nowrap rounded-sm px-3 py-1.5 text-xs font-bold ${i === step ? "bg-ink text-paper" : i < step ? "bg-leaf-soft text-leaf" : "bg-muted text-muted-foreground"}`}
             >
               {i + 1}. {s}
             </button>
@@ -211,12 +211,12 @@ export function NewPool() {
                   <option value="">Select…</option>
                   {ref.data.products.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} — {p.pack_size}
+                      {p.name} · {p.pack_size}
                     </option>
                   ))}
                 </select>
               </Field>
-              <Field label="Supplier *" hint="Private — never shown to customers">
+              <Field label="Supplier *" hint="Private: never shown to customers">
                 <select className={inputCls} value={f.supplier_id} onChange={set("supplier_id")}>
                   <option value="">Select…</option>
                   {ref.data.suppliers.map((s) => (
@@ -429,7 +429,7 @@ export function NewPool() {
                 </p>
                 <p className="rounded-lg bg-warning-soft p-2 text-xs text-warning">
                   After publishing, price, unit, product, minimum and reference price are locked.
-                  Material changes require cancelling and creating a revised offer.
+                  Material changes require cancelling and creating a revised deal.
                 </p>
               </div>
             </div>

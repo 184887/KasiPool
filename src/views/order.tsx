@@ -104,12 +104,12 @@ export function OrderPage() {
         <img
           src={pool.products?.image_url ?? ""}
           alt=""
-          className="size-16 rounded-xl object-cover"
+          className="size-16 rounded-sm border-2 border-ink object-cover"
           width={64}
           height={64}
         />
         <div>
-          <h1 className="font-display text-2xl font-bold">{pool.products?.name}</h1>
+          <h1 className="font-headline text-4xl">{pool.products?.name}</h1>
           <p className="text-sm text-muted-foreground">
             {o.ref ? `Order ${o.ref}` : "Awaiting confirmation"}
           </p>
@@ -117,14 +117,14 @@ export function OrderPage() {
       </div>
 
       {o.status === "awaiting_confirmation" && (
-        <Section title="Confirm your order" className="border-2 border-gold">
+        <Section title="Confirm your order" className="border-4">
           <p className="text-sm">The pool reached its target. Please review and confirm.</p>
           <dl className="mt-3 space-y-1.5 text-sm">
             <Row k="Product" v={`${pool.products?.name} (${pool.products?.pack_size})`} />
             <Row k="Quantity" v={`${o.quantity} ${pool.unit}(s)`} />
             <Row k="Final unit price" v={money(o.unit_price)} />
             <Row k="Order total" v={<b className="text-lg">{money(o.total)}</b>} />
-            <Row k="Collection" v={pool.collection_points?.name ?? "—"} />
+            <Row k="Collection" v={pool.collection_points?.name ?? "-"} />
             <Row
               k="Confirm & pay by"
               v={
@@ -134,7 +134,7 @@ export function OrderPage() {
               }
             />
           </dl>
-          <p className="mt-3 rounded-lg bg-muted p-3 text-xs text-muted-foreground">
+          <p className="mt-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">
             By confirming you agree to buy this quantity at this price and to pay in full before the
             deadline. Stock is ordered only if enough businesses pay. If the pool is not funded, any
             payment is refunded. Your confirmed price will not change.
@@ -153,8 +153,8 @@ export function OrderPage() {
             <Button variant="outline" size="lg" onClick={decline}>
               Decline
             </Button>
-            <Button size="lg" onClick={confirm} disabled={!accept || busy}>
-              {busy ? "Confirming…" : "Confirm My Order"}
+            <Button size="lg" variant="gold" onClick={confirm} disabled={!accept || busy}>
+              {busy ? "Confirming…" : "Confirm my order"}
             </Button>
           </div>
         </Section>
@@ -178,12 +178,18 @@ export function OrderPage() {
             <Row k="Payment deadline" v={dateTime(pool.payment_deadline)} />
           </dl>
           {pay?.online_enabled && (
-            <div className="mt-4 rounded-xl border-2 border-primary/30 bg-primary-soft p-4">
+            <div className="mt-4 rounded-md border-2 border-ink bg-gold-soft p-4">
               <p className="text-sm font-semibold">Pay securely online with Yoco</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Your payment will be confirmed automatically after Yoco verifies it.
               </p>
-              <Button className="mt-3 w-full" size="lg" onClick={payOnline} disabled={paymentBusy}>
+              <Button
+                className="mt-3 w-full"
+                size="lg"
+                variant="gold"
+                onClick={payOnline}
+                disabled={paymentBusy}
+              >
                 {paymentBusy
                   ? "Starting secure checkout…"
                   : `Pay ${money(Number(o.total) - Number(o.amount_paid))} with Yoco`}
@@ -191,7 +197,7 @@ export function OrderPage() {
             </div>
           )}
           {pay?.configured ? (
-            <div className="mt-4 rounded-xl border-2 border-primary/30 bg-primary-soft p-4 text-sm">
+            <div className="mt-4 rounded-md border-2 border-ink bg-muted p-4 text-sm">
               <p className="font-bold">{pay.method}</p>
               <dl className="mt-2 space-y-1">
                 {pay.bank && <Row k="Bank" v={pay.bank} />}
@@ -199,10 +205,10 @@ export function OrderPage() {
                 {pay.account_number && <Row k="Account number" v={pay.account_number} />}
                 {pay.branch_code && <Row k="Branch code" v={pay.branch_code} />}
               </dl>
-              <div className="mt-3 flex items-center justify-between rounded-lg bg-card p-3">
+              <div className="mt-3 flex items-center justify-between rounded-md border-2 border-ink bg-card p-3">
                 <div>
                   <p className="text-xs text-muted-foreground">Use this payment reference</p>
-                  <p className="font-display text-xl font-bold tabular">{o.payment_reference}</p>
+                  <p className="font-headline text-3xl tabular">{o.payment_reference}</p>
                 </div>
                 <Button
                   size="icon"
@@ -223,7 +229,7 @@ export function OrderPage() {
               </p>
             </div>
           ) : !pay?.online_enabled ? (
-            <div className="mt-4 rounded-xl border border-warning/40 bg-warning-soft p-4 text-sm text-warning">
+            <div className="mt-4 rounded-md border-2 border-warning/40 bg-warning-soft p-4 text-sm text-warning">
               <b>Payment instructions are not yet available.</b> Please do not pay yet. KasiPool
               will notify you once official payment details have been set up.
             </div>
@@ -232,9 +238,9 @@ export function OrderPage() {
       )}
 
       {o.fulfilment_status === "ready" && (
-        <Section title="Ready for collection" className="border-2 border-success">
+        <Section title="Ready for collection" className="border-4 border-leaf">
           <p className="text-sm">Show this code at the collection point:</p>
-          <p className="my-3 rounded-xl bg-success-soft py-4 text-center font-display text-4xl font-extrabold tracking-[0.3em] text-success tabular">
+          <p className="my-3 rounded-md bg-leaf-soft py-4 text-center font-headline text-5xl tracking-[0.2em] text-leaf tabular">
             {o.collection_code}
           </p>
           <p className="text-sm">
@@ -245,7 +251,7 @@ export function OrderPage() {
             of {pool.products?.name}.
           </p>
           <p className="mt-2 flex gap-2 text-sm">
-            <MapPin className="size-4 shrink-0 text-primary" />
+            <MapPin className="size-4 shrink-0" aria-hidden="true" />
             <span>
               <b>{pool.collection_points?.name}</b>
               <br />
@@ -259,7 +265,7 @@ export function OrderPage() {
 
       {o.fulfilment_status === "collected" && (
         <Section>
-          <p className="font-display text-xl font-bold text-success">Completed ✓</p>
+          <p className="font-headline text-3xl text-leaf">Completed ✓</p>
           <p className="text-sm text-muted-foreground">Collected {dateTime(o.collected_at)}.</p>
         </Section>
       )}
@@ -273,7 +279,7 @@ export function OrderPage() {
           {o.refunds!.map((r) => (
             <div
               key={r.id}
-              className="flex items-center justify-between border-b py-2 text-sm last:border-0"
+              className="flex items-center justify-between border-b-2 border-ink/10 py-2 text-sm last:border-0"
             >
               <div>
                 <p className="font-semibold">{money(r.amount)}</p>

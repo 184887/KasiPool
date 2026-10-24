@@ -34,7 +34,7 @@ export function Collections() {
   async function collect(id: string) {
     const { error } = await supabase.rpc("admin_collect", { _order: id, _code: codes[id] ?? "" });
     if (error) return toast.error(errMsg(error));
-    toast.success("Goods released — order completed");
+    toast.success("Goods released, order completed");
     qc.invalidateQueries();
   }
 
@@ -57,7 +57,7 @@ export function Collections() {
         {list.map((o) => (
           <div
             key={o.id}
-            className={`rounded-2xl border bg-card p-4 shadow-card ${o.fulfilment_status === "collected" ? "opacity-70" : ""}`}
+            className={`rounded-md border-2 border-ink bg-card p-4 ${o.fulfilment_status === "collected" ? "opacity-70" : ""}`}
           >
             <div className="flex items-start justify-between gap-2">
               <div>

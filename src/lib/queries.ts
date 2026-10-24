@@ -98,6 +98,28 @@ export const settingsQuery = queryOptions({
   },
 });
 
+const MY_ORDER_POOL_SELECT =
+  "pools(id, status, unit, price, min_qty, pledged_qty, participant_count, closes_at, payment_deadline, products(name, image_url, pack_size))";
+
+async function getMyOrders(userId: string) {
+  const { data } = await supabase
+    .from("orders")
+    .select(`*, ${MY_ORDER_POOL_SELECT}`)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+export type MyOrder = Awaited<ReturnType<typeof getMyOrders>>[number];
+
+/** The signed-in shop's orders, newest first. Shared by Home (next step) and My Pools. */
+export const myOrdersQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["my-orders", userId],
+    enabled: !!userId,
+    queryFn: () => getMyOrders(userId!),
+  });
+
 export function errMsg(e: unknown): string {
   if (e && typeof e === "object" && "message" in e) return String(e.message);
   return "Something went wrong. Please try again.";
