@@ -73,7 +73,7 @@ export function Reports() {
         <MetricCard
           label="Gross purchasing spread"
           value={money(spread)}
-          hint="Before costs — not profit"
+          hint="Before costs, not profit"
           tone="gold"
         />
         <MetricCard

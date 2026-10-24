@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Help } from "@/views/help";
 
 export const metadata: Metadata = {
-  title: "Help & contact — KasiPool",
+  title: "Help & contact",
   description: "Get help with pools, payments and collection on KasiPool.",
   openGraph: {
     title: "KasiPool help",

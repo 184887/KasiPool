@@ -111,7 +111,7 @@ export function StartPool() {
               <option value="">Select…</option>
               {ref.data.products.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} — {p.pack_size}
+                  {p.name} · {p.pack_size}
                 </option>
               ))}
             </select>
@@ -211,7 +211,7 @@ export function StartPool() {
               onChange={(e) => setF({ ...f, is_private: e.target.checked })}
             />
             <span>
-              <b>Private group</b> — hidden from the public catalogue. Only people you share the
+              <b>Private group:</b> hidden from the public catalogue. Only people you share the
               invite link or code with can join, wherever they are.
             </span>
           </label>

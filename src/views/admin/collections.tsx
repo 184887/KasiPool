@@ -34,7 +34,7 @@ export function Collections() {
   async function collect(id: string) {
     const { error } = await supabase.rpc("admin_collect", { _order: id, _code: codes[id] ?? "" });
     if (error) return toast.error(errMsg(error));
-    toast.success("Goods released — order completed");
+    toast.success("Goods released, order completed");
     qc.invalidateQueries();
   }
 

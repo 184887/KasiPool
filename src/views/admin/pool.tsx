@@ -99,7 +99,7 @@ export function PoolAdmin() {
       </Link>
       <PageHeader
         title={pool.products?.name ?? "Pool"}
-        subtitle={`${pool.campaigns?.name ?? "No campaign"} · Supplier: ${pool.suppliers?.name ?? "—"} · ${pool.collection_points?.name ?? ""}`}
+        subtitle={`${pool.campaigns?.name ?? "No campaign"} · Supplier: ${pool.suppliers?.name ?? "-"} · ${pool.collection_points?.name ?? ""}`}
         actions={<StatusBadge tone={st.tone}>{st.admin}</StatusBadge>}
       />
 
@@ -184,7 +184,7 @@ export function PoolAdmin() {
                         <p className="text-xs text-muted-foreground">{o.ref}</p>
                       </>
                     ) : (
-                      "—"
+                      "-"
                     )}
                   </Td>
                   <Td>
@@ -193,13 +193,13 @@ export function PoolAdmin() {
                         {PAYMENT_STATUS[o.payment_status].label}
                       </StatusBadge>
                     ) : (
-                      "—"
+                      "-"
                     )}
                   </Td>
                   <Td>
                     {o && o.fulfilment_status !== "none"
                       ? `${FULFIL_STATUS[o.fulfilment_status].label}${o.allocated_qty ? ` (${o.allocated_qty})` : ""}`
-                      : "—"}
+                      : "-"}
                   </Td>
                   <Td>
                     {o?.status === "confirmed" && o.payment_status !== "paid" && (
@@ -513,7 +513,7 @@ export function PoolAdmin() {
               <dl className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Reference</dt>
-                  <dd>{po.supplier_ref || "—"}</dd>
+                  <dd>{po.supplier_ref || "-"}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Quantity</dt>

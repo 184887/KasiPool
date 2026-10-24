@@ -52,7 +52,7 @@ export const ORDER_STATUS: Record<string, { label: string; tone: Tone }> = {
 };
 
 export const FULFIL_STATUS: Record<string, { label: string; tone: Tone }> = {
-  none: { label: "—", tone: "muted" },
+  none: { label: "-", tone: "muted" },
   ordered: { label: "Stock ordered", tone: "info" },
   allocated: { label: "Stock allocated", tone: "info" },
   short: { label: "Partially allocated", tone: "warning" },

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { OrderPage } from "@/views/order";
 
 export const metadata: Metadata = {
-  title: "Your order — KasiPool",
+  title: "Your order",
   description: "Confirm, pay for and track your KasiPool order.",
 };
 

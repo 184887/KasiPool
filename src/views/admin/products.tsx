@@ -117,7 +117,7 @@ export function Products() {
             </Td>
             <Td className="font-medium">{p.name}</Td>
             <Td>{p.sku}</Td>
-            <Td>{p.categories?.name ?? "—"}</Td>
+            <Td>{p.categories?.name ?? "-"}</Td>
             <Td>
               {p.unit} · {p.pack_size}
             </Td>
@@ -173,7 +173,7 @@ export function Products() {
                     value={edit.category_id}
                     onChange={(e) => setEdit({ ...edit, category_id: e.target.value })}
                   >
-                    <option value="">—</option>
+                    <option value="">-</option>
                     {data.cats.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}

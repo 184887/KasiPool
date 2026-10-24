@@ -119,7 +119,7 @@ export function Payments() {
                 {PAYMENT_STATUS[o.payment_status].label}
               </StatusBadge>
             </Td>
-            <Td>{o.paid_at ? dateTime(o.paid_at) : "—"}</Td>
+            <Td>{o.paid_at ? dateTime(o.paid_at) : "-"}</Td>
             <Td>
               {o.payment_status !== "paid" && (
                 <Button size="sm" variant="outline" onClick={() => setPay(o)}>
@@ -138,7 +138,7 @@ export function Payments() {
         >
           {data.refunds.map((r) => (
             <tr key={r.id}>
-              <Td>{r.orders?.ref ?? "—"}</Td>
+              <Td>{r.orders?.ref ?? "-"}</Td>
               <Td>{r.orders?.businesses?.trading_name}</Td>
               <Td className="tabular">{money(r.amount)}</Td>
               <Td className="max-w-xs truncate">{r.reason}</Td>

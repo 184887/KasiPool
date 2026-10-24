@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* KasiPool design system, following the pitch deck: ink on paper, orange and green accents,
-   flat surfaces and square corners. Brand colours live in :root — change them here only. */
+   flat surfaces and square corners. Brand colours live in :root; change them here only. */
 
 @theme inline {
   /* Font variables are set by next/font in src/app/layout.tsx */

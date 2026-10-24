@@ -57,7 +57,7 @@ export function Suppliers() {
     <>
       <PageHeader
         title="Suppliers"
-        subtitle="Private — never visible to customers"
+        subtitle="Private: never visible to customers"
         actions={<Button onClick={() => setEdit({ ...empty })}>+ New supplier</Button>}
       />
       <DataTable

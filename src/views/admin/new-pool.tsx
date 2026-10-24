@@ -211,12 +211,12 @@ export function NewPool() {
                   <option value="">Select…</option>
                   {ref.data.products.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} — {p.pack_size}
+                      {p.name} · {p.pack_size}
                     </option>
                   ))}
                 </select>
               </Field>
-              <Field label="Supplier *" hint="Private — never shown to customers">
+              <Field label="Supplier *" hint="Private: never shown to customers">
                 <select className={inputCls} value={f.supplier_id} onChange={set("supplier_id")}>
                   <option value="">Select…</option>
                   {ref.data.suppliers.map((s) => (

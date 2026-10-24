@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { Home } from "@/views/home";
 
 export const metadata: Metadata = {
-  title: "KasiPool — Buy together, Profit better.",
+  title: { absolute: "KasiPool: Buy together, Profit better." },
   description:
     "Join local businesses to coordinate pooled purchases for the stock you already buy.",
   openGraph: {
-    title: "KasiPool — Buy together, Profit better.",
+    title: "KasiPool: Buy together, Profit better.",
     description: "See product quantities, prices and deadlines before joining a pool.",
   },
 };

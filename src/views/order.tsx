@@ -124,7 +124,7 @@ export function OrderPage() {
             <Row k="Quantity" v={`${o.quantity} ${pool.unit}(s)`} />
             <Row k="Final unit price" v={money(o.unit_price)} />
             <Row k="Order total" v={<b className="text-lg">{money(o.total)}</b>} />
-            <Row k="Collection" v={pool.collection_points?.name ?? "—"} />
+            <Row k="Collection" v={pool.collection_points?.name ?? "-"} />
             <Row
               k="Confirm & pay by"
               v={

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Catalogue } from "@/views/catalogue";
 
 export const metadata: Metadata = {
-  title: "Product catalogue — KasiPool",
+  title: "Product catalogue",
   description:
     "Browse the staples KasiPool pools for: cooking oil, rice, sugar, maize meal, flour and more.",
   openGraph: {

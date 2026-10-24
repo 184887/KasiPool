@@ -291,7 +291,7 @@ export function Offer() {
             </p>
             {pool.is_private && pool.invite_code && (
               <div className="mt-2 rounded-lg bg-primary-soft p-3 text-sm">
-                <p className="font-semibold">Private group — invite code {pool.invite_code}</p>
+                <p className="font-semibold">Private group, invite code {pool.invite_code}</p>
                 <p className="text-xs text-muted-foreground">
                   Share this link:{" "}
                   {`${typeof window !== "undefined" ? window.location.origin : ""}/join/${pool.invite_code}`}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { StartPool } from "@/views/start-pool";
 
 export const metadata: Metadata = {
-  title: "Start a pool — KasiPool",
+  title: "Start a pool",
   description: "Propose a group purchase for your community.",
 };
 

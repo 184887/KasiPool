@@ -14,11 +14,11 @@ const bricolage = Bricolage_Grotesque({
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 
 export const metadata: Metadata = {
-  title: "KasiPool — Buy together, Profit better.",
+  title: { default: "KasiPool: Buy together, Profit better.", template: "%s | KasiPool" },
   description:
     "KasiPool helps Cape Town township businesses coordinate pooled purchases for stock they already buy.",
   openGraph: {
-    title: "KasiPool — Buy together, Profit better.",
+    title: "KasiPool: Buy together, Profit better.",
     description:
       "Join other local businesses to coordinate a larger purchase, with clear quantities, prices and deadlines.",
     type: "website",
