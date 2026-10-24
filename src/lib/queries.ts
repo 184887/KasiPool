@@ -1,0 +1,104 @@
+import { queryOptions } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
+
+export type PaymentSettings = {
+  [key: string]: Json | undefined;
+  configured: boolean;
+  online_enabled?: boolean;
+  method: string;
+  bank: string;
+  account_name: string;
+  account_number: string;
+  branch_code: string;
+  notes: string;
+};
+
+export type ContactSettings = {
+  [key: string]: Json | undefined;
+  phone?: string;
+  email?: string;
+  whatsapp?: string;
+};
+
+export type AppSettings = {
+  payment?: PaymentSettings;
+  terms?: { version: string };
+  contact?: ContactSettings;
+};
+
+export const POOL_SELECT =
+  "*, products(*, categories(name, slug)), collection_points(*), campaigns(name)";
+
+export const PUBLIC_STATUSES = ["open", "scheduled"];
+
+async function refresh() {
+  // Idempotent lifecycle check (closes due pools). Also runs hourly on the backend.
+  await supabase.rpc("refresh_pool_states");
+}
+
+export const activePoolsQuery = queryOptions({
+  queryKey: ["pools", "active"],
+  queryFn: async () => {
+    await refresh();
+    const { data, error } = await supabase
+      .from("pools")
+      .select(POOL_SELECT)
+      .in("status", ["open", "scheduled", "awaiting_confirmation"])
+      .order("closes_at");
+    if (error) throw error;
+    return data;
+  },
+});
+
+export const poolQuery = (id: string) =>
+  queryOptions({
+    queryKey: ["pool", id],
+    queryFn: async () => {
+      await refresh();
+      const { data, error } = await supabase
+        .from("pools")
+        .select(POOL_SELECT)
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const catalogueQuery = queryOptions({
+  queryKey: ["catalogue"],
+  queryFn: async () => {
+    const [{ data: products, error }, { data: cats }, { data: pools }] = await Promise.all([
+      supabase
+        .from("products")
+        .select("*, categories(name, slug)")
+        .eq("active", true)
+        .order("name"),
+      supabase.from("categories").select("*").order("sort"),
+      supabase.from("pools").select("id, product_id, status").in("status", ["open", "scheduled"]),
+    ]);
+    if (error) throw error;
+    return { products: products ?? [], categories: cats ?? [], pools: pools ?? [] };
+  },
+});
+
+export const categoriesQuery = queryOptions({
+  queryKey: ["categories"],
+  queryFn: async () => (await supabase.from("categories").select("*").order("sort")).data ?? [],
+});
+
+export const settingsQuery = queryOptions({
+  queryKey: ["settings"],
+  queryFn: async () => {
+    const { data } = await supabase.from("app_settings").select("*");
+    const map: Record<string, Json> = {};
+    (data ?? []).forEach((r) => (map[r.key] = r.value));
+    return map as AppSettings;
+  },
+});
+
+export function errMsg(e: unknown): string {
+  if (e && typeof e === "object" && "message" in e) return String(e.message);
+  return "Something went wrong. Please try again.";
+}

@@ -1,0 +1,285 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { ChevronRight, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Container } from "@/components/kp/AppShell";
+import { PoolProgress } from "@/components/kp/pool-bits";
+import { Loading, EmptyState, StatusBadge, PageHeader } from "@/components/kp/ui";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { settingsQuery, errMsg } from "@/lib/queries";
+import { money, date, dateTime } from "@/lib/format";
+import { POOL_STATUS, ORDER_STATUS, nextAction, FULFIL_STATUS, PAYMENT_STATUS } from "@/lib/status";
+
+export const Route = createFileRoute("/_authenticated/my-pools")({
+  head: () => ({
+    meta: [
+      { title: "My Pools — KasiPool" },
+      { name: "description", content: "Your pool participations and orders." },
+    ],
+  }),
+  component: MyPools,
+});
+
+const PSEL =
+  "pools(id, status, unit, price, min_qty, pledged_qty, participant_count, closes_at, payment_deadline, products(name, image_url, pack_size))";
+
+async function getMyOrders(userId: string) {
+  return (
+    (
+      await supabase
+        .from("orders")
+        .select(`*, ${PSEL}`)
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+    ).data ?? []
+  );
+}
+
+type MyOrder = Awaited<ReturnType<typeof getMyOrders>>[number];
+
+function JoinWithCode() {
+  const nav = useNavigate();
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function go() {
+    if (!code.trim()) return;
+    setBusy(true);
+    const { data, error } = await supabase.rpc("claim_pool_invite", { _code: code });
+    setBusy(false);
+    if (error || !data) return toast.error(errMsg(error));
+    nav({ to: "/offers/$poolId", params: { poolId: data } });
+  }
+  return (
+    <div className="mb-4 flex gap-2">
+      <Input
+        className="h-11 uppercase"
+        placeholder="Have a private group invite code?"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && go()}
+      />
+      <Button variant="outline" className="h-11" disabled={busy} onClick={go}>
+        Join group
+      </Button>
+    </div>
+  );
+}
+
+function MyPools() {
+  const { user, business } = useAuth();
+  const settings = useQuery(settingsQuery);
+  const payCfg = !!settings.data?.payment?.configured;
+  const parts = useQuery({
+    queryKey: ["my-parts", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      await supabase.rpc("refresh_pool_states");
+      return (
+        (
+          await supabase
+            .from("participations")
+            .select(`*, ${PSEL}`)
+            .eq("user_id", user!.id)
+            .eq("status", "active")
+            .order("created_at", { ascending: false })
+        ).data ?? []
+      );
+    },
+  });
+  const orders = useQuery({
+    queryKey: ["my-orders", user?.id],
+    enabled: !!user,
+    queryFn: async () => getMyOrders(user!.id),
+  });
+
+  if (parts.isLoading || orders.isLoading) return <Loading />;
+  const all = orders.data ?? [];
+  const action = all.filter((o) => nextAction(o, payCfg));
+  const inProgress = all.filter(
+    (o) =>
+      !nextAction(o, payCfg) && o.status === "confirmed" && o.fulfilment_status !== "collected",
+  );
+  const previous = all.filter((o) => !action.includes(o) && !inProgress.includes(o));
+
+  return (
+    <Container className="max-w-3xl">
+      <PageHeader title="My Pools" subtitle={business?.trading_name} />
+      <div className="mb-4">
+        <Button asChild variant="outline">
+          <Link to="/start-pool">Start a pool</Link>
+        </Button>
+      </div>
+      <JoinWithCode />
+      {!business && (
+        <div className="mb-4 rounded-xl bg-warning-soft p-4 text-sm">
+          <Link to="/onboarding" className="font-semibold underline">
+            Complete your business profile
+          </Link>{" "}
+          to join pools.
+        </div>
+      )}
+
+      {action.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-bold">
+            <AlertCircle className="size-5 text-gold" /> Awaiting your action
+          </h2>
+          <div className="space-y-3">
+            {action.map((o) => (
+              <Link
+                key={o.id}
+                to="/orders/$orderId"
+                params={{ orderId: o.id }}
+                className="flex items-center gap-3 rounded-2xl border-2 border-gold bg-gold-soft p-3 shadow-card"
+              >
+                <img
+                  src={o.pools?.products?.image_url ?? ""}
+                  alt=""
+                  className="size-14 rounded-xl object-cover"
+                  width={56}
+                  height={56}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold">{o.pools?.products?.name}</p>
+                  <p className="text-sm">
+                    {o.quantity} × {money(o.unit_price)} = <b>{money(o.total)}</b>
+                  </p>
+                  {o.pools?.payment_deadline && o.fulfilment_status !== "ready" && (
+                    <p className="text-xs text-muted-foreground">
+                      Deadline {dateTime(o.pools.payment_deadline)}
+                    </p>
+                  )}
+                </div>
+                <span className="rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground">
+                  {nextAction(o, payCfg)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="mb-8">
+        <h2 className="mb-3 font-display text-xl font-bold">Active pools</h2>
+        {(parts.data ?? []).length === 0 ? (
+          <EmptyState
+            title="You haven't joined any open pools"
+            action={
+              <Button asChild>
+                <Link to="/offers">Find a deal</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="space-y-3">
+            {parts.data!.map((p) => {
+              const pool = p.pools!;
+              const st = POOL_STATUS[pool.status];
+              return (
+                <Link
+                  key={p.id}
+                  to="/offers/$poolId"
+                  params={{ poolId: pool.id }}
+                  className="block rounded-2xl border bg-card p-4 shadow-card"
+                >
+                  <div className="flex gap-3">
+                    <img
+                      src={pool.products?.image_url ?? ""}
+                      alt=""
+                      className="size-16 rounded-xl object-cover"
+                      width={64}
+                      height={64}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold">{pool.products?.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Your quantity:{" "}
+                        <b className="text-foreground">
+                          {p.quantity} {pool.unit}(s)
+                        </b>{" "}
+                        · est. {money(p.quantity * Number(pool.price))}
+                      </p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <StatusBadge tone={st.tone}>{st.customer}</StatusBadge>
+                        <span className="text-xs text-muted-foreground">
+                          Closes {date(pool.closes_at)}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight className="self-center text-muted-foreground" />
+                  </div>
+                  <div className="mt-3">
+                    <PoolProgress
+                      pledged={pool.pledged_qty}
+                      target={pool.min_qty}
+                      participants={pool.participant_count}
+                      unit={pool.unit}
+                      size="sm"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Next: wait for the pool to reach its target. You can change your quantity until
+                    it closes.
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {inProgress.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 font-display text-xl font-bold">Orders in progress</h2>
+          <OrderList list={inProgress} />
+        </section>
+      )}
+
+      <section>
+        <h2 className="mb-3 font-display text-xl font-bold">Previous orders</h2>
+        {previous.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No previous orders yet.</p>
+        ) : (
+          <OrderList list={previous} />
+        )}
+      </section>
+    </Container>
+  );
+}
+
+function OrderList({ list }: { list: MyOrder[] }) {
+  return (
+    <div className="divide-y rounded-2xl border bg-card shadow-card">
+      {list.map((o) => {
+        const label =
+          o.fulfilment_status !== "none"
+            ? FULFIL_STATUS[o.fulfilment_status]
+            : o.status === "confirmed"
+              ? PAYMENT_STATUS[o.payment_status]
+              : ORDER_STATUS[o.status];
+        return (
+          <Link
+            key={o.id}
+            to="/orders/$orderId"
+            params={{ orderId: o.id }}
+            className="flex items-center gap-3 p-4"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">{o.pools?.products?.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {o.ref ?? "No reference"} · {o.quantity} {o.pools?.unit}(s) ·{" "}
+                {o.payment_status === "paid" ? `Paid ${money(o.amount_paid)}` : money(o.total)}
+                {o.collected_at && ` · Collected ${date(o.collected_at)}`}
+              </p>
+            </div>
+            <StatusBadge tone={label.tone}>{label.label}</StatusBadge>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}

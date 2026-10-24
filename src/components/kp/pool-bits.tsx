@@ -1,0 +1,240 @@
+import { useEffect, useState } from "react";
+import { Minus, Plus, Users, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { pct } from "@/lib/format";
+import { TIMELINE } from "@/lib/status";
+
+export function Logo({ light, className }: { light?: boolean; className?: string }) {
+  return (
+    <span
+      className={cn("inline-flex items-center bg-[#F5F4EF] p-1", light && "rounded-sm", className)}
+    >
+      <img
+        src="/branding/kasipool-logo.jpg"
+        alt="KasiPool"
+        className="h-auto w-[124px] sm:w-40"
+        width={160}
+        height={53}
+      />
+    </span>
+  );
+}
+
+/** The signature pooling progress indicator. Shows interest only (not payment). */
+export function PoolProgress({
+  pledged,
+  target,
+  participants,
+  unit,
+  size = "md",
+  label = "pledged",
+}: {
+  pledged: number;
+  target: number;
+  participants: number;
+  unit: string;
+  size?: "sm" | "md" | "lg";
+  label?: string;
+}) {
+  const p = pct(pledged, target);
+  const reached = pledged >= target;
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setW(p), 50);
+    return () => clearTimeout(t);
+  }, [p]);
+  const dots = Math.min(participants, size === "sm" ? 5 : 8);
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-2">
+        <p
+          className={cn(
+            "font-display font-bold tabular",
+            size === "lg" ? "text-3xl" : size === "md" ? "text-xl" : "text-base",
+          )}
+        >
+          {pledged}{" "}
+          <span className="font-sans text-sm font-medium text-muted-foreground">
+            of {target} {unit}s {label}
+          </span>
+        </p>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-xs font-bold tabular",
+            reached ? "bg-gold text-gold-foreground animate-pop" : "bg-primary-soft text-primary",
+          )}
+        >
+          {p}%
+        </span>
+      </div>
+      <div
+        className={cn(
+          "relative mt-2 overflow-hidden rounded-full bg-muted",
+          size === "lg" ? "h-5" : size === "md" ? "h-3.5" : "h-2.5",
+        )}
+        role="progressbar"
+        aria-valuenow={p}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Pool progress"
+      >
+        <div
+          className="relative h-full overflow-hidden rounded-full bg-gold transition-[width] duration-1000 ease-out"
+          style={{ width: `${w}%` }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "repeating-linear-gradient(135deg, transparent 0 6px, rgb(90 36 16 / 18%) 6px 8px)",
+            }}
+          />
+          <span className="absolute inset-y-0 right-0 w-1 bg-umber" />
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+        <div className="flex -space-x-1.5">
+          {Array.from({ length: dots }).map((_, i) => (
+            <span
+              key={i}
+              className={cn(
+                "grid size-5 place-items-center rounded-full border-2 border-card",
+                i % 3 === 0 ? "bg-gold" : i % 3 === 1 ? "bg-primary" : "bg-umber",
+              )}
+            />
+          ))}
+        </div>
+        <span>
+          <Users className="mr-1 inline size-3.5" />
+          {participants} {participants === 1 ? "business" : "businesses"} pooling
+        </span>
+        {!reached && size !== "sm" && (
+          <span className="ml-auto whitespace-nowrap tabular">
+            {Math.max(target - pledged, 0)} to go
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function Countdown({ to, className }: { to: string; className?: string }) {
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(Date.now());
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  if (now === null) return <span className={className}>…</span>;
+  const ms = new Date(to).getTime() - now;
+  if (ms <= 0) return <span className={className}>Closed</span>;
+  const d = Math.floor(ms / 86400000),
+    h = Math.floor((ms % 86400000) / 3600000),
+    m = Math.floor((ms % 3600000) / 60000),
+    s = Math.floor((ms % 60000) / 1000);
+  return (
+    <span className={cn("tabular", className)}>
+      {d > 0 && `${d}d `}
+      {h}h {m}m {d === 0 && `${s}s`}
+    </span>
+  );
+}
+
+export function QuantityStepper({
+  value,
+  onChange,
+  min = 1,
+  max = 999,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  min?: number;
+  max?: number;
+}) {
+  return (
+    <div className="flex items-center rounded-xl border bg-card">
+      <button
+        type="button"
+        aria-label="Decrease quantity"
+        className="grid size-14 place-items-center text-primary disabled:opacity-30"
+        disabled={value <= min}
+        onClick={() => onChange(Math.max(min, value - 1))}
+      >
+        <Minus className="size-5" />
+      </button>
+      <input
+        aria-label="Quantity"
+        inputMode="numeric"
+        className="h-14 w-16 border-x bg-transparent text-center font-display text-2xl font-bold tabular outline-none"
+        value={value}
+        onChange={(e) => {
+          const n = parseInt(e.target.value.replace(/\D/g, "") || "0", 10);
+          onChange(Math.min(max, n));
+        }}
+        onBlur={() => onChange(Math.max(min, Math.min(max, value)))}
+      />
+      <button
+        type="button"
+        aria-label="Increase quantity"
+        className="grid size-14 place-items-center text-primary disabled:opacity-30"
+        disabled={value >= max}
+        onClick={() => onChange(Math.min(max, value + 1))}
+      >
+        <Plus className="size-5" />
+      </button>
+    </div>
+  );
+}
+
+export function OrderTimeline({ step, failed }: { step: number; failed?: string | null }) {
+  return (
+    <ol className="relative space-y-0">
+      {TIMELINE.map((label, i) => {
+        const done = i < step || (i === step && i === TIMELINE.length - 1);
+        const current = i === step && !failed && i !== TIMELINE.length - 1;
+        return (
+          <li key={label} className="relative flex gap-3 pb-5 last:pb-0">
+            {i < TIMELINE.length - 1 && (
+              <span
+                className={cn(
+                  "absolute left-[13px] top-7 h-[calc(100%-1.5rem)] w-0.5",
+                  i < step ? "bg-primary" : "bg-border",
+                )}
+              />
+            )}
+            <span
+              className={cn(
+                "z-10 grid size-7 shrink-0 place-items-center rounded-full border-2 text-xs font-bold",
+                done
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : current
+                    ? "border-gold bg-gold-soft text-gold-foreground ring-4 ring-gold/25"
+                    : "border-border bg-card text-muted-foreground",
+              )}
+            >
+              {done ? <Check className="size-4" /> : i + 1}
+            </span>
+            <span
+              className={cn(
+                "pt-0.5 text-sm",
+                current ? "font-bold" : done ? "font-medium" : "text-muted-foreground",
+              )}
+            >
+              {label}
+              {current && (
+                <span className="ml-2 rounded bg-gold-soft px-1.5 py-0.5 text-[11px] font-bold text-gold-foreground">
+                  Current
+                </span>
+              )}
+            </span>
+          </li>
+        );
+      })}
+      {failed && (
+        <li className="mt-3 rounded-lg bg-destructive-soft p-3 text-sm text-destructive">
+          {failed}
+        </li>
+      )}
+    </ol>
+  );
+}
