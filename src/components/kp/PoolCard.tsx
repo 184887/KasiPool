@@ -44,7 +44,7 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
     <article className="flex flex-col overflow-hidden rounded-md border-2 border-ink bg-card">
       <Link
         href={`/offers/${pool.id}`}
-        className="relative block aspect-[4/3] overflow-hidden border-b-2 border-ink bg-muted"
+        className="relative block aspect-[4/3] overflow-hidden border-b-2 border-ink bg-white"
       >
         {pool.products?.image_url && (
           <img
@@ -53,7 +53,7 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
             loading="lazy"
             width={816}
             height={816}
-            className="size-full object-cover"
+            className="size-full object-contain px-4 pb-10 pt-12"
           />
         )}
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
