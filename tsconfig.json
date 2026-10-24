@@ -1,36 +1,38 @@
 {
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "vite.config.ts",
-    "vitest.config.ts",
-    "eslint.config.js"
-  ],
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "vitest/globals"],
-
     "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowJs": false,
     "noEmit": true,
-
+    "incremental": true,
+    "esModuleInterop": true,
+    "types": ["vitest/globals"],
     "skipLibCheck": true,
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
-    "noImplicitReturns": false,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": false,
-    "exactOptionalPropertyTypes": false,
-    "noUncheckedSideEffectImports": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts",
+    "*.ts",
+    "*.mjs",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", "supabase/functions"]
 }

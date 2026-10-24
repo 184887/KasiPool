@@ -1,8 +1,6 @@
 node_modules
-dist
-.output
-.vinxi
-pnpm-lock.yaml
+.next
+out
 package-lock.json
-bun.lock
-routeTree.gen.ts
+next-env.d.ts
+src/integrations/supabase/types.ts

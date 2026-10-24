@@ -1,4 +1,6 @@
-import { Link } from "@tanstack/react-router";
+"use client";
+
+import Link from "next/link";
 import { Clock, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { money, savings, dateTime } from "@/lib/format";
@@ -39,8 +41,7 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-card transition-shadow hover:shadow-lift">
       <Link
-        to="/offers/$poolId"
-        params={{ poolId: pool.id }}
+        href={`/offers/${pool.id}`}
         className="relative block aspect-[4/3] overflow-hidden bg-muted"
       >
         {pool.products?.image_url && (
@@ -95,9 +96,7 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
         )}
         <div className="mt-auto flex gap-2 pt-1">
           <Button asChild className="flex-1" variant={open ? "default" : "outline"}>
-            <Link to="/offers/$poolId" params={{ poolId: pool.id }}>
-              {open ? "Join Pool" : "View offer"}
-            </Link>
+            <Link href={`/offers/${pool.id}`}>{open ? "Join Pool" : "View offer"}</Link>
           </Button>
           <Button asChild variant="outline" size="icon" aria-label="Share via WhatsApp">
             <a href={whatsappShareUrl(pool)} target="_blank" rel="noopener noreferrer">
