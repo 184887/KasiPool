@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Container } from "@/components/kp/AppShell";
+import { GoogleButton } from "@/components/kp/GoogleButton";
 import { Logo } from "@/components/kp/pool-bits";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, safeRedirect } from "@/lib/auth";
@@ -141,9 +142,7 @@ export function AuthPage() {
                 ? "Log in to join pools and track orders."
                 : "Step 1 of 2: create your login."}
             </p>
-            <Button variant="outline" size="lg" className="mt-6 w-full" onClick={google}>
-              Continue with Google
-            </Button>
+            <GoogleButton className="mt-6" onClick={google} />
             <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
               <span className="h-px flex-1 bg-border" />
               or continue with {phoneMode ? "mobile" : "email"}
