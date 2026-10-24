@@ -142,11 +142,12 @@ supabase migration new <name>          # create a new migration file
 supabase gen types typescript --linked > src/integrations/supabase/types.ts
 ```
 
-> **Existing database:** these migrations were applied before the project used the Supabase CLI,
-> so the CLI's history table may not list them yet. Run `supabase migration list` first. For each
-> migration that is already in the database but shows as unapplied, mark it applied without
-> running it again:
-> `supabase migration repair --status applied <timestamp>`.
+Without `supabase link`, pass the connection string instead, e.g.
+`supabase db push --db-url "$SUPABASE_DB_URL"`. Use the **session pooler** string from the
+dashboard's Connect panel: the direct `db.<ref>.supabase.co` host is IPv6-only.
+
+> **Hosting:** the database is the Supabase project `spjmlcodmjdihbxwueot` (eu-west-1). It was
+> created fresh from these migrations; the original Lovable Cloud database is no longer used.
 
 ## Edge Functions and third-party providers
 
