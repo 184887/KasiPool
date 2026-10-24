@@ -102,9 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
           <div>
             <Logo />
-            <p className="mt-2 text-muted-foreground">
-              Individual businesses. Combined buying power.
-            </p>
+            <p className="mt-2 text-muted-foreground">Buy together, Profit better.</p>
           </div>
           <div className="space-y-1.5">
             <p className="font-semibold">KasiPool</p>
@@ -147,7 +145,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-hidden="true"
               className={cn(
                 "absolute inset-x-3 top-0 h-[3px] rounded-full",
-                isActive(n.to) ? "bg-[#B4501A]" : "bg-transparent",
+                isActive(n.to) ? "bg-ember" : "bg-transparent",
               )}
             />
             <n.icon className={cn("size-5", isActive(n.to) && "stroke-[2.5]")} aria-hidden="true" />

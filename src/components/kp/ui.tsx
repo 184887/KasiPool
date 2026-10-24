@@ -78,7 +78,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex h-[26px] items-center gap-1 rounded-full px-2.5 text-xs font-bold whitespace-nowrap",
+        "inline-flex h-[26px] items-center gap-1 rounded-sm px-2 text-xs font-bold whitespace-nowrap",
         completed ? "bg-success text-white" : toneCls[tone],
         className,
       )}

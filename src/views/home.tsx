@@ -50,10 +50,10 @@ export function Home() {
             <p className="mb-3 inline-flex rounded-full bg-primary-foreground/10 px-3 py-1 text-xs font-semibold">
               For spaza shops, tuck shops & local traders
             </p>
-            <h1 className="font-display text-[2rem] font-extrabold leading-9 sm:text-5xl sm:leading-[1.05]">
-              Individual businesses.
+            <h1 className="font-headline text-5xl sm:text-7xl">
+              Buy together,
               <br />
-              <span className="text-gold-light">Combined buying power.</span>
+              <span className="text-gold">Profit better.</span>
             </h1>
             <p className="mt-5 max-w-md text-lg text-primary-foreground/85">
               KasiPool brings small business orders together into one coordinated purchase. Choose

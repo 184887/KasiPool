@@ -4,17 +4,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* KasiPool design system. Brand colours live in :root — change them here only. */
+/* KasiPool design system, following the pitch deck: ink on paper, orange and green accents,
+   flat surfaces and square corners. Brand colours live in :root — change them here only. */
 
 @theme inline {
-  --font-display: "Archivo", Arial, sans-serif;
-  --font-sans: "Public Sans", Arial, sans-serif;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* Font variables are set by next/font in src/app/layout.tsx */
+  --font-headline: var(--font-anton), "Arial Narrow", Arial, sans-serif;
+  --font-display: var(--font-bricolage), Arial, sans-serif;
+  --font-sans: var(--font-archivo), Arial, sans-serif;
+  /* Near-square corners, as in the deck; the scale stays tight even at 3xl */
+  --radius-sm: 2px;
+  --radius-md: 3px;
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-xl: calc(var(--radius) + 2px);
+  --radius-2xl: calc(var(--radius) + 4px);
+  --radius-3xl: calc(var(--radius) + 6px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -30,6 +34,12 @@
   --color-gold-light: var(--gold-light);
   --color-gold-foreground: var(--gold-foreground);
   --color-gold-soft: var(--gold-soft);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-ember: var(--ember);
+  --color-leaf: var(--leaf);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-sun: var(--sun);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -63,57 +73,67 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: #f5f4ef;
-  --foreground: #1a2036;
-  --card: #ffffff;
-  --card-foreground: #1a2036;
-  --popover: #ffffff;
-  --popover-foreground: #1a2036;
-  --primary: #142344;
-  --primary-foreground: #ffffff;
-  --primary-soft: #ede6d6;
-  --secondary: #ede6d6;
-  --secondary-foreground: #1a2036;
-  --gold: #d9951f;
-  --gold-light: #f2b84b;
-  --gold-foreground: #142344;
-  --gold-soft: #fcefd0;
-  --muted: #ede6d6;
-  --muted-foreground: #4b5370;
-  --accent: #ede6d6;
-  --accent-foreground: #142344;
+  /* Pitch deck palette */
+  --ink: #1c1a17;
+  --paper: #f3f0ea;
+  --ember: #a64a14; /* deep orange: accent text, numerals (5.1:1 on paper) */
+  --leaf: #1f5e3b;
+  --leaf-soft: #d3ddd5;
+  --sun: #f7c934;
+
+  --radius: 0.25rem;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: #fbf9f5;
+  --card-foreground: var(--ink);
+  --popover: #fbf9f5;
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --primary-soft: #e6e1d8;
+  --secondary: #e6e1d8;
+  --secondary-foreground: var(--ink);
+  /* "gold" is the deck's orange: calls to action and the "Buy big." highlight */
+  --gold: #f2892b;
+  --gold-light: #f6a35c;
+  --gold-foreground: var(--ink);
+  --gold-soft: #fbe3cc;
+  --muted: #e6e1d8;
+  --muted-foreground: #4d4943;
+  --accent: #e6e1d8;
+  --accent-foreground: var(--ink);
   --destructive: #b3261e;
   --destructive-foreground: #ffffff;
-  --destructive-soft: #fbe5e3;
-  --success: #1d7a4b;
-  --success-soft: #e3f3ea;
-  --warning: #8f5200;
-  --warning-soft: #fcefd0;
-  --info: #1d5ba6;
-  --info-soft: #e1ecf8;
-  --border: #d9d0bc;
-  --input: #8c8470;
-  --ring: #f2b84b;
-  --chart-1: #142344;
-  --chart-2: #d9951f;
-  --chart-3: #1d5ba6;
-  --chart-4: #1d7a4b;
-  --chart-5: #b3261e;
-  --sidebar: #0e1833;
-  --sidebar-foreground: #f5f4ef;
-  --sidebar-primary: #f2b84b;
-  --sidebar-primary-foreground: #142344;
-  --sidebar-accent: #1e3166;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #4b5370;
-  --sidebar-ring: #f2b84b;
+  --destructive-soft: #f8e1de;
+  --success: var(--leaf);
+  --success-soft: var(--leaf-soft);
+  --warning: #7a4a00;
+  --warning-soft: #fcefc2;
+  --info: var(--ink);
+  --info-soft: #e6e1d8;
+  --border: #cfc8bc;
+  --input: #7a746b;
+  --ring: #f2892b;
+  --chart-1: var(--ink);
+  --chart-2: #f2892b;
+  --chart-3: var(--leaf);
+  --chart-4: var(--sun);
+  --chart-5: var(--ember);
+  --sidebar: var(--ink);
+  --sidebar-foreground: var(--paper);
+  --sidebar-primary: #f2892b;
+  --sidebar-primary-foreground: var(--ink);
+  --sidebar-accent: #34312c;
+  --sidebar-accent-foreground: var(--paper);
+  --sidebar-border: #4d4943;
+  --sidebar-ring: #f2892b;
 
-  --gradient-hero: #142344;
-  --gradient-progress: #d9951f;
-  --gradient-gold: #d9951f;
-  --shadow-card: 0 1px 3px rgb(26 32 54 / 8%), 0 4px 12px rgb(26 32 54 / 5%);
-  --shadow-lift: 0 8px 24px -10px rgb(20 35 68 / 35%);
+  --gradient-hero: var(--ink);
+  --gradient-progress: var(--leaf);
+  --gradient-gold: #f2892b;
+  /* Flat, like the deck: cards rely on borders, not shadows */
+  --shadow-card: none;
+  --shadow-lift: none;
 }
 
 @layer base {
@@ -139,8 +159,8 @@
     letter-spacing: -0.01em;
   }
   ::selection {
-    background: #f2b84b;
-    color: #142344;
+    background: #f2892b;
+    color: #1c1a17;
   }
 }
 
@@ -162,14 +182,18 @@
 @utility font-display {
   font-family: var(--font-display);
 }
+/* Anton: big condensed headlines (deck titles). Single weight, so never bold it. */
+@utility font-headline {
+  font-family: var(--font-headline);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
-@utility text-ember {
-  color: #b4501a;
-}
 @utility bg-umber {
-  background-color: #5a2410;
+  background-color: var(--ink);
 }
 
 @keyframes kp-shimmer {

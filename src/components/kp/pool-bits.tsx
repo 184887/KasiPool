@@ -4,18 +4,37 @@ import { cn } from "@/lib/utils";
 import { pct } from "@/lib/format";
 import { TIMELINE } from "@/lib/status";
 
+/** The deck's two interlocking rings: orange passes over green at the top crossing. */
+export function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 400 260" aria-hidden="true" className={className}>
+      <circle cx="130" cy="130" r="105" fill="none" stroke="#F2892B" strokeWidth="36" />
+      <circle cx="270" cy="130" r="105" fill="none" stroke="#3E9A62" strokeWidth="36" />
+      <path
+        d="M174.4,34.8 A105,105 0 0 1 220.9,77.5"
+        fill="none"
+        stroke="#F2892B"
+        strokeWidth="36"
+      />
+    </svg>
+  );
+}
+
+/** Rings mark + "KasiPool" wordmark. Use `light` on ink backgrounds. */
 export function Logo({ light, className }: { light?: boolean; className?: string }) {
   return (
     <span
-      className={cn("inline-flex items-center bg-[#F5F4EF] p-1", light && "rounded-sm", className)}
+      role="img"
+      aria-label="KasiPool"
+      className={cn("inline-flex items-center gap-2", light ? "text-paper" : "text-ink", className)}
     >
-      <img
-        src="/branding/kasipool-logo.jpg"
-        alt="KasiPool"
-        className="h-auto w-[124px] sm:w-40"
-        width={160}
-        height={53}
-      />
+      <LogoMark className="h-7 w-auto sm:h-8" />
+      <span
+        aria-hidden="true"
+        className="font-display text-[22px] leading-none font-extrabold tracking-[-0.03em] sm:text-2xl"
+      >
+        Kasi<span className="text-gold">Pool</span>
+      </span>
     </span>
   );
 }

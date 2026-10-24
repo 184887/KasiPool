@@ -1,38 +1,39 @@
 import type { Metadata, Viewport } from "next";
+import { Anton, Archivo, Bricolage_Grotesque } from "next/font/google";
 import type { ReactNode } from "react";
 import { Providers } from "./providers";
 import "@/styles.css";
 
+// Self-hosted by next/font: no request to Google at runtime and no layout shift.
+const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
+const bricolage = Bricolage_Grotesque({
+  weight: ["600", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-bricolage",
+});
+const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
+
 export const metadata: Metadata = {
-  title: "KasiPool — Individual businesses. Combined buying power.",
+  title: "KasiPool — Buy together, Profit better.",
   description:
     "KasiPool helps Cape Town township businesses coordinate pooled purchases for stock they already buy.",
   openGraph: {
-    title: "KasiPool — Individual businesses. Combined buying power.",
+    title: "KasiPool — Buy together, Profit better.",
     description:
       "Join other local businesses to coordinate a larger purchase, with clear quantities, prices and deadlines.",
     type: "website",
   },
   twitter: { card: "summary_large_image" },
-  icons: { icon: "/favicon.png", apple: "/apple-touch-icon.png" },
+  icons: { apple: "/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#142344",
+  themeColor: "#1c1a17",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-ZA">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap"
-        />
-      </head>
+    <html lang="en-ZA" className={`${anton.variable} ${bricolage.variable} ${archivo.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>
