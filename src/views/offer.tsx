@@ -84,7 +84,7 @@ export function Offer() {
 
   const s = savings(Number(pool.price), pool.reference_price ? Number(pool.reference_price) : null);
   const st = POOL_STATUS[pool.status];
-  const open = pool.status === "open";
+  const open = pool.status === "open" && !pool.is_sample;
   const maxQty = pool.max_per_customer ?? 999;
 
   async function join() {
@@ -125,6 +125,15 @@ export function Offer() {
       >
         <ArrowLeft className="size-4" /> All deals
       </Link>
+      {pool.is_sample && (
+        <div className="mb-4 rounded-md border-2 border-ink bg-sun p-4 text-ink">
+          <p className="font-display text-lg font-bold">This is a sample deal</p>
+          <p className="text-sm">
+            It shows how KasiPool works. The prices and progress are examples, and you can&apos;t
+            join it.
+          </p>
+        </div>
+      )}
       <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
         <div>
           <div className="relative overflow-hidden rounded-md border-2 border-ink bg-muted">
