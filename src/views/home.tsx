@@ -45,14 +45,22 @@ export function Home() {
         <div className="relative mx-auto max-w-6xl px-4 pb-12 pt-10 md:pb-20 md:pt-16">
           {/* Large rings on wide screens, as on the pitch deck cover */}
           <LogoMark className="pointer-events-none absolute right-4 top-1/2 hidden w-[380px] -translate-y-1/2 md:block lg:w-[480px]" />
-          <p className="text-sm font-bold text-gold">For spaza shops, tuck shops & local traders</p>
-          <h1 className="mt-3 font-headline text-6xl sm:text-8xl">
-            Buy together,
-            <br />
-            <span className="text-gold">Profit better.</span>
+          <h1>
+            <span className="block font-display text-5xl font-extrabold tracking-[-0.03em] sm:text-7xl">
+              Kasi<span className="text-gold">Pool</span>
+            </span>
+            <span className="mt-2 block font-display text-xl font-bold text-paper/80 sm:text-2xl">
+              Collective Buying Alliance
+            </span>
+            <span className="mt-6 block font-headline text-6xl sm:text-8xl">
+              Buy Together.
+              <br />
+              <span className="text-gold">Profit Better.</span>
+            </span>
           </h1>
           <p className="mt-5 max-w-md text-lg text-paper/85">
-            Join other local shops on one big order and get the bulk price. Joining is free.
+            For spaza shops, tuck shops and local traders: join one big order and get the bulk
+            price. Joining is free.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Button asChild size="xl" variant="gold">

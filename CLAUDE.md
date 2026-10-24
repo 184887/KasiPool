@@ -49,8 +49,8 @@ Run lint, typecheck, test and build before committing. Format with `npx prettier
   `font-display` = Bricolage Grotesque for headings, Archivo for body.
 - Look: cream "paper" pages, dark ink only for the header bar and hero sections, flat surfaces,
   near-square corners, thick ink rules. No dark mode.
-- Logo: `Logo` / `LogoMark` in `src/components/kp/pool-bits.tsx` (SVG rings). Tagline: "Buy
-  together, Profit better."
+- Logo: `Logo` / `LogoMark` in `src/components/kp/pool-bits.tsx` (SVG rings). Name line: "KasiPool |
+  Collective Buying Alliance". Tagline: "Buy Together. Profit Better."
 - Users are shop owners on low-end phones and paid data, often with limited digital literacy:
   keep pages light, text plain, tap targets large (buttons are 48px tall), flows short.
 - Keep text and background colours at WCAG AA contrast or better.

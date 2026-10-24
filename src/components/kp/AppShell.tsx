@@ -102,7 +102,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
           <div>
             <Logo />
-            <p className="mt-3 font-semibold">Buy together, Profit better.</p>
+            <p className="mt-3 font-semibold">Collective Buying Alliance</p>
+            <p className="font-semibold">Buy Together. Profit Better.</p>
           </div>
           <div className="space-y-1.5">
             <p className="font-bold">KasiPool</p>
