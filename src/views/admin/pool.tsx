@@ -480,12 +480,12 @@ export function PoolAdmin() {
                 <p>{pool.outcome_note ?? "This pool is closed."}</p>
                 {pool.status !== "completed" && (
                   <Button asChild variant="outline" className="w-full">
-                    <Link href="/admin/pools/new">Relaunch as new offer</Link>
+                    <Link href="/admin/pools/new">Relaunch as new deal</Link>
                   </Button>
                 )}
                 {pool.status !== "completed" && (
                   <p className="text-xs text-muted-foreground">
-                    Customer commitments are not transferred to a new offer.
+                    Customer commitments are not transferred to a new deal.
                   </p>
                 )}
               </div>

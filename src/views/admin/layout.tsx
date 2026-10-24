@@ -84,7 +84,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </Link>
         </aside>
         <div className="min-w-0 flex-1">
-          <div className="sticky top-0 z-30 flex gap-1 overflow-x-auto border-b bg-sidebar px-2 py-2 lg:hidden">
+          <div className="no-scrollbar sticky top-0 z-30 flex gap-1 overflow-x-auto border-b-4 border-gold bg-sidebar px-2 py-2 lg:hidden">
             <Link
               href="/"
               className="shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold text-sidebar-foreground/70"

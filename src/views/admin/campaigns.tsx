@@ -126,7 +126,7 @@ export function Campaigns() {
             {c.pools.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 No pools yet.{" "}
-                <Link href="/admin/pools/new" className="text-primary underline">
+                <Link href="/admin/pools/new" className="text-ember underline">
                   Add one
                 </Link>
               </p>
@@ -134,7 +134,10 @@ export function Campaigns() {
               <ul className="divide-y text-sm">
                 {c.pools.map((p) => (
                   <li key={p.id} className="flex items-center justify-between gap-2 py-2">
-                    <Link href={`/admin/pools/${p.id}`} className="font-medium hover:text-primary">
+                    <Link
+                      href={`/admin/pools/${p.id}`}
+                      className="font-medium hover:text-ember hover:underline"
+                    >
                       {p.products?.name}
                     </Link>
                     <span className="tabular text-muted-foreground">
