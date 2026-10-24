@@ -127,10 +127,6 @@
   --sidebar-accent-foreground: var(--paper);
   --sidebar-border: #4d4943;
   --sidebar-ring: #f2892b;
-
-  --gradient-hero: var(--ink);
-  --gradient-progress: var(--leaf);
-  --gradient-gold: #f2892b;
   /* Flat, like the deck: cards rely on borders, not shadows */
   --shadow-card: none;
   --shadow-lift: none;
@@ -164,15 +160,6 @@
   }
 }
 
-@utility bg-hero {
-  background: var(--gradient-hero);
-}
-@utility bg-progress {
-  background: var(--gradient-progress);
-}
-@utility bg-gold-gradient {
-  background: var(--gradient-gold);
-}
 @utility shadow-card {
   box-shadow: var(--shadow-card);
 }
@@ -189,11 +176,15 @@
   letter-spacing: 0;
   line-height: 1.1;
 }
+/* Horizontal chip rows: still scrollable, no visible bar */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 @utility tabular {
   font-variant-numeric: tabular-nums;
-}
-@utility bg-umber {
-  background-color: var(--ink);
 }
 
 @keyframes kp-shimmer {

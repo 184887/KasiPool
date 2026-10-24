@@ -2,214 +2,159 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Users, BadgeCheck, PackageCheck, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/kp/AppShell";
 import { PoolCard } from "@/components/kp/PoolCard";
-import { PoolProgress } from "@/components/kp/pool-bits";
+import { LogoMark } from "@/components/kp/pool-bits";
 import { Loading, EmptyState } from "@/components/kp/ui";
-import { activePoolsQuery, catalogueQuery } from "@/lib/queries";
+import { useAuth } from "@/lib/auth";
+import { activePoolsQuery, myOrdersQuery, settingsQuery } from "@/lib/queries";
+import { nextAction } from "@/lib/status";
 
 export const STEPS = [
   {
-    icon: Search,
-    title: "Choose an offer",
-    body: "Check the product, pack size, price, deadline and collection details.",
+    title: "Choose a deal",
+    body: "Check the product, pack size, price, deadline and where to collect.",
   },
   {
-    icon: Users,
     title: "Join the pool",
     body: "Choose your quantity. Joining shows interest; it is not a payment.",
   },
   {
-    icon: BadgeCheck,
     title: "Confirm & pay",
-    body: "If the offer is confirmed, review your total before you pay.",
+    body: "If the pool reaches its target, check your total, then pay.",
   },
   {
-    icon: PackageCheck,
     title: "Collect your stock",
     body: "Pick up at the collection point with your code.",
   },
 ];
 
 export function Home() {
+  const { user } = useAuth();
   const pools = useQuery(activePoolsQuery);
-  const cat = useQuery(catalogueQuery);
-  const open = (pools.data ?? []).filter((p) => p.status === "open");
-  const closingSoon = [...open]
+  const closingSoon = (pools.data ?? [])
+    .filter((p) => p.status === "open")
     .sort((a, b) => +new Date(a.closes_at) - +new Date(b.closes_at))
     .slice(0, 3);
-  const hero = open[0];
 
   return (
     <>
-      <section className="bg-hero text-primary-foreground">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
-          <div>
-            <p className="mb-3 inline-flex rounded-full bg-primary-foreground/10 px-3 py-1 text-xs font-semibold">
-              For spaza shops, tuck shops & local traders
-            </p>
-            <h1 className="font-headline text-5xl sm:text-7xl">
-              Buy together,
-              <br />
-              <span className="text-gold">Profit better.</span>
-            </h1>
-            <p className="mt-5 max-w-md text-lg text-primary-foreground/85">
-              KasiPool brings small business orders together into one coordinated purchase. Choose
-              an offer, select your quantity and we coordinate the rest.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="xl" variant="gold">
-                <Link href="/offers">
-                  See open offers <ArrowRight />
-                </Link>
-              </Button>
-              <Button asChild size="xl" variant="heroOutline">
-                <Link href="/how-it-works">How It Works</Link>
-              </Button>
-            </div>
-          </div>
-          {hero && (
-            <Link
-              href={`/offers/${hero.id}`}
-              className="block rounded-3xl bg-card p-5 text-card-foreground shadow-lift"
-            >
-              <div className="flex items-center gap-4">
-                <img
-                  src={hero.products?.image_url ?? ""}
-                  alt=""
-                  className="size-20 rounded-2xl object-cover"
-                  width={80}
-                  height={80}
-                />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Open pool
-                  </p>
-                  <p className="font-display text-xl font-bold">{hero.products?.name}</p>
-                  <p className="text-sm text-muted-foreground">{hero.products?.pack_size}</p>
-                </div>
-              </div>
-              <div className="mt-5">
-                <PoolProgress
-                  pledged={hero.pledged_qty}
-                  target={hero.min_qty}
-                  participants={hero.participant_count}
-                  unit={hero.unit}
-                />
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Joining adds your requested quantity to the shared total. No payment is due now.
-              </p>
+      <section className="bg-ink text-paper">
+        <div className="relative mx-auto max-w-6xl px-4 pb-12 pt-10 md:pb-20 md:pt-16">
+          {/* Large rings on wide screens, as on the pitch deck cover */}
+          <LogoMark className="pointer-events-none absolute right-4 top-1/2 hidden w-[380px] -translate-y-1/2 md:block lg:w-[480px]" />
+          <p className="text-sm font-bold text-gold">For spaza shops, tuck shops & local traders</p>
+          <h1 className="mt-3 font-headline text-6xl sm:text-8xl">
+            Buy together,
+            <br />
+            <span className="text-gold">Profit better.</span>
+          </h1>
+          <p className="mt-5 max-w-md text-lg text-paper/85">
+            Join other local shops on one big order and get the bulk price. Joining is free.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <Button asChild size="xl" variant="gold">
+              <Link href="/offers">
+                See deals <ArrowRight />
+              </Link>
+            </Button>
+            <Link href="/how-it-works" className="font-semibold underline underline-offset-4">
+              How it works
             </Link>
-          )}
+          </div>
         </div>
       </section>
 
-      <Container>
-        <div className="mb-4 mt-4 flex items-end justify-between">
-          <h2 className="font-display text-2xl font-bold">Active offers</h2>
-          <Link href="/offers" className="text-sm font-semibold text-ember">
-            See all →
+      {user && <NextStep userId={user.id} />}
+
+      <Container className="pt-8">
+        <div className="mb-4 flex items-end justify-between gap-4 border-b-4 border-ink pb-2">
+          <h2 className="font-headline text-3xl">Closing soon</h2>
+          <Link href="/offers" className="font-semibold text-ember">
+            See all deals <ArrowRight className="inline size-4" aria-hidden="true" />
           </Link>
         </div>
         {pools.isLoading ? (
           <Loading />
-        ) : open.length === 0 ? (
+        ) : closingSoon.length === 0 ? (
           <EmptyState
-            title="No open offers right now"
+            title="No open deals right now"
             body="New deals are added regularly. Check back soon."
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {open.slice(0, 6).map((p) => (
+            {closingSoon.map((p) => (
               <PoolCard key={p.id} pool={p} />
             ))}
           </div>
         )}
       </Container>
 
-      <section id="how" className="bg-primary-soft">
-        <Container className="py-12">
-          <h2 className="text-center font-display text-3xl font-bold">How KasiPool works</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((s, i) => (
-              <div key={s.title} className="rounded-2xl bg-card p-5 shadow-card">
-                <div className="flex items-center gap-3">
-                  <span className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
-                    <s.icon className="size-5" />
-                  </span>
-                  <span className="font-display text-3xl font-extrabold text-gold">{i + 1}</span>
-                </div>
-                <p className="mt-3 font-display text-lg font-bold">{s.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{s.body}</p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
+      <Container className="py-12">
+        <h2 className="border-b-4 border-ink pb-2 font-headline text-3xl">How it works</h2>
+        <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="border-t-2 border-ink pt-3">
+              <span className="font-headline text-5xl text-ember">{i + 1}</span>
+              <p className="mt-2 font-display text-xl font-bold">{s.title}</p>
+              <p className="mt-1 text-muted-foreground">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-8 rounded-md bg-leaf-soft p-4 font-semibold text-leaf">
+          Joining is free. You only pay if the pool reaches its target. If it doesn&apos;t, you owe
+          nothing.
+        </p>
+      </Container>
 
-      {closingSoon.length > 0 && (
-        <Container className="py-10">
-          <h2 className="mb-4 font-display text-2xl font-bold">Closing soon</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {closingSoon.map((p) => (
-              <PoolCard key={p.id} pool={p} />
-            ))}
+      {!user && (
+        <Container className="pb-4">
+          <div className="rounded-md bg-ink p-8 text-paper md:p-12">
+            <h2 className="font-headline text-4xl">Run a local business?</h2>
+            <p className="mt-2 max-w-md text-paper/85">
+              Register your business to join pools and get bulk prices.
+            </p>
+            <Button asChild size="xl" variant="gold" className="mt-6">
+              <Link href="/auth?mode=register">Register your business</Link>
+            </Button>
           </div>
         </Container>
       )}
-
-      <Container className="py-6">
-        <div className="grid gap-6 rounded-3xl border bg-card p-6 shadow-card md:grid-cols-2 md:p-10">
-          <div>
-            <h2 className="font-display text-2xl font-bold">Why pool your buying?</h2>
-            <p className="mt-3 text-muted-foreground">
-              KasiPool brings together what several businesses want to buy and coordinates one
-              larger purchase. Each business chooses its own quantity and pays only for its
-              confirmed order.
-            </p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              You only pay once a pool reaches its target. If it doesn't, nothing is owed.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-display text-lg font-semibold">Featured products</h3>
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {(cat.data?.products ?? []).slice(0, 8).map((p) => (
-                <Link
-                  key={p.id}
-                  href="/catalogue"
-                  className="overflow-hidden rounded-xl bg-muted"
-                  title={p.name}
-                >
-                  <img
-                    src={p.image_url ?? ""}
-                    alt={p.name}
-                    loading="lazy"
-                    className="aspect-square w-full object-cover"
-                    width={120}
-                    height={120}
-                  />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Container>
-
-      <Container className="py-10">
-        <div className="rounded-3xl bg-hero p-8 text-center text-primary-foreground md:p-12">
-          <h2 className="font-display text-3xl font-bold">Run a local business?</h2>
-          <p className="mx-auto mt-2 max-w-md text-primary-foreground/85">
-            Create a business account to browse offers and join a pool.
-          </p>
-          <Button asChild size="xl" variant="gold" className="mt-6">
-            <Link href="/auth?mode=register">Register your business</Link>
-          </Button>
-        </div>
-      </Container>
     </>
+  );
+}
+
+/** Banner for signed-in shops when an order is waiting on them (confirm, pay or collect). */
+function NextStep({ userId }: { userId: string }) {
+  const orders = useQuery(myOrdersQuery(userId));
+  const settings = useQuery(settingsQuery);
+  const payCfg = !!settings.data?.payment?.configured;
+  const waiting = (orders.data ?? []).filter((o) => nextAction(o, payCfg));
+  if (waiting.length === 0) return null;
+  const first = waiting[0];
+  return (
+    <div className="border-b-4 border-ink bg-gold">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 text-ink">
+        <p className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold">Your next step</span>
+          <span className="font-display text-xl font-bold">
+            {nextAction(first, payCfg)}: {first.pools?.products?.name}
+          </span>
+          {waiting.length > 1 && (
+            <span className="block text-sm">
+              and {waiting.length - 1} more {waiting.length === 2 ? "order needs" : "orders need"}{" "}
+              you
+            </span>
+          )}
+        </p>
+        <Button asChild>
+          <Link href={waiting.length > 1 ? "/my-pools" : `/orders/${first.id}`}>
+            {waiting.length > 1 ? "Open My Pools" : "Open order"} <ArrowRight />
+          </Link>
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -39,10 +39,10 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
   const st = POOL_STATUS[pool.status];
   const open = pool.status === "open";
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-card transition-shadow hover:shadow-lift">
+    <article className="flex flex-col overflow-hidden rounded-md border-2 border-ink bg-card">
       <Link
         href={`/offers/${pool.id}`}
-        className="relative block aspect-[4/3] overflow-hidden bg-muted"
+        className="relative block aspect-[4/3] overflow-hidden border-b-2 border-ink bg-muted"
       >
         {pool.products?.image_url && (
           <img
@@ -51,15 +51,15 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
             loading="lazy"
             width={816}
             height={816}
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="size-full object-cover"
           />
         )}
-        <StatusBadge className="absolute right-3 top-3" tone={st?.tone ?? "muted"}>
+        <StatusBadge className="absolute left-3 top-3" tone={st?.tone ?? "muted"}>
           {st?.customer}
         </StatusBadge>
         {s && (
-          <span className="absolute bottom-3 right-3 rounded-lg bg-gold px-2 py-1 text-xs font-extrabold text-gold-foreground shadow">
-            Potential saving {money(s.amount)}
+          <span className="absolute bottom-3 left-3 rounded-sm bg-leaf px-2 py-1 text-sm font-bold text-paper">
+            Save {money(s.amount)}
           </span>
         )}
       </Link>
@@ -71,15 +71,15 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
           </p>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="font-display text-[28px] font-extrabold leading-8 text-primary tabular">
-            {money(pool.price)}
-          </span>
+          <span className="font-headline text-4xl tabular">{money(pool.price)}</span>
           {s && (
-            <span className="text-sm text-muted-foreground line-through tabular">
-              {money(pool.reference_price)}
-            </span>
+            <>
+              <span className="text-sm text-muted-foreground line-through tabular">
+                {money(pool.reference_price)}
+              </span>
+              <span className="text-sm font-bold text-leaf">-{s.pct.toFixed(1)}%</span>
+            </>
           )}
-          {s && <span className="text-xs font-semibold text-success">−{s.pct.toFixed(1)}%</span>}
         </div>
         <PoolProgress
           pledged={pool.pledged_qty}
@@ -91,14 +91,14 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
         {open && (
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="size-4" aria-hidden="true" /> Closes in{" "}
-            <Countdown to={pool.closes_at} className="font-semibold text-foreground" />
+            <Countdown to={pool.closes_at} className="font-semibold text-ink" />
           </p>
         )}
         <div className="mt-auto flex gap-2 pt-1">
-          <Button asChild className="flex-1" variant={open ? "default" : "outline"}>
-            <Link href={`/offers/${pool.id}`}>{open ? "Join Pool" : "View offer"}</Link>
+          <Button asChild className="flex-1" variant={open ? "gold" : "outline"}>
+            <Link href={`/offers/${pool.id}`}>{open ? "Join pool" : "View deal"}</Link>
           </Button>
-          <Button asChild variant="outline" size="icon" aria-label="Share via WhatsApp">
+          <Button asChild variant="outline" size="icon" aria-label="Share on WhatsApp">
             <a href={whatsappShareUrl(pool)} target="_blank" rel="noopener noreferrer">
               <Share2 />
             </a>

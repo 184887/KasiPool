@@ -1,16 +1,6 @@
-import type { Metadata } from "next";
-import { Catalogue } from "@/views/catalogue";
+import { permanentRedirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Product catalogue",
-  description:
-    "Browse the staples KasiPool pools for: cooking oil, rice, sugar, maize meal, flour and more.",
-  openGraph: {
-    title: "KasiPool product catalogue",
-    description: "Everyday stock for spaza shops and local traders.",
-  },
-};
-
+// The catalogue was merged into Deals (/offers).
 export default function Page() {
-  return <Catalogue />;
+  permanentRedirect("/offers");
 }

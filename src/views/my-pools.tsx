@@ -13,26 +13,12 @@ import { PoolProgress } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, PageHeader } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { settingsQuery, errMsg } from "@/lib/queries";
+import { settingsQuery, errMsg, myOrdersQuery, type MyOrder } from "@/lib/queries";
 import { money, date, dateTime } from "@/lib/format";
 import { POOL_STATUS, ORDER_STATUS, nextAction, FULFIL_STATUS, PAYMENT_STATUS } from "@/lib/status";
 
 const PSEL =
   "pools(id, status, unit, price, min_qty, pledged_qty, participant_count, closes_at, payment_deadline, products(name, image_url, pack_size))";
-
-async function getMyOrders(userId: string) {
-  return (
-    (
-      await supabase
-        .from("orders")
-        .select(`*, ${PSEL}`)
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-    ).data ?? []
-  );
-}
-
-type MyOrder = Awaited<ReturnType<typeof getMyOrders>>[number];
 
 function JoinWithCode() {
   const nav = useRouter();
@@ -83,11 +69,7 @@ export function MyPools() {
       );
     },
   });
-  const orders = useQuery({
-    queryKey: ["my-orders", user?.id],
-    enabled: !!user,
-    queryFn: async () => getMyOrders(user!.id),
-  });
+  const orders = useQuery(myOrdersQuery(user?.id));
 
   if (parts.isLoading || orders.isLoading) return <Loading />;
   const all = orders.data ?? [];

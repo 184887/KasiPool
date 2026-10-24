@@ -62,7 +62,6 @@ export function PoolProgress({
     const t = setTimeout(() => setW(p), 50);
     return () => clearTimeout(t);
   }, [p]);
-  const dots = Math.min(participants, size === "sm" ? 5 : 8);
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
@@ -79,8 +78,8 @@ export function PoolProgress({
         </p>
         <span
           className={cn(
-            "rounded-full px-2 py-0.5 text-xs font-bold tabular",
-            reached ? "bg-gold text-gold-foreground animate-pop" : "bg-primary-soft text-primary",
+            "rounded-sm px-1.5 py-0.5 text-xs font-bold tabular",
+            reached ? "bg-gold text-ink animate-pop" : "bg-muted text-ink",
           )}
         >
           {p}%
@@ -88,7 +87,7 @@ export function PoolProgress({
       </div>
       <div
         className={cn(
-          "relative mt-2 overflow-hidden rounded-full bg-muted",
+          "relative mt-2 overflow-hidden rounded-sm bg-muted",
           size === "lg" ? "h-5" : size === "md" ? "h-3.5" : "h-2.5",
         )}
         role="progressbar"
@@ -98,33 +97,13 @@ export function PoolProgress({
         aria-label="Pool progress"
       >
         <div
-          className="relative h-full overflow-hidden rounded-full bg-gold transition-[width] duration-1000 ease-out"
+          className="h-full bg-leaf transition-[width] duration-1000 ease-out"
           style={{ width: `${w}%` }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "repeating-linear-gradient(135deg, transparent 0 6px, rgb(90 36 16 / 18%) 6px 8px)",
-            }}
-          />
-          <span className="absolute inset-y-0 right-0 w-1 bg-umber" />
-        </div>
+        />
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-        <div className="flex -space-x-1.5">
-          {Array.from({ length: dots }).map((_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "grid size-5 place-items-center rounded-full border-2 border-card",
-                i % 3 === 0 ? "bg-gold" : i % 3 === 1 ? "bg-primary" : "bg-umber",
-              )}
-            />
-          ))}
-        </div>
         <span>
-          <Users className="mr-1 inline size-3.5" />
+          <Users className="mr-1 inline size-3.5" aria-hidden="true" />
           {participants} {participants === 1 ? "business" : "businesses"} pooling
         </span>
         {!reached && size !== "sm" && (
