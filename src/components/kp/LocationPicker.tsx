@@ -76,7 +76,7 @@ export function LocationPicker({
 
   return (
     <div className="space-y-2 rounded-lg border p-3">
-      <p className="text-sm font-semibold">Business location *</p>
+      <p className="text-sm font-semibold">Map pin (optional)</p>
       <div className="flex gap-2">
         <Input
           className="h-12"

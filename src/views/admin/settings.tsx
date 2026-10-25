@@ -166,8 +166,7 @@ export function Settings() {
             </Button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            WhatsApp campaign messages are sent only to businesses that opted in. Configure the
-            approved Meta template and API credentials in Supabase Edge Function secrets.
+            Shown on the Help page and to shops who forget their PIN.
           </p>
         </Section>
 

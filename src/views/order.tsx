@@ -97,7 +97,7 @@ export function OrderPage() {
       </Link>
       <div className="flex items-center gap-3">
         <img
-          src={pool.products?.image_url ?? ""}
+          src={pool.products?.image_url ?? undefined}
           alt=""
           className="size-16 rounded-sm border-2 border-ink object-cover"
           width={64}

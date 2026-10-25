@@ -616,6 +616,7 @@ export type Database = {
           reference_date: string | null;
           reference_price: number | null;
           reference_source: string | null;
+          reopened_at: string | null;
           status: string;
           supplier_id: string | null;
           unit: string;
@@ -653,6 +654,7 @@ export type Database = {
           reference_date?: string | null;
           reference_price?: number | null;
           reference_source?: string | null;
+          reopened_at?: string | null;
           status?: string;
           supplier_id?: string | null;
           unit: string;
@@ -689,6 +691,7 @@ export type Database = {
           reference_date?: string | null;
           reference_price?: number | null;
           reference_source?: string | null;
+          reopened_at?: string | null;
           status?: string;
           supplier_id?: string | null;
           unit?: string;
@@ -1012,6 +1015,7 @@ export type Database = {
       confirm_order: { Args: { _accept: boolean; _order: string }; Returns: string };
       decline_order: { Args: { _order: string }; Returns: undefined };
       discount_share_pct: { Args: Record<PropertyKey, never>; Returns: number };
+      fail_pool: { Args: { _note: string; _pool: string }; Returns: string };
       finalise_funding: { Args: { _pool: string }; Returns: string };
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"]; _user_id: string };

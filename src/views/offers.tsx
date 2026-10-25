@@ -125,7 +125,7 @@ export function Offers() {
                 {noDeal.map((p) => (
                   <li key={p.id} className="flex items-center gap-3 p-3">
                     <img
-                      src={p.image_url ?? ""}
+                      src={p.image_url ?? undefined}
                       alt=""
                       loading="lazy"
                       className="size-14 shrink-0 rounded-sm bg-muted object-cover"

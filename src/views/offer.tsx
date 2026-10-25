@@ -52,6 +52,8 @@ export function Offer() {
       ).data,
   });
   const active = mine.data?.status === "active" ? mine.data : null;
+  // A converted participation means the shop already has an order in this pool
+  const ordered = mine.data?.status === "converted";
   const activeQuantity = active?.quantity;
 
   useEffect(() => {
@@ -89,6 +91,7 @@ export function Offer() {
   const maxQty = pool.max_per_customer ?? 999;
   const zones = pool.pool_zones.flatMap((pz) => (pz.delivery_zones ? [pz.delivery_zones] : []));
   const myZone = zones.find((z) => z.id === shopZoneId(business));
+  const outOfArea = !!business && zones.length > 0 && !myZone;
 
   async function join() {
     if (!user) {
@@ -140,13 +143,17 @@ export function Offer() {
       <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
         <div>
           <div className="relative overflow-hidden rounded-md border-2 border-ink bg-muted">
-            <img
-              src={pool.products?.image_url ?? ""}
-              alt={pool.products?.name ?? ""}
-              className="aspect-square w-full object-cover"
-              width={816}
-              height={816}
-            />
+            {pool.products?.image_url ? (
+              <img
+                src={pool.products.image_url}
+                alt={pool.products.name}
+                className="aspect-square w-full object-cover"
+                width={816}
+                height={816}
+              />
+            ) : (
+              <div className="aspect-square w-full" />
+            )}
             <StatusBadge className="absolute left-4 top-4" tone={st.tone}>
               {st.customer}
             </StatusBadge>
@@ -179,9 +186,12 @@ export function Offer() {
                 <p className="font-bold text-leaf">
                   Potential saving: {money(s.amount)} per {pool.unit} ({s.pct.toFixed(2)}%)
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Source: {pool.reference_source} ({date(pool.reference_date)})
-                </p>
+                {pool.reference_source && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Source: {pool.reference_source}
+                    {pool.reference_date && ` (${date(pool.reference_date)})`}
+                  </p>
+                )}
               </div>
             ) : (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -229,6 +239,13 @@ export function Offer() {
                 </span>
               </p>
             )}
+            {open && pool.reopened_at && (
+              <p className="mt-3 rounded-md bg-gold-soft p-3 text-sm text-ink">
+                <b>Open again to fill the gap.</b> Some shops didn&apos;t pay, so this deal needs{" "}
+                {Math.max(pool.min_qty - pool.pledged_qty, 0)} more {pool.unit}(s) by{" "}
+                {dateTime(pool.closes_at)}.
+              </p>
+            )}
             {pool.status === "unsuccessful" && (
               <p className="mt-3 rounded-md bg-destructive-soft p-3 text-sm text-destructive">
                 {pool.outcome_note ?? "This deal did not reach its target."} No payment is required.
@@ -236,7 +253,18 @@ export function Offer() {
             )}
           </Section>
 
-          {open && (
+          {open && ordered && (
+            <Section>
+              <p className="text-sm">
+                You already have an order in this deal.{" "}
+                <Link href="/my-pools" className="font-semibold text-ember underline">
+                  See My Pools
+                </Link>
+              </p>
+            </Section>
+          )}
+
+          {open && !ordered && (
             <Section>
               {active && (
                 <p className="mb-3 rounded-md bg-leaf-soft p-3 text-sm font-semibold text-leaf">
@@ -272,9 +300,15 @@ export function Offer() {
                 variant="gold"
                 className="mt-4 w-full"
                 onClick={join}
-                disabled={busy || businessLoading}
+                disabled={busy || businessLoading || outOfArea}
               >
-                {busy ? "Saving…" : active ? "Update my quantity" : "Join this pool"}
+                {outOfArea
+                  ? "Not delivered to your area"
+                  : busy
+                    ? "Saving…"
+                    : active
+                      ? "Update my quantity"
+                      : "Join this pool"}
               </Button>
               {active && (
                 <Button variant="ghost" className="mt-2 w-full text-destructive" onClick={withdraw}>
