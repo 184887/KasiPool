@@ -146,10 +146,13 @@ removed from the sign-in page for now; the provider code is in git history.
 Migrations are plain SQL files in `supabase/migrations/`, managed by the Supabase CLI.
 
 ```sh
-supabase link --project-ref <project-ref>
-supabase db push                       # apply any pending migrations
 supabase migration new <name>          # create a new migration file
-supabase gen types typescript --linked > src/integrations/supabase/types.ts
+supabase start                         # local Supabase in Docker, applies all migrations
+supabase migration up --local          # apply new migrations to the local stack
+supabase test db                       # pgTAP tests in supabase/tests/
+node scripts/gen-types.mjs             # regenerate src/integrations/supabase/types.ts
+supabase link --project-ref <project-ref>
+supabase db push                       # apply pending migrations to the live project
 ```
 
 Without `supabase link`, pass the connection string instead, e.g.

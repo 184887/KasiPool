@@ -71,8 +71,11 @@ Run lint, typecheck, test and build before committing. Format with `npx prettier
 - The direct `db.<ref>.supabase.co` host is IPv6-only; use the session pooler URL in
   `SUPABASE_DB_URL` (`.env.local`).
 - Pushing migrations or deploying Edge Functions changes the live project: ask first.
-- Keep `src/integrations/supabase/types.ts` as is unless the schema changes; the generator
-  drops hand-fixed nullable RPC arguments, so re-apply those by hand after regenerating.
+- Test schema changes on the local stack first: `npx supabase start` (Docker), then
+  `npx supabase migration up --local` and `npx supabase test db` (pgTAP tests in
+  `supabase/tests/`). Add tests for new database functions.
+- Regenerate `src/integrations/supabase/types.ts` with `node scripts/gen-types.mjs` (reads the
+  local stack). RPC arguments that accept null go in its `NULLABLE_ARGS` list.
 
 ### Sign-in
 
