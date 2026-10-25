@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { Field, inputCls } from "@/components/kp/admin";
+import { useConfirm } from "@/components/kp/ConfirmDialog";
+import { dateTime } from "@/lib/format";
 import { settingsQuery, errMsg, type ContactSettings, type PaymentSettings } from "@/lib/queries";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -171,10 +173,12 @@ export function Settings() {
         </Section>
 
         <Section title="Administrators">
-          <p className="mb-2 text-sm text-muted-foreground">
-            Team members log in at /admin/login with their email and password. Create their login in
-            Supabase (Authentication, Users, Add user, tick Auto Confirm), then grant access here.
+          <p className="mb-3 text-sm text-muted-foreground">
+            New team members ask for access at /admin/login (&quot;Ask for admin access&quot;).
+            Their request shows here. Only approve people you know: check with them first.
           </p>
+          <AdminRequests />
+          <p className="mb-1 mt-4 text-sm font-semibold">Give or remove access by email</p>
           <div className="flex gap-2">
             <input
               className={inputCls}
@@ -227,4 +231,85 @@ export function Settings() {
 /** Loose check: something@something.something, no spaces */
 export function isEmail(s: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+export const adminRequestsQuery = {
+  queryKey: ["admin-requests"],
+  queryFn: async () =>
+    (await supabase.from("admin_requests").select("*").eq("status", "pending").order("created_at"))
+      .data ?? [],
+};
+
+/** Waiting requests for admin access, each with Approve and Decline. */
+function AdminRequests() {
+  const qc = useQueryClient();
+  const { data } = useQuery(adminRequestsQuery);
+  const [ask, confirmDialog] = useConfirm();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function review(
+    r: { user_id: string; full_name: string; email: string },
+    approve: boolean,
+  ) {
+    const ok = await ask(
+      approve
+        ? {
+            title: `Make ${r.full_name} an admin?`,
+            body: `${r.email} will be able to see every business, order and payment, and change settings.`,
+            confirmLabel: "Approve",
+          }
+        : {
+            title: `Decline ${r.full_name}?`,
+            body: "They won't get admin access. They can ask again later.",
+            confirmLabel: "Decline",
+            danger: true,
+          },
+    );
+    if (ok === false) return;
+    setBusy(r.user_id);
+    const { error } = await supabase.rpc("admin_review_access", {
+      _user: r.user_id,
+      _approve: approve,
+    });
+    setBusy(null);
+    if (error) return toast.error(errMsg(error));
+    toast.success(approve ? `${r.full_name} is now an admin` : "Request declined");
+    qc.invalidateQueries({ queryKey: ["admin-requests"] });
+  }
+
+  return (
+    <>
+      {!data?.length ? (
+        <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
+          No requests waiting.
+        </p>
+      ) : (
+        <ul className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink">
+          {data.map((r) => (
+            <li key={r.user_id} className="flex flex-wrap items-center gap-3 p-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold">{r.full_name}</p>
+                <p className="break-all text-sm text-muted-foreground">{r.email}</p>
+                <p className="text-sm text-muted-foreground">Asked {dateTime(r.created_at)}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" disabled={busy === r.user_id} onClick={() => review(r, true)}>
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={busy === r.user_id}
+                  onClick={() => review(r, false)}
+                >
+                  Decline
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {confirmDialog}
+    </>
+  );
 }

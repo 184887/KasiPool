@@ -5,7 +5,7 @@
 - Supplier costs live in `pool_costs` (admin-only RLS), separate from the publicly readable `pools` table.
 - Interest (participations), orders, payments, purchase orders and refunds are separate tables; never collapse them into one status field.
 - Customer-facing status labels map from internal statuses in `src/lib/status.ts`; all money/time formatting goes through `src/lib/format.ts` (ZAR, Africa/Johannesburg).
-- Roles live in `user_roles`. Admins are email + password accounts that log in at `/admin/login`; the first admin is set once in SQL (the `claim_first_admin()` button was removed from the app).
+- Roles live in `user_roles`. Admins are email + password accounts that log in at `/admin/login`; the first admin is set once in SQL (the `claim_first_admin()` button was removed from the app). New team members ask for access there (`request_admin_access`, table `admin_requests`) and an existing admin approves it in Settings (`admin_review_access`).
 
 ## Next.js version
 
