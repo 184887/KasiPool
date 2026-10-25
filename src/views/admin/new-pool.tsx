@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { Field, inputCls } from "@/components/kp/admin";
 import { PoolCard } from "@/components/kp/PoolCard";
-import { errMsg } from "@/lib/queries";
+import { errMsg, settingsQuery } from "@/lib/queries";
 import { sastLocalToIso, isoToSastLocal, money } from "@/lib/format";
+import { discountSplit } from "@/lib/pricing";
 
 const STEPS = [
   "Campaign",
@@ -23,6 +24,7 @@ const STEPS = [
 
 export function NewPool() {
   const nav = useRouter();
+  const settings = useQuery(settingsQuery);
   const ref = useQuery({
     queryKey: ["pool-refs"],
     queryFn: async () => {
@@ -49,7 +51,6 @@ export function NewPool() {
     supplier_id: "",
     unit: "carton",
     supplier_cost: "",
-    price: "",
     reference_price: "",
     reference_source: "",
     reference_date: "",
@@ -84,10 +85,10 @@ export function NewPool() {
     if (s === 1 && (!f.product_id || !f.supplier_id || !f.unit))
       return "Select a product, supplier and unit";
     if (s === 2) {
-      if (!(+f.price > 0) || !(+f.supplier_cost >= 0) || f.supplier_cost === "")
-        return "Enter supplier cost and customer price";
-      if (f.reference_price && (!f.reference_source || !f.reference_date))
-        return "A reference price needs a source and date";
+      if (f.reference_price === "" || f.supplier_cost === "")
+        return "Enter the supplier's list price and bulk price";
+      if (!(+f.supplier_cost >= 0) || !(+f.reference_price > +f.supplier_cost))
+        return "The list price must be higher than the bulk price";
     }
     if (s === 3) {
       if (!(+f.min_qty > 0)) return "Enter a minimum quantity";
@@ -133,8 +134,9 @@ export function NewPool() {
           product_id: f.product_id,
           supplier_id: f.supplier_id,
           unit: f.unit,
-          price: +f.price,
-          reference_price: f.reference_price ? +f.reference_price : null,
+          // The price is set from the list and bulk prices when the pool is published
+          price: null,
+          reference_price: +f.reference_price,
           reference_source: f.reference_source || null,
           reference_date: f.reference_date || null,
           fee_note: f.fee_note,
@@ -169,7 +171,11 @@ export function NewPool() {
     }
   }
 
-  const spread = +f.price - +f.supplier_cost;
+  const share = settings.data?.pricing?.discount_share_pct ?? 0;
+  const split =
+    f.reference_price !== "" && f.supplier_cost !== ""
+      ? discountSplit(+f.reference_price, +f.supplier_cost, share)
+      : null;
   return (
     <>
       <PageHeader title="New pool" subtitle="Create a time-limited deal" />
@@ -234,7 +240,17 @@ export function NewPool() {
           {step === 2 && (
             <>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="Supplier cost per unit (R) *" hint="Admin only">
+                <Field label="Supplier list price per unit (R) *" hint="Their normal price">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className={inputCls}
+                    value={f.reference_price}
+                    onChange={set("reference_price")}
+                  />
+                </Field>
+                <Field label="Supplier bulk price per unit (R) *" hint="Admin only">
                   <input
                     type="number"
                     step="0.01"
@@ -244,56 +260,38 @@ export function NewPool() {
                     onChange={set("supplier_cost")}
                   />
                 </Field>
-                <Field label="Customer price per unit (R) *">
+              </div>
+              {split && (
+                <div
+                  className={`rounded-md border-2 p-3 text-sm ${split.shopSaving > 0 ? "border-ink bg-muted" : "border-destructive text-destructive"}`}
+                >
+                  <p>
+                    Shops pay <b>{money(split.price)}</b> per {f.unit || "unit"} and save{" "}
+                    <b>{money(split.shopSaving)}</b>.
+                  </p>
+                  <p className="text-muted-foreground">
+                    KasiPool keeps {money(split.kasipool)} per unit ({share}% of the discount, set
+                    in Settings). The price is fixed when you publish.
+                  </p>
+                </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Where the list price comes from" hint="e.g. Supplier price list">
                   <input
-                    type="number"
-                    step="0.01"
-                    min="0"
                     className={inputCls}
-                    value={f.price}
-                    onChange={set("price")}
+                    value={f.reference_source}
+                    onChange={set("reference_source")}
+                  />
+                </Field>
+                <Field label="List price date">
+                  <input
+                    type="date"
+                    className={inputCls}
+                    value={f.reference_date}
+                    onChange={set("reference_date")}
                   />
                 </Field>
               </div>
-              {f.price && f.supplier_cost && (
-                <p
-                  className={`text-sm ${spread < 0 ? "text-destructive" : "text-muted-foreground"}`}
-                >
-                  Gross spread per unit: {money(spread)} (not profit)
-                </p>
-              )}
-              <Field
-                label="Reference price (R)"
-                hint="Only enter a verified comparison price. Leave blank to show no savings claim."
-              >
-                <input
-                  type="number"
-                  step="0.01"
-                  className={inputCls}
-                  value={f.reference_price}
-                  onChange={set("reference_price")}
-                />
-              </Field>
-              {f.reference_price && (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Reference source *">
-                    <input
-                      className={inputCls}
-                      value={f.reference_source}
-                      onChange={set("reference_source")}
-                      placeholder="e.g. Wholesaler shelf price, Khayelitsha"
-                    />
-                  </Field>
-                  <Field label="Reference date *">
-                    <input
-                      type="date"
-                      className={inputCls}
-                      value={f.reference_date}
-                      onChange={set("reference_date")}
-                    />
-                  </Field>
-                </div>
-              )}
               <Field label="Fees note">
                 <input className={inputCls} value={f.fee_note} onChange={set("fee_note")} />
               </Field>
@@ -410,8 +408,8 @@ export function NewPool() {
                   id: "preview",
                   status: "open",
                   unit: f.unit,
-                  price: +f.price,
-                  reference_price: f.reference_price ? +f.reference_price : null,
+                  price: split?.price ?? null,
+                  reference_price: +f.reference_price,
                   min_qty: +f.min_qty,
                   pledged_qty: 0,
                   participant_count: 0,
@@ -425,7 +423,8 @@ export function NewPool() {
                   Target: {f.min_qty} {f.unit}s{f.max_qty && ` (max ${f.max_qty})`}
                 </p>
                 <p>
-                  Supplier cost: {money(f.supplier_cost)} · Price: {money(f.price)}
+                  List {money(f.reference_price)} · Bulk {money(f.supplier_cost)} · Shop price{" "}
+                  {money(split?.price)}
                 </p>
                 <p className="rounded-lg bg-warning-soft p-2 text-xs text-warning">
                   After publishing, price, unit, product, minimum and reference price are locked.

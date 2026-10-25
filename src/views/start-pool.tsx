@@ -33,7 +33,6 @@ export function StartPool() {
   const [f, setF] = useState({
     product_id: suggested,
     unit: "",
-    price: "",
     min_qty: "",
     max_qty: "",
     min_per_customer: "1",
@@ -68,13 +67,11 @@ export function StartPool() {
   async function submit() {
     if (!f.product_id || !f.collection_point_id)
       return toast.error("Choose a product and collection point");
-    if (!(+f.price > 0) || !(+f.min_qty > 0))
-      return toast.error("Enter a price and target quantity");
+    if (!(+f.min_qty > 0)) return toast.error("Enter a target quantity");
     setBusy(true);
     const { error } = await supabase.rpc("propose_pool", {
       _product: f.product_id,
       _unit: f.unit,
-      _price: +f.price,
       _min_qty: +f.min_qty,
       _max_qty: f.max_qty ? +f.max_qty : null,
       _min_per: +f.min_per_customer || 1,
@@ -110,7 +107,7 @@ export function StartPool() {
     <Container className="max-w-2xl">
       <PageHeader
         title="Start a pool"
-        subtitle="Propose a group purchase. We confirm supplier availability and cost, then publish it for others to join."
+        subtitle="Suggest a product for a group order. We get the supplier's bulk price, then publish the deal for other shops to join."
       />
       <Section>
         <div className="space-y-4">
@@ -127,19 +124,6 @@ export function StartPool() {
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Purchasing unit *">
               <input className={inputCls} value={f.unit} onChange={set("unit")} />
-            </Field>
-            <Field
-              label="Proposed price per unit (R) *"
-              hint="Final price is confirmed before publishing"
-            >
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                className={inputCls}
-                value={f.price}
-                onChange={set("price")}
-              />
             </Field>
             <Field label="Minimum target quantity *">
               <input

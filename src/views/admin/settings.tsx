@@ -22,6 +22,7 @@ export function Settings() {
   });
   const [pay, setPay] = useState<PaymentSettings | null | undefined>(null);
   const [contact, setContact] = useState<ContactSettings | null | undefined>(null);
+  const [share, setShare] = useState("");
   const [mobile, setMobile] = useState("");
   const [cp, setCp] = useState({
     name: "",
@@ -36,6 +37,7 @@ export function Settings() {
     if (data) {
       setPay(data.payment);
       setContact(data.contact);
+      setShare(String(data.pricing?.discount_share_pct ?? ""));
     }
   }, [data]);
   if (isLoading || !pay) return <Loading />;
@@ -88,6 +90,38 @@ export function Settings() {
     <>
       <PageHeader title="Settings" />
       <div className="grid gap-4 lg:grid-cols-2">
+        <Section title="Pricing">
+          <p className="mb-3 text-sm text-muted-foreground">
+            KasiPool keeps this share of each deal's discount (list price minus bulk price); shops
+            get the rest. Example at 20%: list R250, bulk R200, so the shop pays R210 and KasiPool
+            keeps R10. A pool's price is fixed when it is published, so changes only affect pools
+            published afterwards.
+          </p>
+          <div className="flex items-end gap-2">
+            <Field label="KasiPool share of the discount (%)">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.5"
+                className={inputCls}
+                value={share}
+                onChange={(e) => setShare(e.target.value)}
+              />
+            </Field>
+            <Button
+              onClick={() => {
+                const pct = Number(share);
+                if (share === "" || !(pct >= 0 && pct <= 100))
+                  return toast.error("Enter a percentage between 0 and 100");
+                saveKey("pricing", { discount_share_pct: pct });
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        </Section>
+
         <Section title="Payment instructions">
           <p className="mb-3 rounded-lg bg-warning-soft p-3 text-xs text-warning">
             Only enter KasiPool's real, verified business account. Until this is enabled, customers

@@ -510,6 +510,7 @@ export type Database = {
           confirm_window_hours: number;
           confirmed_qty: number;
           created_at: string;
+          discount_share_pct: number | null;
           fee_note: string | null;
           fulfilment_note: string | null;
           id: string;
@@ -527,7 +528,7 @@ export type Database = {
           participant_count: number;
           payment_deadline: string | null;
           pledged_qty: number;
-          price: number;
+          price: number | null;
           product_id: string;
           proposed_by: string | null;
           qualified_at: string | null;
@@ -548,6 +549,7 @@ export type Database = {
           confirm_window_hours?: number;
           confirmed_qty?: number;
           created_at?: string;
+          discount_share_pct?: number | null;
           fee_note?: string | null;
           fulfilment_note?: string | null;
           id?: string;
@@ -565,7 +567,7 @@ export type Database = {
           participant_count?: number;
           payment_deadline?: string | null;
           pledged_qty?: number;
-          price: number;
+          price?: number | null;
           product_id: string;
           proposed_by?: string | null;
           qualified_at?: string | null;
@@ -585,6 +587,7 @@ export type Database = {
           confirm_window_hours?: number;
           confirmed_qty?: number;
           created_at?: string;
+          discount_share_pct?: number | null;
           fee_note?: string | null;
           fulfilment_note?: string | null;
           id?: string;
@@ -602,7 +605,7 @@ export type Database = {
           participant_count?: number;
           payment_deadline?: string | null;
           pledged_qty?: number;
-          price?: number;
+          price?: number | null;
           product_id?: string;
           proposed_by?: string | null;
           qualified_at?: string | null;
@@ -922,6 +925,7 @@ export type Database = {
       close_pool: { Args: { _pool: string }; Returns: undefined };
       confirm_order: { Args: { _accept: boolean; _order: string }; Returns: string };
       decline_order: { Args: { _order: string }; Returns: undefined };
+      discount_share_pct: { Args: Record<PropertyKey, never>; Returns: number };
       distance_km: {
         Args: { _lat1: number; _lat2: number; _lng1: number; _lng2: number };
         Returns: number;
@@ -937,6 +941,7 @@ export type Database = {
         Args: { _body: string; _link: string; _title: string; _user: string };
         Returns: undefined;
       };
+      pool_price: { Args: { _bulk: number; _list: number; _share_pct: number }; Returns: number };
       propose_pool: {
         Args: {
           _closes: string;
@@ -947,7 +952,6 @@ export type Database = {
           _min_qty: number;
           _note: string | null;
           _opens: string;
-          _price: number;
           _private?: boolean;
           _product: string;
           _unit: string;

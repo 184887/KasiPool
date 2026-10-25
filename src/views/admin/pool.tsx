@@ -12,13 +12,21 @@ import { Loading, PageHeader, StatusBadge, Section, MetricCard } from "@/compone
 import { DataTable, Td, Field, inputCls } from "@/components/kp/admin";
 import { PoolProgress } from "@/components/kp/pool-bits";
 import { PaymentDialog, type PaymentDialogOrder } from "@/components/kp/PaymentDialog";
-import { errMsg } from "@/lib/queries";
+import { errMsg, settingsQuery } from "@/lib/queries";
+import { discountSplit } from "@/lib/pricing";
 import { money, dateTime, date, sastLocalToIso, isoToSastLocal } from "@/lib/format";
 import { POOL_STATUS, PAYMENT_STATUS, ORDER_STATUS, FULFIL_STATUS } from "@/lib/status";
 
 export function PoolAdmin() {
   const { poolId } = useParams<{ poolId: string }>();
   const qc = useQueryClient();
+  const settings = useQuery(settingsQuery);
+  const suppliers = useQuery({
+    queryKey: ["admin-suppliers-active"],
+    queryFn: async () =>
+      (await supabase.from("suppliers").select("id, name").eq("active", true).order("name")).data ??
+      [],
+  });
   const { data, isLoading } = useQuery({
     queryKey: ["admin-pool", poolId],
     queryFn: async () => {
@@ -83,11 +91,19 @@ export function PoolAdmin() {
     return true;
   });
   const d = draft ?? {
-    price: String(pool.price),
+    supplier_id: pool.supplier_id ?? "",
+    list: pool.reference_price == null ? "" : String(pool.reference_price),
     min_qty: String(pool.min_qty),
     closes_at: isoToSastLocal(pool.closes_at),
     cost: String(cost?.supplier_cost ?? ""),
   };
+  // Drafts show the price they would get if published now
+  const share = settings.data?.pricing?.discount_share_pct ?? 0;
+  const preview =
+    pool.status === "draft" && d.list !== "" && d.cost !== ""
+      ? discountSplit(+d.list, +d.cost, share)
+      : null;
+  const shownPrice = pool.price ?? preview?.price ?? null;
 
   return (
     <>
@@ -121,9 +137,9 @@ export function PoolAdmin() {
           tone={pool.paid_qty >= pool.min_qty ? "success" : undefined}
         />
         <MetricCard
-          label="Price / supplier cost"
-          value={money(pool.price)}
-          hint={`Cost ${money(cost?.supplier_cost)} · spread ${money(Number(pool.price) - Number(cost?.supplier_cost ?? 0))}`}
+          label={pool.status === "draft" ? "Price if published now" : "Price / bulk cost"}
+          value={shownPrice == null ? "-" : money(shownPrice)}
+          hint={`List ${money(pool.reference_price)} · bulk ${money(cost?.supplier_cost)} · KasiPool ${money(Number(shownPrice ?? 0) - Number(cost?.supplier_cost ?? 0))}/unit${pool.discount_share_pct != null ? ` (${pool.discount_share_pct}%)` : ""}`}
         />
         <MetricCard
           label={pool.status === "open" ? "Closes" : "Payment deadline"}
@@ -227,16 +243,30 @@ export function PoolAdmin() {
           <Section title="Next step">
             {pool.status === "draft" && (
               <div className="space-y-3">
+                <Field label="Supplier">
+                  <select
+                    className={inputCls}
+                    value={d.supplier_id}
+                    onChange={(e) => setDraft({ ...d, supplier_id: e.target.value })}
+                  >
+                    <option value="">Select…</option>
+                    {(suppliers.data ?? []).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
                 <div className="grid grid-cols-2 gap-2">
-                  <Field label="Price (R)">
+                  <Field label="List price (R)">
                     <input
                       className={inputCls}
                       type="number"
-                      value={d.price}
-                      onChange={(e) => setDraft({ ...d, price: e.target.value })}
+                      value={d.list}
+                      onChange={(e) => setDraft({ ...d, list: e.target.value })}
                     />
                   </Field>
-                  <Field label="Supplier cost (R)">
+                  <Field label="Bulk price (R)">
                     <input
                       className={inputCls}
                       type="number"
@@ -261,6 +291,13 @@ export function PoolAdmin() {
                     />
                   </Field>
                 </div>
+                {preview && (
+                  <p className="text-sm text-muted-foreground">
+                    Shops would pay <b className="text-ink">{money(preview.price)}</b> and save{" "}
+                    {money(preview.shopSaving)}; KasiPool keeps {money(preview.kasipool)} per unit (
+                    {share}% of the discount).
+                  </p>
+                )}
                 <Button
                   variant="outline"
                   className="w-full"
@@ -269,12 +306,14 @@ export function PoolAdmin() {
                       const r = await supabase
                         .from("pools")
                         .update({
-                          price: +d.price,
+                          supplier_id: d.supplier_id || null,
+                          reference_price: d.list === "" ? null : +d.list,
                           min_qty: +d.min_qty,
                           closes_at: sastLocalToIso(d.closes_at),
                         })
                         .eq("id", poolId);
                       if (r.error) return r;
+                      if (d.cost === "") return r;
                       return supabase
                         .from("pool_costs")
                         .upsert({ pool_id: poolId, supplier_cost: +d.cost });

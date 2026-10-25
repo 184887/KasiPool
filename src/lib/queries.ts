@@ -24,6 +24,8 @@ export type AppSettings = {
   payment?: PaymentSettings;
   terms?: { version: string };
   contact?: ContactSettings;
+  /** KasiPool's share of each pool's discount, in percent */
+  pricing?: { discount_share_pct: number };
 };
 
 export const POOL_SELECT =
