@@ -114,10 +114,6 @@ export function Home() {
             </li>
           ))}
         </ol>
-        <p className="mt-8 rounded-md bg-leaf-soft p-4 font-semibold text-leaf">
-          You do not pay when you join. You pay only when the pool is full. If the pool does not
-          fill up, you pay nothing.
-        </p>
       </Container>
 
       {!user && (
