@@ -6,6 +6,7 @@ import { Container } from "@/components/kp/AppShell";
 import { BusinessForm } from "@/components/kp/BusinessForm";
 import { Loading } from "@/components/kp/ui";
 import { useAuth, safeRedirect } from "@/lib/auth";
+import { loginToPhone } from "@/lib/phone-auth";
 
 export function Onboarding() {
   const { user, business, businessLoading } = useAuth();
@@ -25,7 +26,8 @@ export function Onboarding() {
         </p>
         <BusinessForm
           userId={user.id}
-          email={user.email}
+          mobile={loginToPhone(user.email)}
+          email={loginToPhone(user.email) ? null : user.email}
           onDone={() => nav.push(safeRedirect(redirect))}
         />
       </div>

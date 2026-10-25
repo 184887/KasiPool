@@ -12,6 +12,7 @@ import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { errMsg } from "@/lib/queries";
+import { loginToPhone } from "@/lib/phone-auth";
 
 export function Profile() {
   const { user, business, businessLoading, isAdmin, signOut } = useAuth();
@@ -34,7 +35,7 @@ export function Profile() {
 
   return (
     <Container className="max-w-2xl space-y-4">
-      <PageHeader title="Profile" subtitle={user.email ?? undefined} />
+      <PageHeader title="Profile" subtitle={loginToPhone(user.email) ?? user.email ?? undefined} />
       <Section title="Business details">
         {business ? (
           <BusinessForm userId={user.id} existing={business} onDone={() => {}} />

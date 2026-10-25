@@ -10,6 +10,7 @@ import { Field, inputCls } from "@/components/kp/admin";
 import { LocationPicker } from "@/components/kp/LocationPicker";
 import { settingsQuery, errMsg, type ContactSettings, type PaymentSettings } from "@/lib/queries";
 import type { Json } from "@/integrations/supabase/types";
+import { phoneToLogin } from "@/lib/phone-auth";
 
 export function Settings() {
   const qc = useQueryClient();
@@ -21,7 +22,7 @@ export function Settings() {
   });
   const [pay, setPay] = useState<PaymentSettings | null | undefined>(null);
   const [contact, setContact] = useState<ContactSettings | null | undefined>(null);
-  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [cp, setCp] = useState({
     name: "",
     area: "",
@@ -48,10 +49,16 @@ export function Settings() {
     qc.invalidateQueries({ queryKey: ["settings"] });
   }
   async function role(make: boolean) {
-    const { error } = await supabase.rpc("admin_set_role", { _email: email, _make_admin: make });
-    if (error) return toast.error(errMsg(error));
+    // Accounts sign in by phone; admin_set_role looks them up by their hidden login address
+    const login = phoneToLogin(mobile);
+    if (!login) return toast.error("Enter a valid South African mobile number");
+    const { error } = await supabase.rpc("admin_set_role", { _email: login, _make_admin: make });
+    if (error)
+      return toast.error(
+        /no account/i.test(error.message) ? "No account with that number" : errMsg(error),
+      );
     toast.success(make ? "Admin access granted" : "Admin access removed");
-    setEmail("");
+    setMobile("");
   }
   async function addPoint() {
     if (!cp.name || !cp.area) return toast.error("Name and area required");
@@ -178,19 +185,21 @@ export function Settings() {
 
         <Section title="Administrators">
           <p className="mb-2 text-sm text-muted-foreground">
-            Grant or remove admin access for an existing account.
+            Grant or remove admin access for an existing account, by its mobile number.
           </p>
           <div className="flex gap-2">
             <input
               className={inputCls}
-              placeholder="user@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="tel"
+              placeholder="072 123 4567"
+              aria-label="Mobile number"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
             />
-            <Button onClick={() => role(true)} disabled={!email}>
+            <Button onClick={() => role(true)} disabled={!mobile}>
               Grant
             </Button>
-            <Button variant="outline" onClick={() => role(false)} disabled={!email}>
+            <Button variant="outline" onClick={() => role(false)} disabled={!mobile}>
               Remove
             </Button>
           </div>
