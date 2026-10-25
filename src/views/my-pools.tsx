@@ -114,7 +114,7 @@ export function MyPools() {
                 className="flex items-center gap-3 rounded-md border-2 border-ink bg-gold-soft p-3"
               >
                 <img
-                  src={o.pools?.products?.image_url ?? ""}
+                  src={o.pools?.products?.image_url ?? undefined}
                   alt=""
                   className="size-14 rounded-sm object-cover"
                   width={56}
@@ -123,7 +123,9 @@ export function MyPools() {
                 <div className="min-w-0 flex-1">
                   <p className="font-bold">{o.pools?.products?.name}</p>
                   <p className="text-sm">
-                    {o.quantity} × {money(o.unit_price)} = <b>{money(o.total)}</b>
+                    {o.quantity} × {money(o.unit_price)}
+                    {Number(o.delivery_fee) > 0 && ` + ${money(o.delivery_fee)} delivery`} ={" "}
+                    <b>{money(o.total)}</b>
                   </p>
                   {o.pools?.payment_deadline && o.fulfilment_status !== "ready" && (
                     <p className="text-xs text-muted-foreground">
@@ -164,7 +166,7 @@ export function MyPools() {
                 >
                   <div className="flex gap-3">
                     <img
-                      src={pool.products?.image_url ?? ""}
+                      src={pool.products?.image_url ?? undefined}
                       alt=""
                       className="size-16 rounded-sm object-cover"
                       width={64}

@@ -7,8 +7,8 @@ $$;
 
 -- Zones: Khayelitsha (R50) and Gugulethu (R40); the deal only delivers to Khayelitsha
 insert into public.delivery_zones (id, name, delivery_fee) values
-  ('00000000-0000-0000-0000-0000000000e1', 'Khayelitsha', 50),
-  ('00000000-0000-0000-0000-0000000000e2', 'Gugulethu', 40);
+  ('00000000-0000-0000-0000-0000000000e1', 'Test zone K', 50),
+  ('00000000-0000-0000-0000-0000000000e2', 'Test zone G', 40);
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-00000000ad01', 'admin@test.local', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-00000000c001', 'a@test.local', 'authenticated', 'authenticated'),
@@ -49,7 +49,7 @@ select lives_ok($$select public.admin_publish_pool('00000000-0000-0000-0000-0000
 -- Joining checks the delivery zone
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c003');
 select throws_like($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 4)$$,
-  '%doesn''t deliver to Gugulethu%', 'a shop outside the zones can''t join');
+  '%doesn''t deliver to Test zone G%', 'a shop outside the zones can''t join');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select lives_ok($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 6)$$, 'shop A joins');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');

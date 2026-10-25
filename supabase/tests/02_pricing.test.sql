@@ -10,7 +10,7 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-00000000ad01', 'admin@test.local', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-00000000c001', 'shop@test.local', 'authenticated', 'authenticated');
 insert into public.user_roles (user_id, role) values ('00000000-0000-0000-0000-00000000ad01', 'admin');
-insert into public.delivery_zones (id, name) values ('00000000-0000-0000-0000-0000000000e1', 'Zone');
+insert into public.delivery_zones (id, name) values ('00000000-0000-0000-0000-0000000000e1', 'Test zone');
 insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province, address, zone_id)
 values ('00000000-0000-0000-0000-00000000c001', 'Shop', 'Sipho', '+27600000002', 'Gugulethu', 'Cape Town', 'Western Cape',
   '2 NY1', '00000000-0000-0000-0000-0000000000e1');

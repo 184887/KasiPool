@@ -110,7 +110,7 @@ export function Products() {
           <tr key={p.id}>
             <Td>
               <img
-                src={p.image_url ?? ""}
+                src={p.image_url ?? undefined}
                 alt=""
                 className="size-10 rounded-md bg-muted object-cover"
               />

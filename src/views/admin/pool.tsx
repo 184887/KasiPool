@@ -378,6 +378,13 @@ export function PoolAdmin() {
                   Customers are registering interest. The pool closes automatically when the target
                   or deadline is reached.
                 </p>
+                {pool.reopened_at && (
+                  <p className="rounded-md bg-gold-soft p-2">
+                    Reopened {dateTime(pool.reopened_at)} after unpaid orders expired.{" "}
+                    {pool.paid_qty} already paid; {Math.max(pool.min_qty - pool.pledged_qty, 0)}{" "}
+                    more needed by the closing time, or paid shops are refunded.
+                  </p>
+                )}
                 <Button
                   variant="outline"
                   className="w-full"
