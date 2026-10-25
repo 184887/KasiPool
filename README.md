@@ -14,7 +14,8 @@ There are two sides to the app:
 
 ### Business rules
 
-Confirmed with the team on 2026-10-25:
+Confirmed with the team on 2026-10-25. For how admins run zones, pools, payments and deliveries
+day to day, see the [admin guide](docs/admin-guide.md).
 
 - **Pricing:** shops pay KasiPool, KasiPool pays the supplier. KasiPool keeps one global share of
   the discount (Admin → Settings): `price = list - (1 - share) × (list - bulk)`.
