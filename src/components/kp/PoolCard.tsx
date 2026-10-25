@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, Share2 } from "lucide-react";
+import { Clock, MapPin, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { money, savings, dateTime } from "@/lib/format";
 import { POOL_STATUS } from "@/lib/status";
+import { distanceLabel } from "@/lib/delivery";
+import type { PoolDistance } from "@/lib/queries";
 import { StatusBadge } from "./ui";
 import { PoolProgress, Countdown, ProductImage } from "./pool-bits";
 
@@ -37,10 +39,11 @@ export function whatsappShareUrl(p: PoolWithProduct) {
   return `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
 
-export function PoolCard({ pool }: { pool: PoolWithProduct }) {
+export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?: PoolDistance }) {
   const s = savings(Number(pool.price), pool.reference_price ? Number(pool.reference_price) : null);
   const st = POOL_STATUS[pool.status];
-  const open = pool.status === "open" && !pool.is_sample;
+  const tooFar = !!distance && !distance.in_range;
+  const open = pool.status === "open" && !pool.is_sample && !tooFar;
   return (
     <article className="flex flex-col overflow-hidden rounded-md border-2 border-ink bg-card">
       <Link
@@ -93,6 +96,14 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
           unit={pool.unit}
           size="sm"
         />
+        {distance && (
+          <p
+            className={`flex items-center gap-1.5 text-sm ${tooFar ? "font-semibold text-warning" : "text-muted-foreground"}`}
+          >
+            <MapPin className="size-4" aria-hidden="true" />
+            {tooFar ? `Too far for you (${distanceLabel(distance)})` : distanceLabel(distance)}
+          </p>
+        )}
         {pool.status === "open" && (
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="size-4" aria-hidden="true" /> Closes in{" "}

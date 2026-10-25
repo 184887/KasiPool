@@ -5,13 +5,16 @@ import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, StatusBadge, Section, MetricCard } from "@/components/kp/ui";
 import { DataTable, Td, Field, inputCls } from "@/components/kp/admin";
 import { PoolProgress } from "@/components/kp/pool-bits";
 import { PaymentDialog, type PaymentDialogOrder } from "@/components/kp/PaymentDialog";
+import { LocationPicker, type PickedLocation } from "@/components/kp/LocationPicker";
+import { DEFAULT_RADIUS_KM, mapsUrl } from "@/lib/delivery";
+import type { Tables } from "@/integrations/supabase/types";
 import { errMsg, settingsQuery } from "@/lib/queries";
 import { discountSplit } from "@/lib/pricing";
 import { money, dateTime, date, sastLocalToIso, isoToSastLocal } from "@/lib/format";
@@ -21,11 +24,6 @@ export function PoolAdmin() {
   const { poolId } = useParams<{ poolId: string }>();
   const qc = useQueryClient();
   const settings = useQuery(settingsQuery);
-  const allZones = useQuery({
-    queryKey: ["admin-zones"],
-    queryFn: async () =>
-      (await supabase.from("delivery_zones").select("*").order("sort").order("name")).data ?? [],
-  });
   const suppliers = useQuery({
     queryKey: ["admin-suppliers-active"],
     queryFn: async () =>
@@ -36,12 +34,10 @@ export function PoolAdmin() {
     queryKey: ["admin-pool", poolId],
     queryFn: async () => {
       await supabase.rpc("refresh_pool_states");
-      const [p, c, parts, orders, po] = await Promise.all([
+      const [p, c, parts, orders, po, loc] = await Promise.all([
         supabase
           .from("pools")
-          .select(
-            "*, products(*), suppliers(name), campaigns(name), pool_zones(zone_id, delivery_zones(name))",
-          )
+          .select("*, products(*), suppliers(name), campaigns(name)")
           .eq("id", poolId)
           .single(),
         supabase.from("pool_costs").select("*").eq("pool_id", poolId).maybeSingle(),
@@ -56,6 +52,7 @@ export function PoolAdmin() {
           .eq("pool_id", poolId)
           .order("created_at"),
         supabase.from("purchase_orders").select("*").eq("pool_id", poolId).maybeSingle(),
+        supabase.from("pool_locations").select("*").eq("pool_id", poolId).maybeSingle(),
       ]);
       return {
         pool: p.data!,
@@ -63,6 +60,7 @@ export function PoolAdmin() {
         parts: parts.data ?? [],
         orders: orders.data ?? [],
         po: po.data,
+        location: loc.data,
       };
     },
   });
@@ -78,7 +76,7 @@ export function PoolAdmin() {
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
 
   if (isLoading || !data) return <Loading />;
-  const { pool, cost, parts, orders, po } = data;
+  const { pool, cost, parts, orders, po, location } = data;
   const st = POOL_STATUS[pool.status];
   const call = async (fn: () => PromiseLike<{ error: unknown }>, ok: string) => {
     const { error } = await fn();
@@ -123,7 +121,7 @@ export function PoolAdmin() {
       </Link>
       <PageHeader
         title={pool.products?.name ?? "Pool"}
-        subtitle={`${pool.campaigns?.name ?? "No campaign"} · Supplier: ${pool.suppliers?.name ?? "-"} · Delivers to ${pool.pool_zones.map((pz) => pz.delivery_zones?.name).join(", ") || "-"}`}
+        subtitle={`${pool.campaigns?.name ?? "No campaign"} · Supplier: ${pool.suppliers?.name ?? "-"} · ${pool.is_private ? "Private group" : location ? `Within ${location.radius_km} km of ${location.label ?? "its centre"}` : "No centre set"}`}
         actions={<StatusBadge tone={st.tone}>{st.admin}</StatusBadge>}
       />
 
@@ -299,38 +297,13 @@ export function PoolAdmin() {
                     />
                   </Field>
                 </div>
-                <fieldset>
-                  <legend className="mb-1 text-sm font-medium">Delivers to</legend>
-                  <div className="grid grid-cols-2 gap-1 text-sm">
-                    {(allZones.data ?? []).map((z) => {
-                      const on = pool.pool_zones.some((pz) => pz.zone_id === z.id);
-                      return (
-                        <label key={z.id} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={on}
-                            onChange={() =>
-                              call(
-                                () =>
-                                  on
-                                    ? supabase
-                                        .from("pool_zones")
-                                        .delete()
-                                        .eq("pool_id", poolId)
-                                        .eq("zone_id", z.id)
-                                    : supabase
-                                        .from("pool_zones")
-                                        .insert({ pool_id: poolId, zone_id: z.id }),
-                                on ? `Removed ${z.name}` : `Added ${z.name}`,
-                              )
-                            }
-                          />
-                          {z.name}
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
+                <PoolLocationEditor
+                  key={location?.updated_at ?? "none"}
+                  poolId={poolId}
+                  location={location}
+                  isPrivate={pool.is_private}
+                  onSaved={() => qc.invalidateQueries()}
+                />
                 {preview && (
                   <p className="text-sm text-muted-foreground">
                     Shops would pay <b className="text-ink">{money(preview.price)}</b> and save{" "}
@@ -651,5 +624,90 @@ export function PoolAdmin() {
       </div>
       <PaymentDialog order={payOrder} onClose={() => setPayOrder(null)} />
     </>
+  );
+}
+
+/** Where a pool is centred and how far away businesses can be to join it. */
+function PoolLocationEditor({
+  poolId,
+  location,
+  isPrivate,
+  onSaved,
+}: {
+  poolId: string;
+  location: Tables<"pool_locations"> | null;
+  isPrivate: boolean;
+  onSaved: () => void;
+}) {
+  const [centre, setCentre] = useState<PickedLocation | null>(
+    location
+      ? {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          address: location.label ?? "",
+        }
+      : null,
+  );
+  const [radius, setRadius] = useState(String(location?.radius_km ?? DEFAULT_RADIUS_KM));
+  const [busy, setBusy] = useState(false);
+  const link = mapsUrl(centre?.latitude, centre?.longitude);
+
+  async function save() {
+    if (!centre) return toast.error("Choose where the deal is centred");
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_set_pool_location", {
+      _pool: poolId,
+      _lat: centre.latitude,
+      _lon: centre.longitude,
+      _radius: +radius,
+      _label: centre.address,
+    });
+    setBusy(false);
+    if (error) return toast.error(errMsg(error));
+    toast.success("Location saved");
+    onSaved();
+  }
+
+  return (
+    <fieldset className="space-y-2">
+      <legend className="mb-1 text-sm font-medium">Who can join</legend>
+      {isPrivate && (
+        <p className="text-sm text-muted-foreground">
+          Private group: anyone with the code can join, wherever they are. Check the delivery makes
+          sense before publishing.
+        </p>
+      )}
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ember underline underline-offset-4"
+        >
+          <MapPin className="size-4" aria-hidden="true" /> See the centre on Google Maps
+        </a>
+      )}
+      <LocationPicker
+        title={location ? "Move the centre" : "Centre of the deal *"}
+        hint="For a deal a business asked for, the centre is that business."
+        latitude={centre?.latitude ?? null}
+        longitude={centre?.longitude ?? null}
+        address={centre?.address ?? ""}
+        onPick={setCentre}
+      />
+      <Field label="Businesses can join within (km)">
+        <input
+          className={inputCls}
+          type="number"
+          min="1"
+          max="100"
+          value={radius}
+          onChange={(e) => setRadius(e.target.value)}
+        />
+      </Field>
+      <Button variant="outline" onClick={save} disabled={busy}>
+        {busy ? "Saving…" : "Save location"}
+      </Button>
+    </fieldset>
   );
 }

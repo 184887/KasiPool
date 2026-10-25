@@ -12,6 +12,8 @@ import { PoolCard } from "@/components/kp/PoolCard";
 import { errMsg, settingsQuery } from "@/lib/queries";
 import { sastLocalToIso, isoToSastLocal, money } from "@/lib/format";
 import { discountSplit } from "@/lib/pricing";
+import { LocationPicker, type PickedLocation } from "@/components/kp/LocationPicker";
+import { DEFAULT_RADIUS_KM } from "@/lib/delivery";
 
 const STEPS = [
   "Campaign",
@@ -28,17 +30,15 @@ export function NewPool() {
   const ref = useQuery({
     queryKey: ["pool-refs"],
     queryFn: async () => {
-      const [c, p, s, z] = await Promise.all([
+      const [c, p, s] = await Promise.all([
         supabase.from("campaigns").select("*").order("created_at", { ascending: false }),
         supabase.from("products").select("*").eq("active", true).order("name"),
         supabase.from("suppliers").select("*").eq("active", true).order("name"),
-        supabase.from("delivery_zones").select("*").eq("active", true).order("sort").order("name"),
       ]);
       return {
         campaigns: c.data ?? [],
         products: p.data ?? [],
         suppliers: s.data ?? [],
-        zones: z.data ?? [],
       };
     },
   });
@@ -65,7 +65,8 @@ export function NewPool() {
     confirm_window_hours: "24",
   });
   const [busy, setBusy] = useState(false);
-  const [zoneIds, setZoneIds] = useState<string[]>([]);
+  const [centre, setCentre] = useState<PickedLocation | null>(null);
+  const [radius, setRadius] = useState(String(DEFAULT_RADIUS_KM));
   if (ref.isLoading || !ref.data) return <Loading />;
   const set =
     (k: keyof typeof f) =>
@@ -96,7 +97,8 @@ export function NewPool() {
     if (s === 4) {
       if (new Date(sastLocalToIso(f.closes_at)) <= new Date(sastLocalToIso(f.opens_at)))
         return "Closing must be after opening";
-      if (zoneIds.length === 0) return "Choose at least one delivery zone";
+      if (!centre) return "Choose where the deal is centred";
+      if (!(+radius > 0 && +radius <= 100)) return "The distance must be between 1 and 100 km";
     }
     return null;
   }
@@ -155,10 +157,14 @@ export function NewPool() {
         .from("pool_costs")
         .insert({ pool_id: pool.id, supplier_cost: +f.supplier_cost });
       if (ce) throw ce;
-      const { error: ze } = await supabase
-        .from("pool_zones")
-        .insert(zoneIds.map((zone_id) => ({ pool_id: pool.id, zone_id })));
-      if (ze) throw ze;
+      const { error: le } = await supabase.rpc("admin_set_pool_location", {
+        _pool: pool.id,
+        _lat: centre!.latitude,
+        _lon: centre!.longitude,
+        _radius: +radius,
+        _label: centre!.address,
+      });
+      if (le) throw le;
       if (publish) {
         const { error: pe } = await supabase.rpc("admin_publish_pool", { _pool: pool.id });
         if (pe) throw pe;
@@ -206,7 +212,7 @@ export function NewPool() {
                   ))}
                 </select>
               </Field>
-              <Field label="…or create a new campaign" hint="e.g. November Spaza Essentials">
+              <Field label="…or create a new campaign" hint="e.g. November Essentials">
                 <input className={inputCls} value={f.new_campaign} onChange={set("new_campaign")} />
               </Field>
             </>
@@ -367,36 +373,24 @@ export function NewPool() {
                   onChange={set("confirm_window_hours")}
                 />
               </Field>
-              <fieldset>
-                <legend className="mb-1 text-sm font-medium">Delivers to *</legend>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {ref.data.zones.map((z) => (
-                    <label
-                      key={z.id}
-                      className="flex items-center gap-2 rounded-md border-2 border-ink/20 p-2 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={zoneIds.includes(z.id)}
-                        onChange={(e) =>
-                          setZoneIds(
-                            e.target.checked
-                              ? [...zoneIds, z.id]
-                              : zoneIds.filter((id) => id !== z.id),
-                          )
-                        }
-                      />
-                      <span>
-                        {z.name}{" "}
-                        <span className="text-muted-foreground">({money(z.delivery_fee)})</span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                {ref.data.zones.length === 0 && (
-                  <p className="text-sm text-warning">Add delivery zones in Settings first.</p>
-                )}
-              </fieldset>
+              <LocationPicker
+                title="Centre of the deal *"
+                hint="Pick the township or a landmark in the middle of the businesses you want to reach."
+                latitude={centre?.latitude ?? null}
+                longitude={centre?.longitude ?? null}
+                address={centre?.address ?? ""}
+                onPick={setCentre}
+              />
+              <Field label="Businesses can join within (km) *">
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  className={inputCls}
+                  value={radius}
+                  onChange={(e) => setRadius(e.target.value)}
+                />
+              </Field>
               <Field label="Expected supplier fulfilment">
                 <textarea
                   className={inputCls + " h-20 py-2"}

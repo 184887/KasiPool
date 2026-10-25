@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { Field, inputCls } from "@/components/kp/admin";
-import { DeliveryZonesAdmin } from "@/components/kp/DeliveryZonesAdmin";
 import { settingsQuery, errMsg, type ContactSettings, type PaymentSettings } from "@/lib/queries";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -17,12 +16,14 @@ export function Settings() {
   const [pay, setPay] = useState<PaymentSettings | null | undefined>(null);
   const [contact, setContact] = useState<ContactSettings | null | undefined>(null);
   const [share, setShare] = useState("");
+  const [fee, setFee] = useState("0");
   const [email, setEmail] = useState("");
   useEffect(() => {
     if (data) {
       setPay(data.payment);
       setContact(data.contact);
       setShare(String(data.pricing?.discount_share_pct ?? ""));
+      setFee(String(data.delivery?.fee_per_order ?? 0));
     }
   }, [data]);
   if (isLoading || !pay) return <Loading />;
@@ -38,11 +39,11 @@ export function Settings() {
   async function role(make: boolean) {
     // Team members sign in at /admin/login with their own email address
     const login = email.trim();
-    if (!/^[^s@]+@[^s@]+.[^s@]+$/.test(login)) return toast.error("Enter an email address");
+    if (!isEmail(login)) return toast.error("Enter an email address");
     const { error } = await supabase.rpc("admin_set_role", { _email: login, _make_admin: make });
     if (error)
       return toast.error(
-        /no account/i.test(error.message) ? "No account with that number" : errMsg(error),
+        /no account/i.test(error.message) ? "No account with that email" : errMsg(error),
       );
     toast.success(make ? "Admin access granted" : "Admin access removed");
     setEmail("");
@@ -192,8 +193,38 @@ export function Settings() {
           </div>
         </Section>
 
-        <DeliveryZonesAdmin />
+        <Section title="Delivery">
+          <p className="mb-3 text-sm text-muted-foreground">
+            One delivery fee per order, added to each order when the business confirms. R0 shows
+            shops &quot;Delivery is free&quot;. Orders already confirmed keep their fee.
+          </p>
+          <div className="flex items-end gap-2">
+            <Field label="Delivery fee per order (R)">
+              <input
+                className={inputCls}
+                type="number"
+                min="0"
+                step="1"
+                value={fee}
+                onChange={(e) => setFee(e.target.value)}
+              />
+            </Field>
+            <Button
+              onClick={() => {
+                if (!(+fee >= 0)) return toast.error("Enter 0 or more");
+                saveKey("delivery", { fee_per_order: +fee });
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        </Section>
       </div>
     </>
   );
+}
+
+/** Loose check: something@something.something, no spaces */
+export function isEmail(s: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }

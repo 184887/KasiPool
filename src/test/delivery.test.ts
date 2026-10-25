@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapsUrl, shopZoneId } from "@/lib/delivery";
+import { byDistance, distanceLabel, distanceText, mapsUrl } from "@/lib/delivery";
 
 describe("mapsUrl", () => {
   it("links to the pin", () => {
@@ -13,10 +13,24 @@ describe("mapsUrl", () => {
   });
 });
 
-describe("shopZoneId", () => {
-  it("uses the other address's zone when stock goes there", () => {
-    expect(shopZoneId({ deliver_to: "other", zone_id: "a", delivery_zone_id: "b" })).toBe("b");
-    expect(shopZoneId({ deliver_to: "business", zone_id: "a", delivery_zone_id: "b" })).toBe("a");
-    expect(shopZoneId(null)).toBeNull();
+describe("distanceLabel", () => {
+  it("says how far, in plain words", () => {
+    expect(distanceLabel({ distance_km: 0 })).toBe("Under 1 km away");
+    expect(distanceLabel({ distance_km: 4 })).toBe("4 km away");
+    expect(distanceText({ distance_km: 0 })).toBe("under 1 km");
+  });
+});
+
+describe("byDistance", () => {
+  it("puts near pools first, open-to-all next and too-far pools last", () => {
+    const d = new Map([
+      ["far", { distance_km: 12, radius_km: 10, in_range: false }],
+      ["near", { distance_km: 2, radius_km: 10, in_range: true }],
+      ["mid", { distance_km: 8, radius_km: 10, in_range: true }],
+    ]);
+    const ids = byDistance([{ id: "far" }, { id: "all" }, { id: "mid" }, { id: "near" }], d).map(
+      (p) => p.id,
+    );
+    expect(ids).toEqual(["near", "mid", "all", "far"]);
   });
 });

@@ -26,9 +26,7 @@ export function Deliveries() {
       (
         await supabase
           .from("orders")
-          .select(
-            "*, businesses(trading_name, rep_name, mobile), pools(unit, products(name)), delivery_zones(name)",
-          )
+          .select("*, businesses(trading_name, rep_name, mobile), pools(unit, products(name))")
           .in("fulfilment_status", ["out_for_delivery", "delivered", "received"])
           .order("out_for_delivery_at", { ascending: false })
       ).data ?? [],
@@ -107,12 +105,7 @@ export function Deliveries() {
                 {o.allocated_qty} × {o.pools?.products?.name}{" "}
                 <span className="text-sm font-normal">({o.pools?.unit}s)</span>
               </p>
-              <p className="mt-2 text-sm">
-                {o.delivery_address ?? "-"}
-                {o.delivery_zones && (
-                  <span className="text-muted-foreground"> · {o.delivery_zones.name}</span>
-                )}
-              </p>
+              <p className="mt-2 text-sm">{o.delivery_address ?? "-"}</p>
               {mapsUrl(o.delivery_latitude, o.delivery_longitude) && (
                 <a
                   href={mapsUrl(o.delivery_latitude, o.delivery_longitude)!}

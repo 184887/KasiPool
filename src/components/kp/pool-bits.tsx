@@ -138,8 +138,8 @@ export function PoolProgress({
         <span>
           <Users className="mr-1 inline size-3.5" aria-hidden="true" />
           {participants === 0
-            ? "Be the first shop to join"
-            : `${participants} ${participants === 1 ? "shop" : "shops"} joined`}
+            ? "Be the first business to join"
+            : `${participants} ${participants === 1 ? "business" : "businesses"} joined`}
         </span>
         {!reached && size !== "sm" && (
           <span className="ml-auto whitespace-nowrap tabular">
