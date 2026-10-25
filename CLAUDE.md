@@ -74,6 +74,20 @@ Run lint, typecheck, test and build before committing. Format with `npx prettier
 - Keep `src/integrations/supabase/types.ts` as is unless the schema changes; the generator
   drops hand-fixed nullable RPC arguments, so re-apply those by hand after regenerating.
 
+### Supabase agent skills
+
+`.claude/skills/supabase` and `.claude/skills/supabase-postgres-best-practices` are Supabase's
+own skills, installed with `npx skills add supabase/agent-skills` and pinned in
+`skills-lock.json`. Update them with `npx skills update`; don't edit the files by hand. Where they
+disagree with this file, this file wins:
+
+- Business logic in SECURITY DEFINER functions in `public` is deliberate (see AGENTS.md). Don't
+  switch them to SECURITY INVOKER or move them; every new one must check `auth.uid()` or
+  `has_role(...)` in its body.
+- There is no local database. `supabase db query`, MCP `execute_sql` and `apply_migration` would
+  run on the live project, so ask first. Write schema changes as a new migration file instead
+  of using `supabase db pull`.
+
 ## Secrets
 
 - `.env` and `.env.*` are git-ignored (except `.env.example`). Never commit keys, passwords or
