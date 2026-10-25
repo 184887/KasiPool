@@ -40,7 +40,7 @@ export function Settings() {
   }, [data]);
   if (isLoading || !pay) return <Loading />;
 
-  async function saveKey(key: string, value: Json) {
+  async function saveKey(key: string, value: NonNullable<Json>) {
     const { error } = await supabase
       .from("app_settings")
       .upsert({ key, value, updated_at: new Date().toISOString() });
@@ -126,14 +126,6 @@ export function Settings() {
               />{" "}
               Show these payment instructions to customers
             </label>
-            <label className="flex items-center gap-2 text-sm font-medium">
-              <input
-                type="checkbox"
-                checked={pay.online_enabled ?? false}
-                onChange={(e) => setPay({ ...pay, online_enabled: e.target.checked })}
-              />{" "}
-              Offer online payment through Yoco
-            </label>
             <Button
               onClick={() => {
                 if (pay.configured && (!pay.account_number || !pay.account_name))
@@ -144,10 +136,6 @@ export function Settings() {
               Save payment settings
             </Button>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Yoco API keys and webhook secrets must be configured in Supabase Edge Function secrets;
-            never enter them here. Yoco payments are verified by signed webhooks.
-          </p>
         </Section>
 
         <Section title="Contact details (Help page)">

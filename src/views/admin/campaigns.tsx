@@ -26,7 +26,6 @@ export function Campaigns() {
   });
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  const [sendingCampaign, setSendingCampaign] = useState<string | null>(null);
   if (isLoading) return <Loading />;
   async function create() {
     if (!name.trim()) return;
@@ -38,54 +37,6 @@ export function Campaigns() {
     setDesc("");
     toast.success("Campaign created");
     qc.invalidateQueries();
-  }
-  async function sendWhatsApp(campaign: { id: string; name: string }) {
-    if (
-      !window.confirm(
-        `Send the approved WhatsApp campaign template for "${campaign.name}" to all businesses that opted in?`,
-      )
-    )
-      return;
-    setSendingCampaign(campaign.id);
-    try {
-      let sent = 0;
-      let failed = 0;
-      let remaining = 0;
-      let retryFailed = true;
-      do {
-        const { data: result, error } = await supabase.functions.invoke("send-whatsapp-campaign", {
-          body: { campaign_id: campaign.id, retry_failed: retryFailed },
-        });
-        if (error) throw error;
-        if (
-          !result ||
-          !Number.isSafeInteger(result.sent) ||
-          !Number.isSafeInteger(result.failed) ||
-          !Number.isSafeInteger(result.remaining) ||
-          result.sent < 0 ||
-          result.failed < 0 ||
-          result.remaining < 0
-        ) {
-          throw new Error("WhatsApp campaign did not return a valid delivery summary.");
-        }
-        sent += result.sent;
-        failed += result.failed;
-        remaining = result.remaining;
-        retryFailed = false;
-      } while (remaining > 0);
-
-      if (failed > 0) {
-        toast.error(`WhatsApp campaign sent to ${sent}; ${failed} delivery(s) failed.`);
-      } else if (sent === 0) {
-        toast.info("There are no opted-in businesses to contact for this campaign.");
-      } else {
-        toast.success(`WhatsApp campaign sent to ${sent} opted-in business(es).`);
-      }
-    } catch (error) {
-      toast.error(errMsg(error));
-    } finally {
-      setSendingCampaign(null);
-    }
   }
   return (
     <>
@@ -113,16 +64,6 @@ export function Campaigns() {
         {(data ?? []).map((c) => (
           <Section key={c.id} title={c.name}>
             {c.description && <p className="mb-2 text-sm text-muted-foreground">{c.description}</p>}
-            <Button
-              className="mb-3"
-              variant="outline"
-              onClick={() => sendWhatsApp(c)}
-              disabled={sendingCampaign === c.id}
-            >
-              {sendingCampaign === c.id
-                ? "Sending WhatsApp campaign…"
-                : "Send WhatsApp to opted-in businesses"}
-            </Button>
             {c.pools.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 No pools yet.{" "}

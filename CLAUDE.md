@@ -100,7 +100,7 @@ disagree with this file, this file wins:
 - `.env` and `.env.*` are git-ignored (except `.env.example`). Never commit keys, passwords or
   connection strings.
 - Only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` may be public.
-  Provider secrets (Yoco, Clickatell, WhatsApp) are Supabase Edge Function secrets.
+  Provider secrets (e.g. Clickatell) are Supabase Edge Function secrets.
 
 ## Git
 

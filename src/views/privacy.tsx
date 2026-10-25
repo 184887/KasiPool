@@ -14,9 +14,7 @@ export function Privacy() {
       <h2>How we use it</h2>
       <p>
         To manage your participation, confirm orders, verify payments, coordinate collection and
-        send in-app notifications. Yoco processes online payments, and Clickatell delivers
-        verification codes when you choose mobile sign-in. Other businesses never see your details
-        or quantities.
+        send in-app notifications. Other businesses never see your details or quantities.
       </p>
       <h2>Marketing</h2>
       <p>

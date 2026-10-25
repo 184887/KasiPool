@@ -30,14 +30,7 @@ export function Payments() {
         supabase
           .from("audit_events")
           .select("*")
-          .in("action", [
-            "record_payment",
-            "payment_issue",
-            "refund_owed",
-            "refund_completed",
-            "yoco_payment_mismatch",
-            "yoco_payment_rejected",
-          ])
+          .in("action", ["record_payment", "payment_issue", "refund_owed", "refund_completed"])
           .order("created_at", { ascending: false })
           .limit(50),
       ]);

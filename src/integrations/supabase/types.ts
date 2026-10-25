@@ -1,10 +1,25 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.18";
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: { extensions?: Json; operationName?: string; query?: string; variables?: Json };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
   public: {
     Tables: {
@@ -12,17 +27,18 @@ export type Database = {
         Row: {
           key: string;
           updated_at: string;
-          value: Json;
+          value: NonNullable<Json>;
         };
+        ComputedFields: never;
         Insert: {
           key: string;
           updated_at?: string;
-          value: Json;
+          value: NonNullable<Json>;
         };
         Update: {
           key?: string;
           updated_at?: string;
-          value?: Json;
+          value?: NonNullable<Json>;
         };
         Relationships: [];
       };
@@ -36,6 +52,7 @@ export type Database = {
           entity_id: string | null;
           id: string;
         };
+        ComputedFields: never;
         Insert: {
           action: string;
           actor?: string | null;
@@ -59,14 +76,13 @@ export type Database = {
       businesses: {
         Row: {
           address: string | null;
-          latitude: number | null;
-          longitude: number | null;
           category: string | null;
           city: string;
           created_at: string;
           email: string | null;
           id: string;
-          is_demo: boolean;
+          latitude: number | null;
+          longitude: number | null;
           marketing_opt_in: boolean;
           mobile: string;
           notify_in_app: boolean;
@@ -78,16 +94,16 @@ export type Database = {
           trading_name: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           address?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           category?: string | null;
           city: string;
           created_at?: string;
           email?: string | null;
           id?: string;
-          is_demo?: boolean;
+          latitude?: number | null;
+          longitude?: number | null;
           marketing_opt_in?: boolean;
           mobile: string;
           notify_in_app?: boolean;
@@ -101,14 +117,13 @@ export type Database = {
         };
         Update: {
           address?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           category?: string | null;
           city?: string;
           created_at?: string;
           email?: string | null;
           id?: string;
-          is_demo?: boolean;
+          latitude?: number | null;
+          longitude?: number | null;
           marketing_opt_in?: boolean;
           mobile?: string;
           notify_in_app?: boolean;
@@ -127,21 +142,19 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: string;
-          is_demo: boolean;
           name: string;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           description?: string | null;
           id?: string;
-          is_demo?: boolean;
           name: string;
         };
         Update: {
           created_at?: string;
           description?: string | null;
           id?: string;
-          is_demo?: boolean;
           name?: string;
         };
         Relationships: [];
@@ -153,6 +166,7 @@ export type Database = {
           slug: string;
           sort: number;
         };
+        ComputedFields: never;
         Insert: {
           id?: string;
           name: string;
@@ -171,37 +185,38 @@ export type Database = {
         Row: {
           active: boolean;
           address: string | null;
-          latitude: number | null;
-          longitude: number | null;
           area: string;
           created_at: string;
           fee_note: string | null;
           id: string;
           instructions: string | null;
+          latitude: number | null;
+          longitude: number | null;
           name: string;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           address?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           area: string;
           created_at?: string;
           fee_note?: string | null;
           id?: string;
           instructions?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           name: string;
         };
         Update: {
           active?: boolean;
           address?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           area?: string;
           created_at?: string;
           fee_note?: string | null;
           id?: string;
           instructions?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           name?: string;
         };
         Relationships: [];
@@ -216,6 +231,7 @@ export type Database = {
           title: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           body?: string | null;
           created_at?: string;
@@ -250,7 +266,6 @@ export type Database = {
           failure_reason: string | null;
           fulfilment_status: string;
           id: string;
-          is_demo: boolean;
           paid_at: string | null;
           participation_id: string | null;
           payment_reference: string | null;
@@ -265,6 +280,7 @@ export type Database = {
           unit_price: number;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           allocated_qty?: number;
           amount_paid?: number;
@@ -278,7 +294,6 @@ export type Database = {
           failure_reason?: string | null;
           fulfilment_status?: string;
           id?: string;
-          is_demo?: boolean;
           paid_at?: string | null;
           participation_id?: string | null;
           payment_reference?: string | null;
@@ -306,7 +321,6 @@ export type Database = {
           failure_reason?: string | null;
           fulfilment_status?: string;
           id?: string;
-          is_demo?: boolean;
           paid_at?: string | null;
           participation_id?: string | null;
           payment_reference?: string | null;
@@ -356,6 +370,7 @@ export type Database = {
           updated_at: string;
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           business_id: string;
           created_at?: string;
@@ -404,6 +419,7 @@ export type Database = {
           order_id: string;
           recorded_by: string | null;
         };
+        ComputedFields: never;
         Insert: {
           amount: number;
           channel_reference?: string | null;
@@ -434,100 +450,12 @@ export type Database = {
           },
         ];
       };
-      yoco_checkout_attempts: {
-        Row: {
-          amount_cents: number;
-          checkout_id: string | null;
-          created_at: string;
-          id: string;
-          order_id: string;
-          payment_id: string | null;
-          status: string;
-          updated_at: string;
-        };
-        Insert: {
-          amount_cents: number;
-          checkout_id?: string | null;
-          created_at?: string;
-          id?: string;
-          order_id: string;
-          payment_id?: string | null;
-          status?: string;
-          updated_at?: string;
-        };
-        Update: {
-          amount_cents?: number;
-          checkout_id?: string | null;
-          created_at?: string;
-          id?: string;
-          order_id?: string;
-          payment_id?: string | null;
-          status?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "yoco_checkout_attempts_order_id_fkey";
-            columns: ["order_id"];
-            isOneToOne: false;
-            referencedRelation: "orders";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      whatsapp_campaign_deliveries: {
-        Row: {
-          business_id: string;
-          campaign_id: string;
-          created_at: string;
-          error: string | null;
-          id: string;
-          provider_message_id: string | null;
-          status: string;
-          updated_at: string;
-        };
-        Insert: {
-          business_id: string;
-          campaign_id: string;
-          created_at?: string;
-          error?: string | null;
-          id?: string;
-          provider_message_id?: string | null;
-          status?: string;
-          updated_at?: string;
-        };
-        Update: {
-          business_id?: string;
-          campaign_id?: string;
-          created_at?: string;
-          error?: string | null;
-          id?: string;
-          provider_message_id?: string | null;
-          status?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "whatsapp_campaign_deliveries_business_id_fkey";
-            columns: ["business_id"];
-            isOneToOne: false;
-            referencedRelation: "businesses";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "whatsapp_campaign_deliveries_campaign_id_fkey";
-            columns: ["campaign_id"];
-            isOneToOne: false;
-            referencedRelation: "campaigns";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       pool_costs: {
         Row: {
           pool_id: string;
           supplier_cost: number;
         };
+        ComputedFields: never;
         Insert: {
           pool_id: string;
           supplier_cost: number;
@@ -546,6 +474,33 @@ export type Database = {
           },
         ];
       };
+      pool_members: {
+        Row: {
+          created_at: string;
+          pool_id: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          pool_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          pool_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pool_members_pool_id_fkey";
+            columns: ["pool_id"];
+            isOneToOne: false;
+            referencedRelation: "pools";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       pools: {
         Row: {
           campaign_id: string | null;
@@ -558,12 +513,11 @@ export type Database = {
           fee_note: string | null;
           fulfilment_note: string | null;
           id: string;
-          is_demo: boolean;
-          max_per_customer: number | null;
-          max_distance_km: number;
+          invite_code: string | null;
           is_private: boolean;
           is_sample: boolean;
-          invite_code: string | null;
+          max_distance_km: number;
+          max_per_customer: number | null;
           max_qty: number | null;
           min_per_customer: number;
           min_qty: number;
@@ -574,8 +528,8 @@ export type Database = {
           payment_deadline: string | null;
           pledged_qty: number;
           price: number;
-          proposed_by: string | null;
           product_id: string;
+          proposed_by: string | null;
           qualified_at: string | null;
           reference_date: string | null;
           reference_price: number | null;
@@ -585,6 +539,7 @@ export type Database = {
           unit: string;
           updated_at: string;
         };
+        ComputedFields: never;
         Insert: {
           campaign_id?: string | null;
           closed_at?: string | null;
@@ -596,12 +551,11 @@ export type Database = {
           fee_note?: string | null;
           fulfilment_note?: string | null;
           id?: string;
-          is_demo?: boolean;
-          max_per_customer?: number | null;
-          max_distance_km?: number;
+          invite_code?: string | null;
           is_private?: boolean;
           is_sample?: boolean;
-          invite_code?: string | null;
+          max_distance_km?: number;
+          max_per_customer?: number | null;
           max_qty?: number | null;
           min_per_customer?: number;
           min_qty: number;
@@ -612,8 +566,8 @@ export type Database = {
           payment_deadline?: string | null;
           pledged_qty?: number;
           price: number;
-          proposed_by?: string | null;
           product_id: string;
+          proposed_by?: string | null;
           qualified_at?: string | null;
           reference_date?: string | null;
           reference_price?: number | null;
@@ -634,12 +588,11 @@ export type Database = {
           fee_note?: string | null;
           fulfilment_note?: string | null;
           id?: string;
-          is_demo?: boolean;
-          max_per_customer?: number | null;
-          max_distance_km?: number;
+          invite_code?: string | null;
           is_private?: boolean;
           is_sample?: boolean;
-          invite_code?: string | null;
+          max_distance_km?: number;
+          max_per_customer?: number | null;
           max_qty?: number | null;
           min_per_customer?: number;
           min_qty?: number;
@@ -650,8 +603,8 @@ export type Database = {
           payment_deadline?: string | null;
           pledged_qty?: number;
           price?: number;
-          proposed_by?: string | null;
           product_id?: string;
+          proposed_by?: string | null;
           qualified_at?: string | null;
           reference_date?: string | null;
           reference_price?: number | null;
@@ -701,12 +654,12 @@ export type Database = {
           description: string | null;
           id: string;
           image_url: string | null;
-          is_demo: boolean;
           name: string;
           pack_size: string | null;
           sku: string;
           unit: string;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           brand?: string | null;
@@ -715,7 +668,6 @@ export type Database = {
           description?: string | null;
           id?: string;
           image_url?: string | null;
-          is_demo?: boolean;
           name: string;
           pack_size?: string | null;
           sku: string;
@@ -729,7 +681,6 @@ export type Database = {
           description?: string | null;
           id?: string;
           image_url?: string | null;
-          is_demo?: boolean;
           name?: string;
           pack_size?: string | null;
           sku?: string;
@@ -763,6 +714,7 @@ export type Database = {
           total: number;
           unit_cost: number;
         };
+        ComputedFields: never;
         Insert: {
           created_at?: string;
           created_by?: string | null;
@@ -826,6 +778,7 @@ export type Database = {
           recorded_by: string | null;
           status: string;
         };
+        ComputedFields: never;
         Insert: {
           amount: number;
           completed_at?: string | null;
@@ -866,12 +819,12 @@ export type Database = {
           created_at: string;
           email: string | null;
           id: string;
-          is_demo: boolean;
           location: string | null;
           mobile: string | null;
           name: string;
           notes: string | null;
         };
+        ComputedFields: never;
         Insert: {
           active?: boolean;
           categories?: string[] | null;
@@ -879,7 +832,6 @@ export type Database = {
           created_at?: string;
           email?: string | null;
           id?: string;
-          is_demo?: boolean;
           location?: string | null;
           mobile?: string | null;
           name: string;
@@ -892,7 +844,6 @@ export type Database = {
           created_at?: string;
           email?: string | null;
           id?: string;
-          is_demo?: boolean;
           location?: string | null;
           mobile?: string | null;
           name?: string;
@@ -906,6 +857,7 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"];
           user_id: string;
         };
+        ComputedFields: never;
         Insert: {
           id?: string;
           role: Database["public"]["Enums"]["app_role"];
@@ -923,19 +875,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      admin_cancel_pool: {
-        Args: { _pool: string; _reason: string };
-        Returns: undefined;
-      };
+      admin_cancel_pool: { Args: { _pool: string; _reason: string }; Returns: undefined };
       admin_close_now: { Args: { _pool: string }; Returns: undefined };
-      admin_collect: {
-        Args: { _code: string; _order: string };
-        Returns: undefined;
-      };
-      admin_complete_refund: {
-        Args: { _reference: string; _refund: string };
-        Returns: undefined;
-      };
+      admin_collect: { Args: { _code: string; _order: string }; Returns: undefined };
+      admin_complete_refund: { Args: { _reference: string; _refund: string }; Returns: undefined };
       admin_create_po: {
         Args: {
           _expected: string | null;
@@ -949,32 +892,11 @@ export type Database = {
         Args: { _amount: number; _order: string; _reason: string };
         Returns: undefined;
       };
-      admin_exists: { Args: never; Returns: boolean };
+      admin_exists: { Args: Record<PropertyKey, never>; Returns: boolean };
       admin_finalise_funding: { Args: { _pool: string }; Returns: string };
-      admin_flag_payment_issue: {
-        Args: { _note: string; _order: string };
-        Returns: undefined;
-      };
+      admin_flag_payment_issue: { Args: { _note: string; _order: string }; Returns: undefined };
       admin_mark_ready: { Args: { _pool: string }; Returns: number };
       admin_publish_pool: { Args: { _pool: string }; Returns: undefined };
-      claim_pool_invite: { Args: { _code: string }; Returns: string };
-      propose_pool: {
-        Args: {
-          _product: string;
-          _unit: string;
-          _price: number;
-          _min_qty: number;
-          _max_qty: number | null;
-          _min_per: number | null;
-          _max_per: number | null;
-          _opens: string;
-          _closes: string;
-          _collection_point: string;
-          _note: string | null;
-          _private?: boolean;
-        };
-        Returns: string;
-      };
       admin_receive_stock: {
         Args: { _note: string; _pool: string; _received: number };
         Returns: undefined;
@@ -989,81 +911,51 @@ export type Database = {
         };
         Returns: undefined;
       };
-      admin_resolve_failed_pool: {
-        Args: { _note: string; _pool: string };
-        Returns: undefined;
-      };
-      admin_set_role: {
-        Args: { _email: string; _make_admin: boolean };
-        Returns: undefined;
-      };
+      admin_resolve_failed_pool: { Args: { _note: string; _pool: string }; Returns: undefined };
+      admin_set_role: { Args: { _email: string; _make_admin: boolean }; Returns: undefined };
       audit: {
         Args: { _action: string; _details?: Json; _entity: string; _id: string };
         Returns: undefined;
       };
-      claim_first_admin: { Args: never; Returns: undefined };
+      claim_first_admin: { Args: Record<PropertyKey, never>; Returns: undefined };
+      claim_pool_invite: { Args: { _code: string }; Returns: string };
       close_pool: { Args: { _pool: string }; Returns: undefined };
-      confirm_order: {
-        Args: { _accept: boolean; _order: string };
-        Returns: string;
-      };
+      confirm_order: { Args: { _accept: boolean; _order: string }; Returns: string };
       decline_order: { Args: { _order: string }; Returns: undefined };
+      distance_km: {
+        Args: { _lat1: number; _lat2: number; _lng1: number; _lng2: number };
+        Returns: number;
+      };
       finalise_funding: { Args: { _pool: string }; Returns: string };
       has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"];
-          _user_id: string;
-        };
+        Args: { _role: Database["public"]["Enums"]["app_role"]; _user_id: string };
         Returns: boolean;
       };
-      is_admin: { Args: never; Returns: boolean };
+      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       join_pool: { Args: { _pool: string; _qty: number }; Returns: Json };
       notify: {
         Args: { _body: string; _link: string; _title: string; _user: string };
         Returns: undefined;
       };
-      provider_attach_yoco_checkout: {
-        Args: { _attempt: string; _checkout_id: string };
-        Returns: undefined;
-      };
-      provider_complete_yoco_checkout: {
-        Args: { _amount_cents: number; _attempt: string; _currency: string; _payment_id: string };
-        Returns: boolean;
-      };
-      provider_fail_yoco_checkout: {
-        Args: { _attempt: string };
-        Returns: undefined;
-      };
-      provider_fail_yoco_webhook: {
-        Args: { _attempt: string; _payment_id: string };
-        Returns: undefined;
-      };
-      provider_finish_whatsapp_delivery: {
+      propose_pool: {
         Args: {
-          _delivery: string;
-          _error: string | null;
-          _provider_message_id: string | null;
-          _status: string;
+          _closes: string;
+          _collection_point: string;
+          _max_per: number | null;
+          _max_qty: number | null;
+          _min_per: number | null;
+          _min_qty: number;
+          _note: string | null;
+          _opens: string;
+          _price: number;
+          _private?: boolean;
+          _product: string;
+          _unit: string;
         };
-        Returns: undefined;
-      };
-      provider_prepare_whatsapp_campaign: {
-        Args: { _campaign: string; _retry_failed?: boolean };
-        Returns: {
-          business_id: string;
-          campaign_name: string;
-          delivery_id: string;
-          description: string | null;
-          mobile: string;
-          trading_name: string;
-        }[];
-      };
-      provider_prepare_yoco_checkout: {
-        Args: { _order: string };
-        Returns: Json;
+        Returns: string;
       };
       recalc_pool: { Args: { _pool: string }; Returns: undefined };
-      refresh_pool_states: { Args: never; Returns: undefined };
+      refresh_pool_states: { Args: Record<PropertyKey, never>; Returns: undefined };
       withdraw_from_pool: { Args: { _pool: string }; Returns: undefined };
     };
     Enums: {
@@ -1089,9 +981,7 @@ export type Tables<
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R;
@@ -1114,9 +1004,7 @@ export type TablesInsert<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I;
     }
@@ -1138,9 +1026,7 @@ export type TablesUpdate<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U;
     }
@@ -1162,9 +1048,7 @@ export type Enums<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never) = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
@@ -1178,15 +1062,16 @@ export type CompositeTypes<
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-}
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "customer"],

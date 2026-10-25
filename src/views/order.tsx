@@ -48,7 +48,6 @@ export function OrderPage() {
   });
   const [accept, setAccept] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [paymentBusy, setPaymentBusy] = useState(false);
 
   if (isLoading) return <Loading />;
   if (!o)
@@ -77,19 +76,6 @@ export function OrderPage() {
     if (error) return toast.error(errMsg(error));
     toast.success("Order declined");
     qc.invalidateQueries();
-  }
-
-  async function payOnline() {
-    setPaymentBusy(true);
-    const { data, error } = await supabase.functions.invoke("create-yoco-checkout", {
-      body: { order_id: orderId },
-    });
-    setPaymentBusy(false);
-    if (error) return toast.error(errMsg(error));
-    if (typeof data?.redirect_url !== "string") {
-      return toast.error("The payment provider did not return a checkout link");
-    }
-    window.location.assign(data.redirect_url);
   }
 
   return (
@@ -177,25 +163,6 @@ export function OrderPage() {
             {Number(o.amount_paid) > 0 && <Row k="Verified so far" v={money(o.amount_paid)} />}
             <Row k="Payment deadline" v={dateTime(pool.payment_deadline)} />
           </dl>
-          {pay?.online_enabled && (
-            <div className="mt-4 rounded-md border-2 border-ink bg-gold-soft p-4">
-              <p className="text-sm font-semibold">Pay securely online with Yoco</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Your payment will be confirmed automatically after Yoco verifies it.
-              </p>
-              <Button
-                className="mt-3 w-full"
-                size="lg"
-                variant="gold"
-                onClick={payOnline}
-                disabled={paymentBusy}
-              >
-                {paymentBusy
-                  ? "Starting secure checkout…"
-                  : `Pay ${money(Number(o.total) - Number(o.amount_paid))} with Yoco`}
-              </Button>
-            </div>
-          )}
           {pay?.configured ? (
             <div className="mt-4 rounded-md border-2 border-ink bg-muted p-4 text-sm">
               <p className="font-bold">{pay.method}</p>
@@ -228,12 +195,12 @@ export function OrderPage() {
                 change to “Paid” once verified.
               </p>
             </div>
-          ) : !pay?.online_enabled ? (
+          ) : (
             <div className="mt-4 rounded-md border-2 border-warning/40 bg-warning-soft p-4 text-sm text-warning">
               <b>Payment instructions are not yet available.</b> Please do not pay yet. KasiPool
               will notify you once official payment details have been set up.
             </div>
-          ) : null}
+          )}
         </Section>
       )}
 

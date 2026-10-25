@@ -5,7 +5,6 @@ import type { Json } from "@/integrations/supabase/types";
 export type PaymentSettings = {
   [key: string]: Json | undefined;
   configured: boolean;
-  online_enabled?: boolean;
   method: string;
   bank: string;
   account_name: string;
