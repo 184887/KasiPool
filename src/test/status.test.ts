@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { safeRedirect } from "@/lib/auth";
 import { nextAction, timelineStep } from "@/lib/status";
@@ -38,5 +38,21 @@ describe("order progress", () => {
     expect(timelineStep({ ...order, payment_status: "paid", fulfilment_status: "received" })).toBe(
       6,
     );
+  });
+});
+
+describe("errMsg", () => {
+  it("shows our own messages and hides internal ones", async () => {
+    const { errMsg, FriendlyError } = await import("@/lib/queries");
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(errMsg({ code: "P0001", message: "This pool is closed" })).toBe("This pool is closed");
+    expect(errMsg(new FriendlyError("Try later"))).toBe("Try later");
+    expect(
+      errMsg({ code: "23505", message: 'duplicate key value violates unique constraint "x"' }),
+    ).toBe("Something went wrong. Please try again.");
+    expect(errMsg(new TypeError("Failed to fetch"))).toBe(
+      "No connection. Check your data and try again.",
+    );
+    spy.mockRestore();
   });
 });

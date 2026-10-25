@@ -12,20 +12,21 @@ import { Container } from "@/components/kp/AppShell";
 import { Logo } from "@/components/kp/pool-bits";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, safeRedirect } from "@/lib/auth";
-import { errMsg, settingsQuery } from "@/lib/queries";
+import { errMsg, FriendlyError, settingsQuery } from "@/lib/queries";
 import { isValidPin, phoneToLogin } from "@/lib/phone-auth";
 
 type Search = { redirect?: string; mode?: "login" | "register" };
 
 const REDIRECT_KEY = "kp-auth-redirect";
 
-/** Supabase's messages refer to email and password; say number and PIN instead. */
+/** Sign-in errors talk about email and password; say number and PIN instead. */
 function authError(err: unknown): string {
-  const msg = errMsg(err);
+  const msg = err && typeof err === "object" && "message" in err ? String(err.message) : "";
   if (/invalid login credentials/i.test(msg)) return "Wrong mobile number or PIN";
   if (/already (been )?registered|already exists/i.test(msg))
     return "This number is already registered. Log in instead.";
-  return msg;
+  if (/rate limit|too many/i.test(msg)) return "Too many tries. Please wait a few minutes.";
+  return errMsg(err);
 }
 
 const digits = (v: string) => v.replace(/\D/g, "").slice(0, 6);
@@ -76,7 +77,8 @@ export function AuthPage() {
         });
         if (error) throw error;
         // No session means Supabase still requires email confirmation, which can't arrive
-        if (!data.session) throw new Error("You can't register right now. Please try again later.");
+        if (!data.session)
+          throw new FriendlyError("You can't register right now. Please try again later.");
       }
     } catch (err) {
       toast.error(authError(err));
