@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import {
   LayoutDashboard,
   Layers,
@@ -59,6 +59,13 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   }, [isLogin, loading, user, allowed.data, nav, pathname]);
   const active = (to: string) =>
     to === "/admin" ? pathname === "/admin" : pathname.startsWith(to);
+  // Phones: keep the current tab visible in the scrolling tab bar
+  const tabs = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    tabs.current
+      ?.querySelector<HTMLElement>("[aria-current=page]")
+      ?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [pathname, allowed.data]);
   if (isLogin) return <>{children}</>;
   if (!allowed.data) return <Loading />;
   return (
@@ -72,8 +79,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               <Link
                 key={n.to}
                 href={n.to}
+                aria-current={active(n.to) ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   active(n.to)
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60",
@@ -87,23 +95,29 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             href="/"
             className="mt-auto flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground"
           >
-            <ArrowLeft className="size-4" /> Customer view
+            <ArrowLeft className="size-4" /> Back to the app
           </Link>
         </aside>
         <div className="min-w-0 flex-1">
-          <div className="no-scrollbar sticky top-0 z-30 flex gap-1 overflow-x-auto border-b-4 border-gold bg-sidebar px-2 py-2 lg:hidden">
+          <nav
+            ref={tabs}
+            aria-label="Admin"
+            className="no-scrollbar sticky top-0 z-30 flex gap-1 overflow-x-auto border-b-4 border-gold bg-sidebar px-2 py-2 lg:hidden"
+          >
             <Link
               href="/"
-              className="shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold text-sidebar-foreground/70"
+              aria-label="Back to the app"
+              className="flex h-11 shrink-0 items-center gap-1 rounded-md px-3 text-sm font-semibold text-sidebar-foreground/70"
             >
-              ← App
+              <ArrowLeft className="size-4" aria-hidden="true" /> App
             </Link>
             {NAV.map((n) => (
               <Link
                 key={n.to}
                 href={n.to}
+                aria-current={active(n.to) ? "page" : undefined}
                 className={cn(
-                  "shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold",
+                  "flex h-11 shrink-0 items-center rounded-md px-3 text-sm font-semibold transition-colors",
                   active(n.to)
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
                     : "text-sidebar-foreground/80",
@@ -112,8 +126,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                 {n.label}
               </Link>
             ))}
-          </div>
-          <main className="mx-auto max-w-7xl p-4 md:p-6">{children}</main>
+          </nav>
+          <main key={pathname} className="mx-auto max-w-7xl animate-enter p-4 md:p-6">
+            {children}
+          </main>
         </div>
       </div>
     </div>

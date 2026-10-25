@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               href={isAdmin ? "/admin" : "/admin/login"}
               aria-label="Admin"
-              className="flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 hover:bg-paper/10 hover:text-paper"
+              className="flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 transition-colors hover:bg-paper/10 hover:text-paper"
             >
               <Shield className="size-4" aria-hidden="true" />
               <span>Admin</span>
@@ -77,7 +77,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {user ? (
               <Link
                 href="/notifications"
-                className="relative grid size-11 place-items-center rounded-md hover:bg-paper/10"
+                className="relative grid size-11 place-items-center rounded-md transition-colors hover:bg-paper/10"
                 aria-label={`Notifications (${unread.data ?? 0} unread)`}
               >
                 <Bell className="size-5" />
@@ -97,7 +97,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="flex-1">{children}</main>
+      <main key={pathname} className="flex-1 animate-enter">
+        {children}
+      </main>
       <footer className="mt-16 border-t-4 border-ink">
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm sm:grid-cols-3">
           <div>
@@ -127,14 +129,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             href={n.to}
             aria-current={isActive(n.to) ? "page" : undefined}
             className={cn(
-              "relative flex min-h-16 flex-col items-center justify-center gap-1 py-2 text-sm font-bold",
+              "relative flex min-h-16 flex-col items-center justify-center gap-1 py-2 text-sm font-bold transition-colors active:bg-ink/5",
               isActive(n.to) ? "text-ink" : "text-muted-foreground",
             )}
           >
             <span
               aria-hidden="true"
               className={cn(
-                "absolute inset-x-4 top-0 h-1",
+                "absolute inset-x-4 top-0 h-1 transition-colors",
                 isActive(n.to) ? "bg-gold" : "bg-transparent",
               )}
             />

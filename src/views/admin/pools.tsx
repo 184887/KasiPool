@@ -63,7 +63,7 @@ export function PoolsAdmin() {
         </select>
       </div>
       {isLoading ? (
-        <Loading />
+        <Loading inline />
       ) : (
         <DataTable
           head={[

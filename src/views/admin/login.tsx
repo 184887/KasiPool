@@ -70,7 +70,7 @@ export function AdminLoginPage() {
         </p>
         {notAdmin ? (
           <div className="mt-6 space-y-3 text-center text-sm">
-            <p>You are logged in as a shop. Log out to use a team account.</p>
+            <p>You are logged in with a business account. Log out to use a team account.</p>
             <Button variant="outline" className="w-full" onClick={signOut}>
               Log out
             </Button>

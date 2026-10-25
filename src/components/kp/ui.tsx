@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import {
-  Loader2,
   Inbox,
   ArrowLeftRight,
   BadgeCheck,
@@ -81,7 +80,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex h-[26px] items-center gap-1 rounded-sm px-2 text-xs font-bold whitespace-nowrap",
+        "inline-flex h-7 items-center gap-1 rounded-sm px-2 text-sm font-bold whitespace-nowrap",
         completed ? "bg-success text-white" : toneCls[tone],
         className,
       )}
@@ -111,13 +110,26 @@ export function EmptyState({
   );
 }
 
-export function Loading({ label = "Loading…" }: { label?: string }) {
+/**
+ * Grey blocks in the shape of a page while data loads, so the layout doesn't jump when it
+ * arrives. `inline` is for a list inside a page that is already showing.
+ */
+export function Loading({ label = "Loading…", inline }: { label?: string; inline?: boolean }) {
+  const block = "rounded-md bg-ink/10 animate-pulse";
   return (
     <div
-      className="flex items-center justify-center gap-2 py-16 text-muted-foreground"
       role="status"
+      aria-live="polite"
+      className={cn(!inline && "mx-auto max-w-3xl px-4 py-6", "animate-fade-in")}
     >
-      <Loader2 className="size-5 animate-spin" /> {label}
+      <span className="sr-only">{label}</span>
+      {!inline && <div className={cn(block, "mb-2 h-11 w-2/3 max-w-xs")} />}
+      {!inline && <div className={cn(block, "mb-6 h-4 w-1/2 max-w-[14rem]")} />}
+      <div className="space-y-3" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className={cn(block, "h-28")} style={{ animationDelay: `${i * 120}ms` }} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -194,7 +206,7 @@ export function Section({
   return (
     <section className={cn("rounded-md border-2 border-ink bg-card p-4 sm:p-5", className)}>
       {(title || action) && (
-        <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           {title && <h2 className="font-display text-xl font-bold">{title}</h2>}
           {action}
         </div>

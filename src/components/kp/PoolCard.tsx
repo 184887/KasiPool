@@ -34,7 +34,7 @@ export function whatsappShareUrl(p: PoolWithProduct) {
     `KasiPool deal: ${p.products?.name ?? ""}.`,
     `${money(p.price)} per ${p.unit}${s ? ` (you save ${money(s.amount)})` : ""}.`,
     `Closes ${dateTime(p.closes_at)}.`,
-    `Order together with other shops and pay the bulk price. See the deal: ${link}`,
+    `Order together with other businesses and pay the bulk price. See the deal: ${link}`,
   ].join(" ");
   return `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
@@ -130,7 +130,7 @@ export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?:
 export function SampleBadge({ className }: { className?: string }) {
   return (
     <span
-      className={`inline-flex h-[26px] items-center rounded-sm bg-sun px-2 text-xs font-bold text-ink ${className ?? ""}`}
+      className={`inline-flex h-7 items-center rounded-sm bg-sun px-2 text-sm font-bold text-ink ${className ?? ""}`}
     >
       Sample deal
     </span>

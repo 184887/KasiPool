@@ -238,11 +238,10 @@ export function BusinessForm({
             }))
           }
         />
-        <label className="flex items-start gap-3 text-sm">
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
           <Checkbox
             checked={f.deliver_to === "other"}
             onCheckedChange={(v) => setF({ ...f, deliver_to: v ? "other" : "business" })}
-            className="mt-0.5"
           />
           <span>Deliver my stock to another address</span>
         </label>
@@ -288,7 +287,7 @@ export function BusinessForm({
         />
       </label>
       {!existing && (
-        <label className="flex items-start gap-3 text-sm">
+        <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
           <Checkbox checked={terms} onCheckedChange={(v) => setTerms(!!v)} className="mt-0.5" />
           <span>
             I accept the{" "}

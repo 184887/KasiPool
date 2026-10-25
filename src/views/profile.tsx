@@ -18,13 +18,13 @@ export function Profile() {
   return (
     <Container className="max-w-2xl space-y-4">
       <PageHeader title="Profile" subtitle={loginToPhone(user.email) ?? user.email ?? undefined} />
-      <Section title="Shop details">
+      <Section title="Business details">
         {business ? (
           <BusinessForm userId={user.id} existing={business} onDone={() => {}} />
         ) : (
           <p className="text-sm">
             <Link href="/onboarding" className="font-semibold text-ember underline">
-              Add your shop details
+              Add your business details
             </Link>{" "}
             to start joining pools.
           </p>

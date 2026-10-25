@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { MapPin, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useConfirm } from "@/components/kp/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, StatusBadge } from "@/components/kp/ui";
 import { inputCls } from "@/components/kp/admin";
@@ -15,11 +16,12 @@ import { FULFIL_STATUS } from "@/lib/status";
 
 type Filter = "open" | "problems" | "done";
 
-/** Orders on their way to shops: record what the courier reports and handle problems. */
+/** Orders on their way to businesses: record what the courier reports and handle problems. */
 export function Deliveries() {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("open");
+  const [ask, confirmDialog] = useConfirm();
   const { data, isLoading } = useQuery({
     queryKey: ["admin-deliveries"],
     queryFn: async () =>
@@ -121,7 +123,7 @@ export function Deliveries() {
               )}
               {o.received_at && (
                 <p className="text-xs text-muted-foreground">
-                  Shop confirmed receipt {dateTime(o.received_at)}
+                  Business confirmed receipt {dateTime(o.received_at)}
                 </p>
               )}
               {o.problem_reported_at && (
@@ -133,8 +135,16 @@ export function Deliveries() {
                     size="sm"
                     variant="outline"
                     className="mt-2"
-                    onClick={() => {
-                      const note = window.prompt("Note for the shop (optional)") ?? "";
+                    onClick={async () => {
+                      const note = await ask({
+                        title: "Mark this problem resolved?",
+                        confirmLabel: "Mark resolved",
+                        input: {
+                          label: "Note for the business (optional)",
+                          placeholder: "e.g. The missing 2 cases were delivered on Friday",
+                        },
+                      });
+                      if (note === false) return;
                       run(
                         () =>
                           supabase.rpc("admin_resolve_delivery_problem", {
@@ -156,7 +166,7 @@ export function Deliveries() {
                   onClick={() =>
                     run(
                       () => supabase.rpc("admin_mark_delivered", { _order: o.id, _note: "" }),
-                      "Marked delivered; shop asked to confirm",
+                      "Marked delivered; business asked to confirm",
                     )
                   }
                 >
@@ -168,6 +178,7 @@ export function Deliveries() {
         })}
         {list.length === 0 && <p className="text-sm text-muted-foreground">Nothing here.</p>}
       </div>
+      {confirmDialog}
     </>
   );
 }

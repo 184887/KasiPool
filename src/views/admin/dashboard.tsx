@@ -100,7 +100,7 @@ export function Dashboard() {
     },
     {
       n: problems.length,
-      text: "delivery problem(s) reported by shops",
+      text: "delivery problem(s) reported by businesses",
       to: "/admin/deliveries",
     },
     {

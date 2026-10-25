@@ -273,7 +273,7 @@ export function NewPool() {
                   className={`rounded-md border-2 p-3 text-sm ${split.shopSaving > 0 ? "border-ink bg-muted" : "border-destructive text-destructive"}`}
                 >
                   <p>
-                    Shops pay <b>{money(split.price)}</b> per {f.unit || "unit"} and save{" "}
+                    Businesses pay <b>{money(split.price)}</b> per {f.unit || "unit"} and save{" "}
                     <b>{money(split.shopSaving)}</b>.
                   </p>
                   <p className="text-muted-foreground">
@@ -422,7 +422,7 @@ export function NewPool() {
                   Target: {f.min_qty} {f.unit}s{f.max_qty && ` (max ${f.max_qty})`}
                 </p>
                 <p>
-                  List {money(f.reference_price)} · Bulk {money(f.supplier_cost)} · Shop price{" "}
+                  List {money(f.reference_price)} · Bulk {money(f.supplier_cost)} · Business price{" "}
                   {money(split?.price)}
                 </p>
                 <p className="rounded-lg bg-warning-soft p-2 text-xs text-warning">

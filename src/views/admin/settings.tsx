@@ -58,10 +58,10 @@ export function Settings() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Section title="Pricing">
           <p className="mb-3 text-sm text-muted-foreground">
-            KasiPool keeps this share of each deal's discount (list price minus bulk price); shops
-            get the rest. Example at 20%: list R250, bulk R200, so the shop pays R210 and KasiPool
-            keeps R10. A pool's price is fixed when it is published, so changes only affect pools
-            published afterwards.
+            KasiPool keeps this share of each deal's discount (list price minus bulk price);
+            businesses get the rest. Example at 20%: list R250, bulk R200, so the business pays R210
+            and KasiPool keeps R10. A pool's price is fixed when it is published, so changes only
+            affect pools published afterwards.
           </p>
           <div className="flex items-end gap-2">
             <Field label="KasiPool share of the discount (%)">
@@ -166,7 +166,7 @@ export function Settings() {
             </Button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Shown on the Help page and to shops who forget their PIN.
+            Shown on the Help page and to businesses that forget their PIN.
           </p>
         </Section>
 
@@ -196,7 +196,7 @@ export function Settings() {
         <Section title="Delivery">
           <p className="mb-3 text-sm text-muted-foreground">
             One delivery fee per order, added to each order when the business confirms. R0 shows
-            shops &quot;Delivery is free&quot;. Orders already confirmed keep their fee.
+            businesses &quot;Delivery is free&quot;. Orders already confirmed keep their fee.
           </p>
           <div className="flex items-end gap-2">
             <Field label="Delivery fee per order (R)">

@@ -111,7 +111,7 @@ export function PoolProgress({
         </p>
         <span
           className={cn(
-            "rounded-sm px-1.5 py-0.5 text-xs font-bold tabular",
+            "rounded-sm px-1.5 py-0.5 text-sm font-bold tabular",
             reached ? "bg-gold text-ink animate-pop" : "bg-muted text-ink",
           )}
         >
