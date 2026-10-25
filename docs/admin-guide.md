@@ -140,11 +140,13 @@ all its refunds are done.
   dashboard offers that; otherwise a developer can set it with the Supabase admin API. Tell the
   shop the new PIN. (A self-service reset needs SMS, see "Still to do".)
 - **Admins:** to add a team member:
-  1. In the Supabase dashboard: Authentication → Users → Add user → Create new user, with their
-     real email and a password, and tick **Auto Confirm User**.
-  2. An existing admin enters that email in **Admin → Settings → Administrators** and taps Grant.
-  3. They log in at `/admin/login` (or tap **Admin** in the top banner).
-     Remove access with the same form. Change your own password, or log out, in **Admin →
+  1. They open `/admin/login` (or tap **Admin** in the top banner), tap **Ask for admin access**
+     and enter their name, email and a password (at least 8 characters).
+  2. The request shows on the Dashboard work queue and in **Admin → Settings → Administrators**.
+     An existing admin checks with the person, then taps **Approve** (or **Decline**). Only
+     approve people you know: anyone can type any email address.
+  3. They log in at `/admin/login`. Until approved, they are told the request is waiting.
+     You can still grant or remove access by email in the same section. Change your own password, or log out, in **Admin →
      Account**. If someone forgets their password, set a new one in the Supabase dashboard
      (Authentication → Users).
 - One login is one shop. Businesses aren't verified before joining.

@@ -23,6 +23,37 @@ export type Database = {
   };
   public: {
     Tables: {
+      admin_requests: {
+        Row: {
+          created_at: string;
+          email: string;
+          full_name: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          email: string;
+          full_name: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          full_name?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       app_settings: {
         Row: {
           key: string;
@@ -1028,6 +1059,7 @@ export type Database = {
         Returns: undefined;
       };
       admin_resolve_failed_pool: { Args: { _note: string; _pool: string }; Returns: undefined };
+      admin_review_access: { Args: { _approve: boolean; _user: string }; Returns: undefined };
       admin_set_pool_location: {
         Args: { _label: string; _lat: number; _lon: number; _pool: string; _radius: number };
         Returns: undefined;
@@ -1086,6 +1118,7 @@ export type Database = {
       recalc_pool: { Args: { _pool: string }; Returns: undefined };
       refresh_pool_states: { Args: Record<PropertyKey, never>; Returns: undefined };
       report_delivery_problem: { Args: { _note: string; _order: string }; Returns: undefined };
+      request_admin_access: { Args: { _name: string }; Returns: undefined };
       set_order_delivery: { Args: { _order: string }; Returns: undefined };
       withdraw_from_pool: { Args: { _pool: string }; Returns: undefined };
     };

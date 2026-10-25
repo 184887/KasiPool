@@ -7,6 +7,7 @@ import { ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loading, MetricCard, PageHeader, Section } from "@/components/kp/ui";
 import { money } from "@/lib/format";
+import { adminRequestsQuery } from "./settings";
 
 export function useAdminStats() {
   return useQuery({
@@ -41,6 +42,7 @@ export function useAdminStats() {
 
 export function Dashboard() {
   const { data, isLoading } = useAdminStats();
+  const requests = useQuery(adminRequestsQuery).data ?? [];
   if (isLoading || !data) return <Loading />;
   const { pools, biz, parts, orders, costs } = data;
   const by = (s: string) => pools.filter((p) => p.status === s);
@@ -67,6 +69,11 @@ export function Dashboard() {
   const completed = orders.filter((o) => ["delivered", "received"].includes(o.fulfilment_status));
 
   const queue = [
+    {
+      n: requests.length,
+      text: "team member(s) waiting for admin access",
+      to: "/admin/settings",
+    },
     {
       n: by("awaiting_confirmation").filter((p) => p.paid_qty >= p.min_qty).length,
       text: "pool(s) have enough paid demand to finalise funding",
