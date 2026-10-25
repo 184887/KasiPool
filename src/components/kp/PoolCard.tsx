@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { money, savings, dateTime } from "@/lib/format";
 import { POOL_STATUS } from "@/lib/status";
 import { StatusBadge } from "./ui";
-import { PoolProgress, Countdown } from "./pool-bits";
+import { PoolProgress, Countdown, ProductImage } from "./pool-bits";
 
 export type PoolWithProduct = {
   id: string;
@@ -47,16 +47,17 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
         href={`/offers/${pool.id}`}
         className="relative block aspect-[4/3] overflow-hidden border-b-2 border-ink bg-white"
       >
-        {pool.products?.image_url && (
-          <img
-            src={pool.products.image_url}
-            alt={pool.products.name}
-            loading="lazy"
-            width={816}
-            height={816}
-            className="size-full object-contain px-4 pb-10 pt-12"
-          />
-        )}
+        <ProductImage
+          src={pool.products?.image_url}
+          name={pool.products?.name}
+          loading="lazy"
+          width={816}
+          height={816}
+          className={
+            pool.products?.image_url ? "size-full object-contain px-4 pb-10 pt-12" : "size-full"
+          }
+          initialsClassName="text-7xl"
+        />
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           {pool.is_sample && <SampleBadge />}
           <StatusBadge tone={st?.tone ?? "muted"}>{st?.customer}</StatusBadge>

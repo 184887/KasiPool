@@ -46,29 +46,32 @@ export function Home() {
           {/* Large rings on wide screens, as on the pitch deck cover */}
           <LogoMark className="pointer-events-none absolute right-4 top-1/2 hidden w-[380px] -translate-y-1/2 md:block lg:w-[480px]" />
           <h1>
-            <span className="block font-display text-5xl font-extrabold tracking-[-0.03em] sm:text-7xl">
+            <span className="block animate-rise font-display text-5xl font-extrabold tracking-[-0.03em] sm:text-7xl">
               Kasi<span className="text-gold">Pool</span>
             </span>
-            <span className="mt-2 block font-display text-xl font-bold text-paper/80 sm:text-2xl">
+            <span className="mt-2 block animate-rise font-display text-xl font-bold text-paper/80 [animation-delay:80ms] sm:text-2xl">
               Collective Buying Alliance
             </span>
-            <span className="mt-6 block font-headline text-6xl sm:text-8xl">
+            <span className="mt-6 block animate-rise font-headline text-6xl [animation-delay:160ms] sm:text-8xl">
               Buy Together.
               <br />
               <span className="text-gold">Profit Better.</span>
             </span>
           </h1>
-          <p className="mt-5 max-w-md text-lg text-paper/85">
+          <p className="mt-5 max-w-md animate-rise text-lg text-paper/85 [animation-delay:260ms]">
             For spaza shops and small traders. Order together and pay the bulk price. You pay only
             when the pool is full.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div className="mt-7 flex animate-rise flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:340ms]">
             <Button asChild size="xl" variant="gold">
               <Link href="/offers">
                 See deals <ArrowRight />
               </Link>
             </Button>
-            <Link href="/how-it-works" className="font-semibold underline underline-offset-4">
+            <Link
+              href="/how-it-works"
+              className="inline-flex h-12 items-center font-semibold underline underline-offset-4"
+            >
               How it works
             </Link>
           </div>
@@ -120,12 +123,12 @@ export function Home() {
       {!user && (
         <Container className="pb-4">
           <div className="rounded-md bg-ink p-8 text-paper md:p-12">
-            <h2 className="font-headline text-4xl">Run a local business?</h2>
+            <h2 className="font-headline text-4xl">Do you have a shop?</h2>
             <p className="mt-2 max-w-md text-paper/85">
               Register your business to join pools and get bulk prices.
             </p>
             <Button asChild size="xl" variant="gold" className="mt-6">
-              <Link href="/auth?mode=register">Register your business</Link>
+              <Link href="/auth?mode=register">Register your shop</Link>
             </Button>
           </div>
         </Container>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Profile } from "@/views/profile";
 
 export const metadata: Metadata = {
-  title: "Business profile",
+  title: "Shop profile",
   description: "Manage your business details and preferences.",
 };
 

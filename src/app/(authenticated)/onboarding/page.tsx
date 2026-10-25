@@ -4,7 +4,7 @@ import { Loading } from "@/components/kp/ui";
 import { Onboarding } from "@/views/onboarding";
 
 export const metadata: Metadata = {
-  title: "Your business details",
+  title: "Your shop details",
   description: "Add your business profile to start pooling.",
 };
 
