@@ -5,3 +5,6 @@
 - Interest (participations), orders, payments, purchase orders and refunds are separate tables; never collapse them into one status field.
 - Customer-facing status labels map from internal statuses in `src/lib/status.ts`; all money/time formatting goes through `src/lib/format.ts` (ZAR, Africa/Johannesburg).
 - Roles live in `user_roles`; first admin is claimed once via `claim_first_admin()`.
+
+## Next.js version
+- This is Next.js 16, which has breaking changes from older versions. Before writing Next.js code, read the relevant guide in `node_modules/next/dist/docs/` and follow its deprecation notices.
