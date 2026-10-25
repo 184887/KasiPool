@@ -23,11 +23,14 @@ const CATS = [
 
 export function BusinessForm({
   userId,
+  mobile,
   email,
   existing,
   onDone,
 }: {
   userId: string;
+  /** Sign-in number, used to pre-fill a new profile */
+  mobile?: string | null;
   email?: string | null;
   existing?: Tables<"businesses"> | null;
   onDone: () => void;
@@ -36,7 +39,7 @@ export function BusinessForm({
   const [f, setF] = useState({
     trading_name: existing?.trading_name ?? "",
     rep_name: existing?.rep_name ?? "",
-    mobile: existing?.mobile ?? "",
+    mobile: existing?.mobile ?? mobile ?? "",
     email: existing?.email ?? email ?? "",
     category: existing?.category ?? CATS[0],
     township: existing?.township ?? "",

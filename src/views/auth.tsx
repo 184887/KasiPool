@@ -3,21 +3,32 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Container } from "@/components/kp/AppShell";
-import { GoogleButton } from "@/components/kp/GoogleButton";
 import { Logo } from "@/components/kp/pool-bits";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, safeRedirect } from "@/lib/auth";
-import { errMsg } from "@/lib/queries";
-import { normaliseSaMobile } from "@/lib/format";
+import { errMsg, settingsQuery } from "@/lib/queries";
+import { isValidPin, phoneToLogin } from "@/lib/phone-auth";
 
 type Search = { redirect?: string; mode?: "login" | "register" };
 
 const REDIRECT_KEY = "kp-auth-redirect";
+
+/** Supabase's messages refer to email and password; say number and PIN instead. */
+function authError(err: unknown): string {
+  const msg = errMsg(err);
+  if (/invalid login credentials/i.test(msg)) return "Wrong mobile number or PIN";
+  if (/already (been )?registered|already exists/i.test(msg))
+    return "This number is already registered. Log in instead.";
+  return msg;
+}
+
+const digits = (v: string) => v.replace(/\D/g, "").slice(0, 6);
 
 export function AuthPage() {
   const params = useSearchParams();
@@ -28,14 +39,11 @@ export function AuthPage() {
   const nav = useRouter();
   const { user, business, businessLoading } = useAuth();
   const [mode, setMode] = useState<"login" | "register">(search.mode ?? "login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phoneMode, setPhoneMode] = useState(false);
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pin2, setPin2] = useState("");
   const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [forgot, setForgot] = useState(false);
 
   useEffect(() => {
     if (search.redirect) sessionStorage.setItem(REDIRECT_KEY, safeRedirect(search.redirect));
@@ -51,71 +59,38 @@ export function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    const login = phoneToLogin(phone);
+    if (!login) return toast.error("Enter a valid South African mobile number, e.g. 072 123 4567");
+    if (!isValidPin(pin)) return toast.error("Your PIN must be 6 digits");
+    if (mode === "register" && pin !== pin2) return toast.error("The two PINs don't match");
     setBusy(true);
     try {
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ email: login, password: pin });
         if (error) throw error;
       } else {
-        if (password.length < 8) throw new Error("Password must be at least 8 characters");
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/auth" },
+          email: login,
+          password: pin,
+          options: { data: { phone: login.split("@")[0] } },
         });
         if (error) throw error;
-        if (!data.session) setSent(true);
+        // No session means Supabase still requires email confirmation, which can't arrive
+        if (!data.session)
+          throw new Error("Registration isn't available right now. Please try later.");
       }
     } catch (err) {
-      toast.error(errMsg(err));
+      toast.error(authError(err));
     } finally {
       setBusy(false);
     }
   }
 
-  async function google() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/auth" },
-    });
-    if (error) toast.error(errMsg(error));
-  }
-
-  async function sendOtp(e: React.FormEvent) {
-    e.preventDefault();
-    const normalized = normaliseSaMobile(phone);
-    if (!normalized) {
-      toast.error("Enter a valid South African mobile number, e.g. 072 123 4567");
-      return;
-    }
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: normalized,
-        options: { shouldCreateUser: mode === "register" },
-      });
-      if (error) throw error;
-      setPhone(normalized);
-      setOtpSent(true);
-      toast.success("Verification code sent");
-    } catch (err) {
-      toast.error(errMsg(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function verifyOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
-      if (error) throw error;
-    } catch (err) {
-      toast.error(errMsg(err));
-    } finally {
-      setBusy(false);
-    }
+  function switchMode() {
+    setMode(mode === "login" ? "register" : "login");
+    setPin("");
+    setPin2("");
+    setForgot(false);
   }
 
   return (
@@ -124,143 +99,87 @@ export function AuthPage() {
         <div className="text-center">
           <Logo />
         </div>
-        {sent ? (
-          <div className="mt-6 text-center">
-            <h1 className="font-headline text-4xl">Check your email</h1>
-            <p className="mt-2 text-muted-foreground">
-              We sent a confirmation link to <b>{email}</b>. Click it to finish registering, then
-              add your business details.
-            </p>
+        <h1 className="mt-4 text-center font-headline text-4xl">
+          {mode === "login" ? "Welcome back" : "Register your business"}
+        </h1>
+        <p className="mt-1 text-center text-sm text-muted-foreground">
+          {mode === "login"
+            ? "Log in with your mobile number and PIN."
+            : "Step 1 of 2: choose a 6-digit PIN for your mobile number."}
+        </p>
+        <form onSubmit={submit} className="mt-6 space-y-3">
+          <div>
+            <Label htmlFor="phone">Mobile number</Label>
+            <Input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              placeholder="072 123 4567"
+              required
+              className="mt-1 h-12"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
-        ) : (
-          <>
-            <h1 className="mt-4 text-center font-headline text-4xl">
-              {mode === "login" ? "Welcome back" : "Register your business"}
-            </h1>
-            <p className="mt-1 text-center text-sm text-muted-foreground">
-              {mode === "login"
-                ? "Log in to join pools and track orders."
-                : "Step 1 of 2: create your login."}
-            </p>
-            <GoogleButton className="mt-6" onClick={google} />
-            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" />
-              or continue with {phoneMode ? "mobile" : "email"}
-              <span className="h-px flex-1 bg-border" />
+          <div>
+            <Label htmlFor="pin">{mode === "login" ? "PIN" : "Choose a 6-digit PIN"}</Label>
+            <Input
+              id="pin"
+              type="password"
+              inputMode="numeric"
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              pattern="[0-9]{6}"
+              required
+              className="mt-1 h-12 tracking-[0.3em]"
+              value={pin}
+              onChange={(e) => setPin(digits(e.target.value))}
+            />
+          </div>
+          {mode === "register" && (
+            <div>
+              <Label htmlFor="pin2">Enter the PIN again</Label>
+              <Input
+                id="pin2"
+                type="password"
+                inputMode="numeric"
+                autoComplete="new-password"
+                pattern="[0-9]{6}"
+                required
+                className="mt-1 h-12 tracking-[0.3em]"
+                value={pin2}
+                onChange={(e) => setPin2(digits(e.target.value))}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Keep your PIN secret. Don&apos;t use your birthday or 123456.
+              </p>
             </div>
-            {phoneMode ? (
-              otpSent ? (
-                <form onSubmit={verifyOtp} className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Enter the six-digit code sent to <b>{phone}</b>.
-                  </p>
-                  <div>
-                    <Label htmlFor="otp">Verification code</Label>
-                    <Input
-                      id="otp"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      pattern="[0-9]{6}"
-                      maxLength={6}
-                      required
-                      className="mt-1 h-12"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    />
-                  </div>
-                  <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
-                    {busy ? "Verifying…" : "Verify code"}
-                  </Button>
-                  <button
-                    type="button"
-                    className="w-full text-sm font-semibold text-ember underline underline-offset-4"
-                    onClick={() => {
-                      setOtpSent(false);
-                      setOtp("");
-                    }}
-                  >
-                    Use a different number
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={sendOtp} className="space-y-3">
-                  <div>
-                    <Label htmlFor="phone">South African mobile number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      autoComplete="tel"
-                      placeholder="072 123 4567"
-                      required
-                      className="mt-1 h-12"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-                  <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
-                    {busy ? "Sending…" : "Send verification code"}
-                  </Button>
-                </form>
-              )
-            ) : (
-              <form onSubmit={submit} className="space-y-3">
-                <div>
-                  <Label htmlFor="email">Email address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    className="mt-1 h-12"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="pw">Password</Label>
-                  <Input
-                    id="pw"
-                    type="password"
-                    required
-                    minLength={mode === "register" ? 8 : undefined}
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
-                    className="mt-1 h-12"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
-                  {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
-                </Button>
-              </form>
-            )}
-            <p className="mt-4 text-center text-sm">
-              {mode === "login" ? "New to KasiPool? " : "Already registered? "}
-              <button
-                className="font-semibold text-ember underline underline-offset-4"
-                onClick={() => {
-                  setMode(mode === "login" ? "register" : "login");
-                  setOtpSent(false);
-                  setOtp("");
-                }}
-              >
-                {mode === "login" ? "Register" : "Log in"}
-              </button>
-            </p>
+          )}
+          <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
+            {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
+          </Button>
+        </form>
+        {mode === "login" &&
+          (forgot ? (
+            <ForgotPin />
+          ) : (
             <button
               type="button"
               className="mt-3 w-full text-sm font-semibold text-ember underline underline-offset-4"
-              onClick={() => {
-                setPhoneMode(!phoneMode);
-                setOtpSent(false);
-                setOtp("");
-              }}
+              onClick={() => setForgot(true)}
             >
-              {phoneMode ? "Use email instead" : "Use mobile number instead"}
+              Forgot your PIN?
             </button>
-          </>
-        )}
+          ))}
+        <p className="mt-4 text-center text-sm">
+          {mode === "login" ? "New to KasiPool? " : "Already registered? "}
+          <button
+            type="button"
+            className="font-semibold text-ember underline underline-offset-4"
+            onClick={switchMode}
+          >
+            {mode === "login" ? "Register" : "Log in"}
+          </button>
+        </p>
       </div>
       <p className="mt-4 text-center text-xs text-muted-foreground">
         By continuing you agree to the{" "}
@@ -274,5 +193,27 @@ export function AuthPage() {
         .
       </p>
     </Container>
+  );
+}
+
+/** PIN resets are done by KasiPool staff for now, so point people at the contact details. */
+function ForgotPin() {
+  const { data } = useQuery(settingsQuery);
+  const c = data?.contact;
+  const reach = c?.whatsapp
+    ? `WhatsApp ${c.whatsapp}`
+    : c?.phone
+      ? `call ${c.phone}`
+      : c?.email
+        ? `email ${c.email}`
+        : null;
+  return (
+    <p className="mt-3 rounded-md bg-muted p-3 text-sm">
+      To reset your PIN, {reach ? <b>{reach}</b> : "contact KasiPool"} from the number you
+      registered with. We&apos;ll check it&apos;s you and set a new PIN.{" "}
+      <Link href="/help" className="font-semibold text-ember underline">
+        Help & contact
+      </Link>
+    </p>
   );
 }

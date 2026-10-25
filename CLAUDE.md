@@ -74,6 +74,13 @@ Run lint, typecheck, test and build before committing. Format with `npx prettier
 - Keep `src/integrations/supabase/types.ts` as is unless the schema changes; the generator
   drops hand-fixed nullable RPC arguments, so re-apply those by hand after regenerating.
 
+### Sign-in
+
+- Prototype auth is mobile number + 6-digit PIN on Supabase email/password auth: each number
+  maps to `<27...>@phone.kasipool.co.za` via `src/lib/phone-auth.ts`. Always go through
+  `phoneToLogin` / `loginToPhone`; never show the hidden address in the UI.
+- Supabase **Confirm email** must stay off, and `phone.kasipool.co.za` must never get MX records.
+
 ### Supabase agent skills
 
 `.claude/skills/supabase` and `.claude/skills/supabase-postgres-best-practices` are Supabase's

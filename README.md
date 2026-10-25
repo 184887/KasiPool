@@ -125,10 +125,22 @@ These rules are also in [`AGENTS.md`](AGENTS.md):
 
 ### Auth
 
-Supabase Auth supports email and password, Google OAuth, and SMS one-time codes. To use Google,
-enable the provider in Supabase (Authentication → Providers → Google) and add
-`<your-site>/auth` to the allowed redirect URLs. New users finish onboarding by adding their
-business details.
+For the prototype, people sign in with their **mobile number and a 6-digit PIN**. There is no SMS
+step yet. Under the hood this is Supabase email/password auth (`src/lib/phone-auth.ts`):
+
+- Each number maps to a hidden login address, e.g. `27721234567@phone.kasipool.co.za`, and the
+  PIN is its password. The UI only ever shows the number.
+- Supabase must have **Confirm email** turned off (Authentication → Sign In / Providers → Email),
+  because those addresses can't receive mail. Never add mail (MX) records to
+  `phone.kasipool.co.za`.
+- Numbers aren't verified, so someone could register a number that isn't theirs. Turn on SMS
+  verification (the `clickatell-sms-hook` below) before real payments go live.
+- Forgotten PINs are reset by staff: Supabase dashboard → Authentication → Users → find the
+  hidden address → set a new password.
+- Admin access is granted by mobile number in **Admin → Settings**.
+
+New users finish onboarding by adding their business details. Google and email sign-in were
+removed from the sign-in page for now; the provider code is in git history.
 
 ## Database migrations
 
