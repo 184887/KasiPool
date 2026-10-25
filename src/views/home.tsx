@@ -61,8 +61,8 @@ export function Home() {
             </span>
           </h1>
           <p className="mt-5 max-w-md animate-rise text-lg text-paper/85 [animation-delay:260ms]">
-            For local businesses: shops, takeaways, salons, taverns and more. Order together and pay
-            the bulk price. You pay only when the pool is full.
+            For local businesses: shops, salons, car washes, bakeries and more. Order together and
+            pay the bulk price. You pay only when the pool is full.
           </p>
           <div className="mt-7 flex animate-rise flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:340ms]">
             <Button asChild size="xl" variant="gold">

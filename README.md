@@ -33,7 +33,7 @@ day to day, see the [admin guide](docs/admin-guide.md).
   address needs a map pin (many places have no street number). Delivery fees aren't decided yet:
   one flat fee per order in Admin → Settings, R0 (free) for now.
   Admins record what the courier reports; businesses confirm receipt or report a problem.
-- **Who it's for:** every kind of local business (shops, takeaways, salons, taverns, car washes
+- **Who it's for:** every kind of local business (shops, salons, car washes, bakeries, butcheries
   and more), not only spaza shops.
 - **For now:** one login per shop, no business verification, in-app notifications only, EFT
   payments verified by an admin, suppliers managed by admins.
