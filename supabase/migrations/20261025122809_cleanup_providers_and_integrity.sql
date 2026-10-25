@@ -29,6 +29,9 @@ alter table public.notifications
   add constraint notifications_user_id_fkey foreign key (user_id) references auth.users(id) on delete cascade;
 alter table public.pool_members
   add constraint pool_members_user_id_fkey foreign key (user_id) references auth.users(id) on delete cascade;
+-- A sample deal restored from the Lovable prototype names a Lovable account as its proposer
+update public.pools set proposed_by = null
+where proposed_by is not null and not exists (select 1 from auth.users u where u.id = proposed_by);
 alter table public.pools
   add constraint pools_proposed_by_fkey foreign key (proposed_by) references auth.users(id) on delete set null;
 alter table public.payments
