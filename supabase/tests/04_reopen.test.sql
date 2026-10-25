@@ -1,6 +1,9 @@
 begin;
 select plan(17);
 
+-- Free delivery, whatever the local settings say
+update public.app_settings set value = '{"fee_per_order": 0}' where key = 'delivery';
+
 create function pg_temp.act_as(uid uuid) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, true);
 $$;
@@ -17,9 +20,9 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-00000000c002', 'b@test.local', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-00000000c003', 'c@test.local', 'authenticated', 'authenticated');
 insert into public.user_roles (user_id, role) values ('00000000-0000-0000-0000-00000000ad01', 'admin');
-insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province, address, zone_id)
+insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province, address, zone_id, latitude, longitude)
 select u, 'Shop', 'Rep', '+2760000002' || right(u::text, 1), 'Town', 'Cape Town', 'Western Cape', '1 Rd',
-  '00000000-0000-0000-0000-0000000000e1'
+  '00000000-0000-0000-0000-0000000000e1', -34.0116, 18.6458
 from unnest(array['00000000-0000-0000-0000-00000000c001', '00000000-0000-0000-0000-00000000c002',
   '00000000-0000-0000-0000-00000000c003']::uuid[]) u;
 insert into public.suppliers (id, name) values ('00000000-0000-0000-0000-0000000005e1', 'Supplier');
@@ -32,9 +35,9 @@ select id, '00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-0000
 from unnest(array['00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000b2']::uuid[]) id;
 insert into public.pool_costs (pool_id, supplier_cost)
   values ('00000000-0000-0000-0000-0000000000b1', 80), ('00000000-0000-0000-0000-0000000000b2', 80);
-insert into public.pool_zones (pool_id, zone_id)
-  values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000e1'),
-         ('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-0000000000e1');
+insert into public.pool_locations (pool_id, latitude, longitude)
+  values ('00000000-0000-0000-0000-0000000000b1', -34.0116, 18.6458),
+         ('00000000-0000-0000-0000-0000000000b2', -34.0116, 18.6458);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
 select public.admin_publish_pool('00000000-0000-0000-0000-0000000000b1');
 select public.admin_publish_pool('00000000-0000-0000-0000-0000000000b2');

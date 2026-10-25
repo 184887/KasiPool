@@ -12,15 +12,8 @@ button in the top banner) with their email and password, not a phone number and 
 
 Do these once, in this order:
 
-1. **Delivery zones** (Admin → Settings → Delivery zones). Add every area you deliver to, with:
-   - a **name** shops recognise, e.g. "Khayelitsha" or "Gugulethu & Nyanga";
-   - the **areas covered** (suburbs and sections, e.g. "Site C, Harare, Makhaza"), shown to shops
-     when they pick their area;
-   - the **delivery fee per order** in rand.
-
-   Shops can't finish registering until at least one zone exists: choosing a delivery area is
-   compulsory. Use **Hide** to stop offering a zone without deleting it.
-
+1. **Delivery fee** (Admin → Settings → Delivery). One fee per order, added when a business
+   confirms. Leave it at R0 while fees are undecided: shops then see "Delivery is free".
 2. **Pricing** (Admin → Settings → Pricing). Set KasiPool's share of the discount (default 20%).
 3. **Payment instructions** (Admin → Settings). Enter KasiPool's real bank details and tick "Show
    these payment instructions to customers". Until then shops are told not to pay yet.
@@ -52,27 +45,33 @@ keeps R10 per unit.
 
 Admin → Pools → New pool. The wizard asks for campaign (optional), product, supplier, list and
 bulk prices, quantities (minimum target, optional maximum and per-shop limits), opening and
-closing dates, the **payment window** in hours (default 24) and the **delivery zones** the pool
-serves. It previews the shop price and KasiPool's cut. Publish when ready; a pool needs a
-supplier, list and bulk prices and at least one zone.
+closing dates, the **payment window** in hours (default 24), and **who can join**: the centre of
+the deal (search a township or landmark in the middle of the businesses you want to reach) and
+the distance in km (default 10). It previews the shop price and KasiPool's cut. Publish when
+ready; a pool needs a supplier, list and bulk prices and a centre.
 
-**Shop proposals:** shops can suggest a pool (Start a pool). It arrives as a draft with the
-shop's own zone and no price. Open it from Admin → Pools, choose the supplier, enter list and bulk
-prices, add zones if other areas should join, then **Publish pool**.
+**Business requests:** businesses can ask for a deal (My Pools → Ask for a deal). It arrives as a
+draft centred on that business (it is the "hub") with a 10 km radius and no price. Open it from
+Admin → Pools, choose the supplier, enter list and bulk prices, check **Who can join** (the
+distance is a straight line, so shrink it if roads, rail lines or wetlands make 10 km a long
+drive, or move the centre), then **Publish pool**. Before sending a request, a business is shown
+any open deal for the same product it can already join.
 
-**Private groups:** a pool can be invite-only (a code or link, e.g. for a stokvel). Members still
-need a delivery address in one of the pool's zones.
+**Private groups:** a pool can be invite-only (a code or link, e.g. for a stokvel). There is no
+distance limit, so check the deliveries make sense before publishing.
 
 ### 2. Shops join
 
-Joining is free and only records interest. A shop can join if its delivery address (business
-address, or its second delivery address if it chose one) is in one of the pool's zones. Shops
-outside the zones see "This deal doesn't deliver to your area yet".
+Joining only records interest. A business can join if the map pin of where its stock goes
+(business address, or its second delivery address if it chose one) is within the pool's distance
+of the centre. Deals are listed nearest first with "4 km away"; ones that are too far show "Too
+far for you" and can't be joined. Businesses never see where a pool is centred, only how far
+away it is.
 
 ### 3. Target reached: confirm and pay
 
 The pool **closes as soon as the target is reached** (or at the closing time if it isn't). Each
-shop gets an order to confirm, with the goods, its zone's delivery fee and the total. They must
+shop gets an order to confirm, with the goods, the delivery fee (from Settings, R0 for now) and the total. They must
 confirm and pay in full by EFT within the payment window, using their order reference.
 
 Record payments in Admin → Payments (or **Record payment** on the pool page). A payment counts once
@@ -164,8 +163,13 @@ deadlines (fund, reopen or fail). Nobody needs to have the site open.
   phone or WhatsApp when a pool reaches its target, reopens or goes out for delivery.
 - **VAT and tax invoices:** undecided. Prices are treated as final amounts.
 - **Courier integration:** couriers report to KasiPool and an admin records the delivery by hand.
-- **Old pools have no zones:** pools from before 2026-10-25 (including the sample deals) show
-  "Delivers to: -". Set zones on any real ones from the admin pool page.
+- **Old pools have no centre:** pools from before the distance rule (including the sample deals)
+  can be joined from anywhere. The admin pool page shows "No centre set".
+- **Old businesses without a map pin** must add one in their profile before they can join a pool.
+- **Delivery areas** (`delivery_zones`, `pool_zones`) are no longer used but are kept in the
+  database in case they come back.
+- **Delivery fees:** to be decided by the team; change the flat fee in Settings, or ask a
+  developer for fees by distance (the map pins make that possible).
 - **`www.kasipool.co.za`:** its DNS still points at the old holding page; change the `www` record
   at xneelo to the CNAME Vercel shows.
 - **Card payments and WhatsApp campaigns** were removed on 2026-10-25 and can come back from git

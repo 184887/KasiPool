@@ -27,9 +27,7 @@ export function OrderPage() {
       (
         await supabase
           .from("orders")
-          .select(
-            "*, pools(*, products(name, image_url, pack_size)), delivery_zones(name), refunds(*)",
-          )
+          .select("*, pools(*, products(name, image_url, pack_size)), refunds(*)")
           .eq("id", orderId)
           .maybeSingle()
       ).data,
@@ -120,10 +118,7 @@ export function OrderPage() {
             <Row k="Quantity" v={qty(o.quantity, pool.unit)} />
             <Row k="Price for each" v={money(o.unit_price)} />
             <Row k="Goods" v={money(o.quantity * Number(o.unit_price))} />
-            <Row
-              k={`Delivery${o.delivery_zones ? ` (${o.delivery_zones.name})` : ""}`}
-              v={money(o.delivery_fee)}
-            />
+            <Row k="Delivery" v={Number(o.delivery_fee) > 0 ? money(o.delivery_fee) : "Free"} />
             <Row k="Order total" v={<b className="text-lg">{money(o.total)}</b>} />
             <Row k="Deliver to" v={o.delivery_address ?? "-"} />
             <Row

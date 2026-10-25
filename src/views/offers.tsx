@@ -10,13 +10,17 @@ import { Container } from "@/components/kp/AppShell";
 import { PoolCard } from "@/components/kp/PoolCard";
 import { Loading, EmptyState } from "@/components/kp/ui";
 import { ProductImage } from "@/components/kp/pool-bits";
-import { activePoolsQuery, catalogueQuery } from "@/lib/queries";
+import { activePoolsQuery, catalogueQuery, poolDistancesQuery } from "@/lib/queries";
+import { byDistance } from "@/lib/delivery";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 /** Deals: open and upcoming pools, plus products that have no pool yet. */
 export function Offers() {
+  const { user } = useAuth();
   const pools = useQuery(activePoolsQuery);
   const cat = useQuery(catalogueQuery);
+  const dist = useQuery(poolDistancesQuery(user?.id)).data ?? new Map();
   const [q, setQ] = useState("");
   const [category, setCategory] = useState<string | null>(null);
 
@@ -29,7 +33,11 @@ export function Offers() {
     +new Date(a.closes_at) - +new Date(b.closes_at);
 
   const all = pools.data ?? [];
-  const openNow = all.filter((p) => p.status === "open" && matches(p.products)).sort(byClosing);
+  // Nearest first, then closing soonest; deals that are too far go last
+  const openNow = byDistance(
+    all.filter((p) => p.status === "open" && matches(p.products)).sort(byClosing),
+    dist,
+  );
   const soon = all.filter((p) => p.status === "scheduled" && matches(p.products)).sort(byClosing);
   const withDeal = new Set((cat.data?.pools ?? []).map((p) => p.product_id));
   const noDeal = (cat.data?.products ?? []).filter((p) => !withDeal.has(p.id) && matches(p));
@@ -98,7 +106,7 @@ export function Offers() {
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {openNow.map((p) => (
-                  <PoolCard key={p.id} pool={p} />
+                  <PoolCard key={p.id} pool={p} distance={dist.get(p.id)} />
                 ))}
               </div>
             )}
@@ -108,7 +116,7 @@ export function Offers() {
             <DealSection title="Opening soon" count={soon.length}>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {soon.map((p) => (
-                  <PoolCard key={p.id} pool={p} />
+                  <PoolCard key={p.id} pool={p} distance={dist.get(p.id)} />
                 ))}
               </div>
             </DealSection>

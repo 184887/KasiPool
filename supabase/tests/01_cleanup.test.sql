@@ -18,9 +18,9 @@ select is(
 insert into auth.users (id, email, aud, role)
 values ('00000000-0000-0000-0000-0000000000a1', 'a1@test.local', 'authenticated', 'authenticated');
 insert into public.delivery_zones (id, name) values ('00000000-0000-0000-0000-0000000000e1', 'Test zone');
-insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province, address, zone_id)
+insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province, address, zone_id, latitude, longitude)
 values ('00000000-0000-0000-0000-0000000000a1', 'Test Spaza', 'Thandi', '+27600000001', 'Khayelitsha', 'Cape Town', 'Western Cape',
-  '1 Main Rd', '00000000-0000-0000-0000-0000000000e1');
+  '1 Main Rd', '00000000-0000-0000-0000-0000000000e1', -34.0116, 18.6458);
 select throws_ok(
   $$delete from auth.users where id = '00000000-0000-0000-0000-0000000000a1'$$,
   '23503',

@@ -26,10 +26,14 @@ export type AppSettings = {
   contact?: ContactSettings;
   /** KasiPool's share of each pool's discount, in percent */
   pricing?: { discount_share_pct: number };
+  /** One flat delivery fee per order (0 = free delivery) */
+  delivery?: { fee_per_order: number };
 };
 
-export const POOL_SELECT =
-  "*, products(*, categories(name, slug)), pool_zones(delivery_zones(id, name, delivery_fee)), campaigns(name)";
+/** How far the signed-in business is from a pool (rounded km; the pool's centre stays private) */
+export type PoolDistance = { distance_km: number; radius_km: number; in_range: boolean };
+
+export const POOL_SELECT = "*, products(*, categories(name, slug)), campaigns(name)";
 
 async function refresh() {
   // Idempotent lifecycle check (closes due pools). pg_cron also runs it every minute.
@@ -82,19 +86,22 @@ export const catalogueQuery = queryOptions({
   },
 });
 
-/** Active delivery zones, for shops picking their area */
-export const zonesQuery = queryOptions({
-  queryKey: ["delivery-zones"],
-  queryFn: async () =>
-    (
-      await supabase
-        .from("delivery_zones")
-        .select("*")
-        .eq("active", true)
-        .order("sort")
-        .order("name")
-    ).data ?? [],
-});
+/** Distance to each public pool for the signed-in business, by pool id. Pools without a
+ * centre (older ones) and private groups aren't in the map: anyone can join those. */
+export const poolDistancesQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["pool-distances", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase.rpc("my_pool_distances");
+      return new Map<string, PoolDistance>(
+        (data ?? []).map((d) => [
+          d.pool_id,
+          { distance_km: d.distance_km, radius_km: Number(d.radius_km), in_range: d.in_range },
+        ]),
+      );
+    },
+  });
 
 export const settingsQuery = queryOptions({
   queryKey: ["settings"],

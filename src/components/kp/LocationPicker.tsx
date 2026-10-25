@@ -16,11 +16,15 @@ export function LocationPicker({
   longitude,
   address,
   onPick,
+  title = "Map pin *",
+  hint = "Many places have no street number, so the pin is how the driver finds you. Best: stand at your business and tap “Use my current location”.",
 }: {
   latitude: number | null;
   longitude: number | null;
   address: string;
   onPick: (l: PickedLocation) => void;
+  title?: string;
+  hint?: string;
 }) {
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
@@ -77,7 +81,7 @@ export function LocationPicker({
 
   return (
     <div className="space-y-2 rounded-lg border p-3">
-      <p className="text-sm font-semibold">Map pin (optional)</p>
+      <p className="text-sm font-semibold">{title}</p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           className="h-12"
@@ -131,10 +135,7 @@ export function LocationPicker({
           </span>
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          This helps the driver find you. Best: stand in your shop and tap “Use my current
-          location”.
-        </p>
+        <p className="text-sm text-muted-foreground">{hint}</p>
       )}
       <p className="text-sm text-muted-foreground">We use OpenStreetMap to search for places.</p>
     </div>

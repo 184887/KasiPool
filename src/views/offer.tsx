@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Clock, Truck, Share2, Info, PartyPopper, ArrowLeft } from "lucide-react";
+import { Clock, Truck, Share2, Info, PartyPopper, ArrowLeft, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,10 +21,10 @@ import { PoolProgress, Countdown, QuantityStepper, ProductImage } from "@/compon
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { poolQuery, errMsg } from "@/lib/queries";
+import { poolQuery, errMsg, poolDistancesQuery, settingsQuery } from "@/lib/queries";
 import { money, savings, dateTime, date, qty as qtyOf, plural } from "@/lib/format";
 import { POOL_STATUS } from "@/lib/status";
-import { shopZoneId } from "@/lib/delivery";
+import { DEFAULT_RADIUS_KM, distanceText } from "@/lib/delivery";
 
 const PENDING = "kp-pending-join";
 
@@ -37,6 +37,8 @@ export function Offer() {
   const [qty, setQty] = useState(1);
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState<{ qty: number; updated: boolean } | null>(null);
+  const distances = useQuery(poolDistancesQuery(user?.id));
+  const settings = useQuery(settingsQuery);
 
   const mine = useQuery({
     queryKey: ["my-participation", poolId, user?.id],
@@ -89,9 +91,15 @@ export function Offer() {
   const st = POOL_STATUS[pool.status];
   const open = pool.status === "open" && !pool.is_sample;
   const maxQty = pool.max_per_customer ?? 999;
-  const zones = pool.pool_zones.flatMap((pz) => (pz.delivery_zones ? [pz.delivery_zones] : []));
-  const myZone = zones.find((z) => z.id === shopZoneId(business));
-  const outOfArea = !!business && zones.length > 0 && !myZone;
+  const dist = distances.data?.get(pool.id);
+  const tooFar = !!dist && !dist.in_range;
+  // Where the stock goes needs a map pin before the business can join
+  const noPin =
+    !!business &&
+    (business.deliver_to === "other"
+      ? business.delivery_latitude == null
+      : business.latitude == null);
+  const fee = Number(settings.data?.delivery?.fee_per_order ?? 0);
 
   async function join() {
     if (!user) {
@@ -298,15 +306,17 @@ export function Offer() {
                 variant="gold"
                 className="mt-4 w-full"
                 onClick={join}
-                disabled={busy || businessLoading || outOfArea}
+                disabled={busy || businessLoading || tooFar || noPin}
               >
-                {outOfArea
-                  ? "Not delivered to your area"
-                  : busy
-                    ? "Saving…"
-                    : active
-                      ? "Change my order"
-                      : "Join this pool"}
+                {tooFar
+                  ? "Too far for you"
+                  : noPin
+                    ? "Add your map pin first"
+                    : busy
+                      ? "Saving…"
+                      : active
+                        ? "Change my order"
+                        : "Join this pool"}
               </Button>
               {active && (
                 <Button variant="ghost" className="mt-2 w-full text-destructive" onClick={withdraw}>
@@ -327,31 +337,56 @@ export function Offer() {
             <p className="flex gap-2 text-sm">
               <Truck className="size-4 shrink-0" aria-hidden="true" />
               <span>
-                A courier brings the stock to your shop.{" "}
-                {zones.length > 0 ? (
+                A courier brings the stock to your business.{" "}
+                {fee > 0 ? (
                   <>
-                    We deliver this deal to: <b>{zones.map((z) => z.name).join(", ")}</b>
+                    Delivery costs <b>{money(fee)}</b> per order. We add it to your total.
                   </>
                 ) : (
-                  "We will add the delivery areas soon."
+                  <b>Delivery is free.</b>
                 )}
               </span>
             </p>
-            {myZone ? (
-              <p className="mt-2 text-sm">
-                Delivery to {myZone.name} costs <b>{money(myZone.delivery_fee)}</b> per order. We
-                add it to your total.
+            {!pool.is_private && (
+              <p className="mt-2 flex gap-2 text-sm">
+                <MapPin className="size-4 shrink-0" aria-hidden="true" />
+                <span>
+                  Only businesses close to each other can join, so the driver can deliver to all of
+                  them.{" "}
+                  {dist ? (
+                    <>
+                      This deal is for businesses within <b>{dist.radius_km} km</b>. You are{" "}
+                      <b>{distanceText(dist)}</b> away.
+                    </>
+                  ) : (
+                    `Most deals are for businesses within ${DEFAULT_RADIUS_KM} km.`
+                  )}
+                </span>
               </p>
-            ) : (
-              business &&
-              zones.length > 0 && (
-                <p className="mt-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
-                  We don&apos;t deliver this deal to your area yet.{" "}
-                  <Link href="/profile" className="font-semibold underline">
-                    Check your delivery address
-                  </Link>
-                </p>
-              )
+            )}
+            {tooFar && (
+              <p className="mt-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
+                This deal is too far from you.{" "}
+                <Link href="/offers" className="font-semibold underline">
+                  See deals near you
+                </Link>{" "}
+                or{" "}
+                <Link
+                  href={`/start-pool?product=${pool.product_id}`}
+                  className="font-semibold underline"
+                >
+                  ask for this deal near you
+                </Link>
+                .
+              </p>
+            )}
+            {noPin && (
+              <p className="mt-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
+                Please add a map pin for your business first.{" "}
+                <Link href="/profile" className="font-semibold underline">
+                  Go to your profile
+                </Link>
+              </p>
             )}
             {pool.is_private && pool.invite_code && (
               <div className="mt-2 rounded-md bg-muted p-3 text-sm">

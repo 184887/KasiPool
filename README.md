@@ -9,12 +9,12 @@ There are two sides to the app:
 
 - **Customers** browse deals, join pools, confirm and pay for orders, and track them through to
   delivery.
-- **Admins** manage products, suppliers, delivery zones, pools, payments, purchase orders,
+- **Admins** manage products, suppliers, pools, payments, purchase orders,
   deliveries and refunds.
 
 ### Business rules
 
-Confirmed with the team on 2026-10-25. For how admins run zones, pools, payments and deliveries
+Confirmed with the team on 2026-10-25. For how admins run pools, payments and deliveries
 day to day, see the [admin guide](docs/admin-guide.md).
 
 - **Pricing:** shops pay KasiPool, KasiPool pays the supplier. KasiPool keeps one global share of
@@ -23,9 +23,18 @@ day to day, see the [admin guide](docs/admin-guide.md).
   full within the pool's payment window. If unpaid orders leave a gap, the pool reopens for the
   gap until its original closing time, then fails and refunds paid shops if still short. No
   cancelling after paying.
-- **Delivery:** couriers deliver to the shop's business address or an optional second address.
-  Admin-defined delivery zones decide who can join a pool, each with a flat fee per order.
-  Admins record what the courier reports; shops confirm receipt or report a problem.
+- **Who can join (distance):** every public pool has a centre and a radius (default 10 km). A
+  business can join if the place its stock goes to is inside it, so each pool's deliveries stay
+  close together. A pool a business asks for is centred on that business (the "hub"); admins
+  choose the centre of pools they create and can change any radius when reviewing. Private
+  groups (invite code) have no distance limit. Businesses only see how far away a pool is, never
+  where it is centred.
+- **Delivery:** couriers deliver to the business address or an optional second address. Every
+  address needs a map pin (many places have no street number). Delivery fees aren't decided yet:
+  one flat fee per order in Admin → Settings, R0 (free) for now.
+  Admins record what the courier reports; businesses confirm receipt or report a problem.
+- **Who it's for:** every kind of local business (shops, takeaways, salons, taverns, car washes
+  and more), not only spaza shops.
 - **For now:** one login per shop, no business verification, in-app notifications only, EFT
   payments verified by an admin, suppliers managed by admins.
 

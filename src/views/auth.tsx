@@ -101,7 +101,7 @@ export function AuthPage() {
           <Logo />
         </div>
         <h1 className="mt-4 text-center font-headline text-4xl sm:text-5xl">
-          {mode === "login" ? "Welcome back" : "Register your shop"}
+          {mode === "login" ? "Welcome back" : "Register your business"}
         </h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">
           {mode === "login"

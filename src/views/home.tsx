@@ -9,7 +9,7 @@ import { PoolCard } from "@/components/kp/PoolCard";
 import { LogoMark } from "@/components/kp/pool-bits";
 import { Loading, EmptyState } from "@/components/kp/ui";
 import { useAuth } from "@/lib/auth";
-import { activePoolsQuery, myOrdersQuery, settingsQuery } from "@/lib/queries";
+import { activePoolsQuery, myOrdersQuery, poolDistancesQuery, settingsQuery } from "@/lib/queries";
 import { nextAction } from "@/lib/status";
 
 export const STEPS = [
@@ -27,15 +27,17 @@ export const STEPS = [
   },
   {
     title: "Get it delivered",
-    body: "A courier brings your stock to your shop.",
+    body: "A courier brings your stock to your business.",
   },
 ];
 
 export function Home() {
   const { user } = useAuth();
   const pools = useQuery(activePoolsQuery);
+  const dist = useQuery(poolDistancesQuery(user?.id)).data ?? new Map();
+  // Only deals this business can join (too-far ones are on the Deals page)
   const closingSoon = (pools.data ?? [])
-    .filter((p) => p.status === "open")
+    .filter((p) => p.status === "open" && dist.get(p.id)?.in_range !== false)
     .sort((a, b) => +new Date(a.closes_at) - +new Date(b.closes_at))
     .slice(0, 3);
 
@@ -59,8 +61,8 @@ export function Home() {
             </span>
           </h1>
           <p className="mt-5 max-w-md animate-rise text-lg text-paper/85 [animation-delay:260ms]">
-            For spaza shops and small traders. Order together and pay the bulk price. You pay only
-            when the pool is full.
+            For local businesses: shops, takeaways, salons, taverns and more. Order together and pay
+            the bulk price. You pay only when the pool is full.
           </p>
           <div className="mt-7 flex animate-rise flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:340ms]">
             <Button asChild size="xl" variant="gold">
@@ -97,7 +99,7 @@ export function Home() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {closingSoon.map((p) => (
-              <PoolCard key={p.id} pool={p} />
+              <PoolCard key={p.id} pool={p} distance={dist.get(p.id)} />
             ))}
           </div>
         )}
@@ -119,12 +121,12 @@ export function Home() {
       {!user && (
         <Container className="pb-4">
           <div className="rounded-md bg-ink p-8 text-paper md:p-12">
-            <h2 className="font-headline text-4xl">Do you have a shop?</h2>
+            <h2 className="font-headline text-4xl">Do you run a local business?</h2>
             <p className="mt-2 max-w-md text-paper/85">
               Register your business to join pools and get bulk prices.
             </p>
             <Button asChild size="xl" variant="gold" className="mt-6">
-              <Link href="/auth?mode=register">Register your shop</Link>
+              <Link href="/auth?mode=register">Register your business</Link>
             </Button>
           </div>
         </Container>

@@ -20,8 +20,8 @@ const FAQ = [
     "KasiPool checks every payment in our bank account. A screenshot is not enough.",
   ],
   [
-    "What if some shops don't pay?",
-    "The pool opens again for other shops until the closing date. If it is still not full, we pay back everyone who paid.",
+    "What if some businesses don't pay?",
+    "The pool opens again for other businesses until the closing date. If it is still not full, we pay back everyone who paid.",
   ],
   [
     "How do I get my stock?",
@@ -34,7 +34,7 @@ export function HowItWorks() {
     <Container className="max-w-3xl">
       <h1 className="font-headline text-4xl sm:text-5xl">How KasiPool works</h1>
       <p className="mt-2 text-muted-foreground">
-        Many shops. One big order. Better prices for everyone.
+        Many businesses. One big order. Better prices for everyone.
       </p>
       <ol className="mt-8 space-y-6">
         {STEPS.map((s, i) => (

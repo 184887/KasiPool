@@ -8,18 +8,27 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { PROVINCES, normaliseSaMobile } from "@/lib/format";
-import { errMsg, zonesQuery } from "@/lib/queries";
+import { errMsg } from "@/lib/queries";
 import { LocationPicker } from "./LocationPicker";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
-const CATS = [
-  "Spaza / tuck shop",
-  "General dealer",
+// KasiPool is for every kind of local business, not only spaza shops
+export const BUSINESS_TYPES = [
+  "Spaza / general dealer",
   "Takeaway / food vendor",
-  "Shebeen / tavern",
-  "Hair & beauty",
-  "Other",
+  "Restaurant / catering",
+  "Tavern / shebeen",
+  "Hair & beauty salon",
+  "Car wash",
+  "Bakery",
+  "Butchery",
+  "Fruit & veg",
+  "Hardware / building",
+  "Clothing",
+  "Crèche / school",
+  "Church / organisation",
 ];
+const OTHER = "Other";
 
 export function BusinessForm({
   userId,
@@ -36,23 +45,28 @@ export function BusinessForm({
   onDone: () => void;
 }) {
   const qc = useQueryClient();
-  const zones = useQuery(zonesQuery);
   const [f, setF] = useState({
     trading_name: existing?.trading_name ?? "",
     rep_name: existing?.rep_name ?? "",
     mobile: existing?.mobile ?? mobile ?? "",
     email: existing?.email ?? email ?? "",
-    category: existing?.category ?? CATS[0],
+    // A type that isn't in the list was typed under "Other"
+    category:
+      !existing?.category || BUSINESS_TYPES.includes(existing.category)
+        ? (existing?.category ?? BUSINESS_TYPES[0])
+        : OTHER,
+    category_other:
+      existing?.category && !BUSINESS_TYPES.includes(existing.category) ? existing.category : "",
     township: existing?.township ?? "",
     city: existing?.city ?? "Cape Town",
     province: existing?.province ?? "Western Cape",
     address: existing?.address ?? "",
-    zone_id: existing?.zone_id ?? "",
     deliver_to: existing?.deliver_to ?? "business",
     delivery_address: existing?.delivery_address ?? "",
-    delivery_zone_id: existing?.delivery_zone_id ?? "",
     latitude: existing?.latitude ?? (null as number | null),
     longitude: existing?.longitude ?? (null as number | null),
+    delivery_latitude: existing?.delivery_latitude ?? (null as number | null),
+    delivery_longitude: existing?.delivery_longitude ?? (null as number | null),
     marketing_opt_in: existing?.marketing_opt_in ?? false,
   });
   const [terms, setTerms] = useState(!!existing);
@@ -64,19 +78,27 @@ export function BusinessForm({
     e.preventDefault();
     const mobile = normaliseSaMobile(f.mobile);
     if (!mobile) return toast.error("Enter a South African cellphone number, like 072 123 4567");
-    if (!f.address.trim() || !f.zone_id)
-      return toast.error("Enter your shop address and choose your area");
-    if (f.deliver_to === "other" && (!f.delivery_address.trim() || !f.delivery_zone_id))
-      return toast.error("Enter the other address and choose its area");
+    if (f.category === OTHER && !f.category_other.trim())
+      return toast.error("Tell us what type of business you have");
+    if (!f.address.trim()) return toast.error("Enter your business address");
+    if (f.latitude == null || f.longitude == null)
+      return toast.error("Add a map pin so the driver can find your business");
+    if (f.deliver_to === "other" && !f.delivery_address.trim())
+      return toast.error("Enter the other address");
+    if (f.deliver_to === "other" && (f.delivery_latitude == null || f.delivery_longitude == null))
+      return toast.error("Add a map pin for the other address");
     if (!terms) return toast.error("Please accept the terms and privacy notice");
     setBusy(true);
+    const { category_other, ...rest } = f;
     const row = {
-      ...f,
+      ...rest,
+      category: f.category === OTHER ? category_other.trim() : f.category,
       mobile,
       email: f.email || null,
       address: f.address.trim(),
-      delivery_address: f.delivery_address.trim() || null,
-      delivery_zone_id: f.delivery_zone_id || null,
+      delivery_address: f.deliver_to === "other" ? f.delivery_address.trim() : null,
+      delivery_latitude: f.deliver_to === "other" ? f.delivery_latitude : null,
+      delivery_longitude: f.deliver_to === "other" ? f.delivery_longitude : null,
     };
     const { error } = existing
       ? await supabase.from("businesses").update(row).eq("id", existing.id)
@@ -84,6 +106,7 @@ export function BusinessForm({
     setBusy(false);
     if (error) return toast.error(errMsg(error));
     await qc.invalidateQueries({ queryKey: ["my-business"] });
+    await qc.invalidateQueries({ queryKey: ["pool-distances"] });
     toast.success("Saved");
     onDone();
   }
@@ -92,7 +115,7 @@ export function BusinessForm({
   return (
     <form onSubmit={submit} className="space-y-3">
       <div>
-        <Label htmlFor="tn">Shop name *</Label>
+        <Label htmlFor="tn">Business name *</Label>
         <Input
           id="tn"
           required
@@ -132,18 +155,32 @@ export function BusinessForm({
         </div>
       </div>
       <div>
-        <Label htmlFor="cat">Type of shop</Label>
+        <Label htmlFor="cat">Type of business</Label>
         <select
           id="cat"
           className="mt-1 h-12 w-full rounded-md border border-input bg-card px-3"
           value={f.category}
           onChange={set("category")}
         >
-          {CATS.map((c) => (
+          {[...BUSINESS_TYPES, OTHER].map((c) => (
             <option key={c}>{c}</option>
           ))}
         </select>
       </div>
+      {f.category === OTHER && (
+        <div>
+          <Label htmlFor="cat-other">What type of business? *</Label>
+          <Input
+            id="cat-other"
+            required
+            maxLength={60}
+            className={field}
+            placeholder="e.g. Phone repairs"
+            value={f.category_other}
+            onChange={set("category_other")}
+          />
+        </div>
+      )}
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <Label htmlFor="tw">Township *</Label>
@@ -177,7 +214,7 @@ export function BusinessForm({
       <fieldset className="space-y-3 rounded-md border-2 border-ink p-3">
         <legend className="px-1 font-display font-bold">Delivery</legend>
         <div>
-          <Label htmlFor="ad">Shop address *</Label>
+          <Label htmlFor="ad">Business address *</Label>
           <textarea
             id="ad"
             required
@@ -188,13 +225,6 @@ export function BusinessForm({
             onChange={(e) => setF({ ...f, address: e.target.value })}
           />
         </div>
-        <ZoneSelect
-          id="zn"
-          label="Your area *"
-          value={f.zone_id}
-          onChange={(v) => setF({ ...f, zone_id: v })}
-          zones={zones.data}
-        />
         <LocationPicker
           latitude={f.latitude}
           longitude={f.longitude}
@@ -230,12 +260,22 @@ export function BusinessForm({
                 onChange={(e) => setF({ ...f, delivery_address: e.target.value })}
               />
             </div>
-            <ZoneSelect
-              id="dzn"
-              label="Area of the other address *"
-              value={f.delivery_zone_id}
-              onChange={(v) => setF({ ...f, delivery_zone_id: v })}
-              zones={zones.data}
+            <LocationPicker
+              title="Map pin for the other address *"
+              hint="The driver uses this pin to find the other address."
+              latitude={f.delivery_latitude}
+              longitude={f.delivery_longitude}
+              address={f.delivery_address}
+              onPick={(l) =>
+                setF((prev) => ({
+                  ...prev,
+                  delivery_latitude: l.latitude,
+                  delivery_longitude: l.longitude,
+                  delivery_address: prev.delivery_address.trim()
+                    ? prev.delivery_address
+                    : l.address,
+                }))
+              }
             />
           </>
         )}
@@ -267,46 +307,5 @@ export function BusinessForm({
         {busy ? "Saving…" : existing ? "Save changes" : "Finish registration"}
       </Button>
     </form>
-  );
-}
-
-function ZoneSelect({
-  id,
-  label,
-  value,
-  onChange,
-  zones,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (zoneId: string) => void;
-  zones: Tables<"delivery_zones">[] | undefined;
-}) {
-  const zone = zones?.find((z) => z.id === value);
-  return (
-    <div>
-      <Label htmlFor={id}>{label}</Label>
-      <select
-        id={id}
-        required
-        className="mt-1 h-12 w-full rounded-md border border-input bg-card px-3"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">Choose your area…</option>
-        {(zones ?? []).map((z) => (
-          <option key={z.id} value={z.id}>
-            {z.name}
-          </option>
-        ))}
-      </select>
-      {zone?.areas && <p className="mt-1 text-sm text-muted-foreground">Covers: {zone.areas}</p>}
-      {zones && zones.length === 0 && (
-        <p className="mt-1 text-sm text-warning">
-          KasiPool has no delivery areas yet. Please come back soon.
-        </p>
-      )}
-    </div>
   );
 }

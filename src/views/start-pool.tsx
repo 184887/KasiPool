@@ -11,14 +11,17 @@ import { Container } from "@/components/kp/AppShell";
 import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { Field, inputCls } from "@/components/kp/admin";
 import { useAuth } from "@/lib/auth";
-import { errMsg } from "@/lib/queries";
+import { activePoolsQuery, errMsg, poolDistancesQuery } from "@/lib/queries";
+import { DEFAULT_RADIUS_KM, distanceText } from "@/lib/delivery";
 import { sastLocalToIso, isoToSastLocal } from "@/lib/format";
 
 export function StartPool() {
   const nav = useRouter();
   // "Suggest a pool" on the Deals page links here with ?product=<id>
   const suggested = useSearchParams().get("product") ?? "";
-  const { business } = useAuth();
+  const { user, business } = useAuth();
+  const pools = useQuery(activePoolsQuery);
+  const dist = useQuery(poolDistancesQuery(user?.id)).data;
   const ref = useQuery({
     queryKey: ["start-pool-refs"],
     queryFn: async () => {
@@ -60,6 +63,13 @@ export function StartPool() {
       });
     };
 
+  // An open deal for the same product that this business can already join
+  const nearby = (pools.data ?? [])
+    .filter((p) => p.product_id === f.product_id && p.status === "open" && !p.is_sample)
+    .map((p) => ({ pool: p, d: dist?.get(p.id) }))
+    .filter((x) => x.d?.in_range)
+    .sort((a, b) => a.d!.distance_km - b.d!.distance_km)[0];
+
   async function submit() {
     if (!f.product_id) return toast.error("Choose a product");
     if (!(+f.min_qty > 0)) return toast.error("Enter a target quantity");
@@ -85,12 +95,12 @@ export function StartPool() {
   if (!business)
     return (
       <Container className="max-w-2xl">
-        <PageHeader title="Start a pool" />
+        <PageHeader title="Ask for a deal" />
         <p className="text-sm">
           <Link href="/onboarding" className="font-semibold underline">
-            Complete your business profile
+            Add your business details
           </Link>{" "}
-          to start a pool.
+          to ask for a deal.
         </p>
       </Container>
     );
@@ -99,7 +109,7 @@ export function StartPool() {
     <Container className="max-w-2xl">
       <PageHeader
         title="Start a pool"
-        subtitle="Tell us what you want to buy with other shops. We get the price from the supplier, then open the deal."
+        subtitle="Tell us what you want to buy with other businesses. We get the price from the supplier, then open the deal."
       />
       <Section>
         <div className="space-y-4">
@@ -170,8 +180,21 @@ export function StartPool() {
               />
             </Field>
           </div>
+          {nearby && (
+            <p className="rounded-md bg-gold-soft p-3 text-sm text-ink">
+              <b>There is already a deal for this product {distanceText(nearby.d!)} away.</b> Join
+              it instead, so it fills up faster.{" "}
+              <Link
+                href={`/offers/${nearby.pool.id}`}
+                className="font-semibold text-ember underline"
+              >
+                See the deal
+              </Link>
+            </p>
+          )}
           <p className="text-sm text-muted-foreground">
-            We deliver this deal to your area. We can add areas near you.
+            Your business is the centre of this deal. Businesses within {DEFAULT_RADIUS_KM} km of
+            you can join, so the driver can deliver to all of you.
           </p>
           <Field label="Note (optional)">
             <textarea className={inputCls} rows={3} value={f.note} onChange={set("note")} />
@@ -184,8 +207,8 @@ export function StartPool() {
               onChange={(e) => setF({ ...f, is_private: e.target.checked })}
             />
             <span>
-              <b>Private group:</b> other shops can't see this deal. Only shops you give the code to
-              can join.
+              <b>Private group:</b> other businesses can't see this deal. Only businesses you give
+              the code to can join.
             </span>
           </label>
           <Button variant="gold" size="lg" onClick={submit} disabled={busy}>

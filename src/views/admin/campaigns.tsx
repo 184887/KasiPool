@@ -51,7 +51,7 @@ export function Campaigns() {
               className={inputCls}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="November Spaza Essentials"
+              placeholder="November Essentials"
             />
           </Field>
           <Field label="Description">

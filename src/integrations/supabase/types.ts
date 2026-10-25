@@ -526,6 +526,42 @@ export type Database = {
           },
         ];
       };
+      pool_locations: {
+        Row: {
+          label: string | null;
+          latitude: number;
+          longitude: number;
+          pool_id: string;
+          radius_km: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          label?: string | null;
+          latitude: number;
+          longitude: number;
+          pool_id: string;
+          radius_km?: number;
+          updated_at?: string;
+        };
+        Update: {
+          label?: string | null;
+          latitude?: number;
+          longitude?: number;
+          pool_id?: string;
+          radius_km?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pool_locations_pool_id_fkey";
+            columns: ["pool_id"];
+            isOneToOne: true;
+            referencedRelation: "pools";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       pool_members: {
         Row: {
           created_at: string;
@@ -992,19 +1028,13 @@ export type Database = {
         Returns: undefined;
       };
       admin_resolve_failed_pool: { Args: { _note: string; _pool: string }; Returns: undefined };
+      admin_set_pool_location: {
+        Args: { _label: string; _lat: number; _lon: number; _pool: string; _radius: number };
+        Returns: undefined;
+      };
       admin_set_role: { Args: { _email: string; _make_admin: boolean }; Returns: undefined };
       audit: {
         Args: { _action: string; _details?: Json; _entity: string; _id: string };
-        Returns: undefined;
-      };
-      check_delivery_zone: {
-        Args: {
-          _b: Omit<
-            Database["public"]["Tables"]["businesses"]["Row"],
-            Database["public"]["Tables"]["businesses"]["ComputedFields"]
-          >;
-          _pool: string;
-        };
         Returns: undefined;
       };
       claim_first_admin: { Args: Record<PropertyKey, never>; Returns: undefined };
@@ -1023,6 +1053,15 @@ export type Database = {
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       join_pool: { Args: { _pool: string; _qty: number }; Returns: Json };
+      my_pool_distances: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          distance_km: number;
+          in_range: boolean;
+          pool_id: string;
+          radius_km: number;
+        }[];
+      };
       notify: {
         Args: { _body: string; _link: string; _title: string; _user: string };
         Returns: undefined;

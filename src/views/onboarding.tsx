@@ -20,7 +20,7 @@ export function Onboarding() {
     <Container className="max-w-xl">
       <div className="rounded-md border-2 border-ink bg-card p-6">
         <p className="text-sm font-bold text-ember">Step 2 of 2</p>
-        <h1 className="font-headline text-4xl sm:text-5xl">Tell us about your shop</h1>
+        <h1 className="font-headline text-4xl sm:text-5xl">Tell us about your business</h1>
         <p className="mb-5 mt-1 text-sm text-muted-foreground">
           We need this to deliver your stock and to contact you about your orders.
         </p>
