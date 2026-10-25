@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/kp/AppShell";
 import { PoolCard } from "@/components/kp/PoolCard";
 import { Loading, EmptyState } from "@/components/kp/ui";
+import { ProductImage } from "@/components/kp/pool-bits";
 import { activePoolsQuery, catalogueQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
@@ -121,8 +122,9 @@ export function Offers() {
               <ul className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink bg-card">
                 {noDeal.map((p) => (
                   <li key={p.id} className="flex items-center gap-3 p-3">
-                    <img
-                      src={p.image_url ?? undefined}
+                    <ProductImage
+                      src={p.image_url}
+                      name={p.name}
                       alt=""
                       loading="lazy"
                       className="size-14 shrink-0 rounded-sm bg-muted object-cover"

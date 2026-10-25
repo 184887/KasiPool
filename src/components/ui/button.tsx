@@ -9,10 +9,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-[#34312C]",
+        default: "bg-primary text-primary-foreground hover:bg-primary/85",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border-2 border-primary bg-card text-primary hover:bg-primary-soft",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-[#D9D2C6]",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-ember underline-offset-4 hover:underline",
         // The deck's orange: the main call to action
@@ -22,10 +22,10 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-12 px-4",
-        sm: "h-10 rounded-md px-3 text-sm",
+        sm: "h-11 rounded-md px-3 text-sm",
         lg: "h-12 px-6",
         xl: "h-12 px-6",
-        icon: "h-11 w-11",
+        icon: "h-12 w-12",
       },
     },
     defaultVariants: {

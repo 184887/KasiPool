@@ -9,7 +9,7 @@ import { ChevronRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/kp/AppShell";
-import { PoolProgress } from "@/components/kp/pool-bits";
+import { PoolProgress, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, PageHeader, SectionTitle } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -35,13 +35,14 @@ function JoinWithCode() {
   return (
     <div className="mb-4 flex gap-2">
       <Input
-        className="h-11 uppercase"
-        placeholder="Got a group code? Type it here"
+        className="h-12 uppercase placeholder:normal-case"
+        placeholder="Group code"
+        aria-label="Group code"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
       />
-      <Button variant="outline" className="h-11" disabled={busy} onClick={go}>
+      <Button variant="outline" disabled={busy} onClick={go}>
         Join group
       </Button>
     </div>
@@ -113,10 +114,11 @@ export function MyPools() {
                 href={`/orders/${o.id}`}
                 className="flex items-center gap-3 rounded-md border-2 border-ink bg-gold-soft p-3"
               >
-                <img
-                  src={o.pools?.products?.image_url ?? undefined}
+                <ProductImage
+                  src={o.pools?.products?.image_url}
+                  name={o.pools?.products?.name}
                   alt=""
-                  className="size-14 rounded-sm object-cover"
+                  className="size-14 shrink-0 rounded-sm object-cover"
                   width={56}
                   height={56}
                 />
@@ -165,10 +167,11 @@ export function MyPools() {
                   className="block rounded-md border-2 border-ink bg-card p-4"
                 >
                   <div className="flex gap-3">
-                    <img
-                      src={pool.products?.image_url ?? undefined}
+                    <ProductImage
+                      src={pool.products?.image_url}
+                      name={pool.products?.name}
                       alt=""
-                      className="size-16 rounded-sm object-cover"
+                      className="size-16 shrink-0 rounded-sm object-cover"
                       width={64}
                       height={64}
                     />
@@ -176,7 +179,7 @@ export function MyPools() {
                       <p className="font-bold">{pool.products?.name}</p>
                       <p className="text-sm text-muted-foreground">
                         You ordered: <b className="text-foreground">{qty(p.quantity, pool.unit)}</b>{" "}
-                        · est. {money(p.quantity * Number(pool.price))}
+                        · about {money(p.quantity * Number(pool.price))}
                       </p>
                       <div className="mt-1 flex items-center gap-2">
                         <StatusBadge tone={st.tone}>{st.customer}</StatusBadge>

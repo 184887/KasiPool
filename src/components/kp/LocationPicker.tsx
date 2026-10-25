@@ -77,10 +77,11 @@ export function LocationPicker({
   return (
     <div className="space-y-2 rounded-lg border p-3">
       <p className="text-sm font-semibold">Map pin (optional)</p>
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           className="h-12"
-          placeholder="Search your street or area, like Mandela Park"
+          aria-label="Search your street or area"
+          placeholder="Street or area, like Site C"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
@@ -94,7 +95,7 @@ export function LocationPicker({
           <Search className="size-4" /> Search
         </Button>
       </div>
-      <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={useCurrent}>
+      <Button type="button" variant="ghost" disabled={busy} onClick={useCurrent}>
         <LocateFixed className="size-4" /> Use my current location
       </Button>
       {hits.length > 0 && (
@@ -103,7 +104,7 @@ export function LocationPicker({
             <li key={`${h.lat},${h.lon},${h.display_name}`}>
               <button
                 type="button"
-                className="w-full px-3 py-2 text-left hover:bg-muted"
+                className="min-h-12 w-full px-3 py-2 text-left hover:bg-muted"
                 onClick={() => pick(h)}
               >
                 {h.display_name}
@@ -128,7 +129,7 @@ export function LocationPicker({
           You can also mark your shop on the map. This helps the driver.
         </p>
       )}
-      <p className="text-xs text-muted-foreground">We use OpenStreetMap to search for places.</p>
+      <p className="text-sm text-muted-foreground">We use OpenStreetMap to search for places.</p>
     </div>
   );
 }

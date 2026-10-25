@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Container } from "@/components/kp/AppShell";
 import { whatsappShareUrl } from "@/components/kp/PoolCard";
-import { PoolProgress, Countdown, QuantityStepper } from "@/components/kp/pool-bits";
+import { PoolProgress, Countdown, QuantityStepper, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -142,17 +142,14 @@ export function Offer() {
       <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
         <div>
           <div className="relative overflow-hidden rounded-md border-2 border-ink bg-muted">
-            {pool.products?.image_url ? (
-              <img
-                src={pool.products.image_url}
-                alt={pool.products.name}
-                className="aspect-square w-full object-cover"
-                width={816}
-                height={816}
-              />
-            ) : (
-              <div className="aspect-square w-full" />
-            )}
+            <ProductImage
+              src={pool.products?.image_url}
+              name={pool.products?.name}
+              className="aspect-square w-full object-cover"
+              initialsClassName="text-8xl"
+              width={816}
+              height={816}
+            />
             <StatusBadge className="absolute left-4 top-4" tone={st.tone}>
               {st.customer}
             </StatusBadge>
@@ -227,7 +224,7 @@ export function Offer() {
             {open && (
               <p className="mt-3 flex items-center gap-2 font-semibold">
                 <Clock className="size-4" aria-hidden="true" />{" "}
-                <Countdown to={pool.closes_at} className="text-lg" /> left (SAST)
+                <Countdown to={pool.closes_at} className="text-lg" /> left
               </p>
             )}
             {pool.pledged_qty >= pool.min_qty && (
@@ -288,7 +285,7 @@ export function Offer() {
                   <p className="font-headline text-3xl tabular">
                     {money(qty * Number(pool.price))}
                   </p>
-                  <p className="text-sm text-muted-foreground">Potential order value</p>
+                  <p className="text-sm text-muted-foreground">Your total if the pool fills up</p>
                 </div>
               </div>
               {pool.max_per_customer && (

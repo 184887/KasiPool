@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ImgHTMLAttributes } from "react";
 import { Minus, Plus, Users, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pct, plural } from "@/lib/format";
@@ -36,6 +36,39 @@ export function Logo({ light, className }: { light?: boolean; className?: string
         Kasi<span className="text-gold">Pool</span>
       </span>
     </span>
+  );
+}
+
+/**
+ * Product photo. Products added without one get a flat orange tile with their initials, so cards
+ * never show an empty box. `initialsClassName` sets the size of the letters.
+ */
+export function ProductImage({
+  src,
+  name,
+  className,
+  initialsClassName = "text-2xl",
+  ...img
+}: {
+  src: string | null | undefined;
+  name: string | null | undefined;
+  className?: string;
+  initialsClassName?: string;
+} & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "className">) {
+  if (src) return <img src={src} alt={img.alt ?? name ?? ""} className={className} {...img} />;
+  const initials = (name ?? "")
+    .split(/\s+/)
+    .filter((w) => /^[a-z]/i.test(w))
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+  return (
+    <div
+      aria-hidden="true"
+      className={cn("grid place-items-center bg-gold-soft text-ember", className)}
+    >
+      <span className={cn("font-headline leading-none", initialsClassName)}>{initials}</span>
+    </div>
   );
 }
 
@@ -104,7 +137,9 @@ export function PoolProgress({
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
         <span>
           <Users className="mr-1 inline size-3.5" aria-hidden="true" />
-          {participants} {participants === 1 ? "shop" : "shops"} joined
+          {participants === 0
+            ? "Be the first shop to join"
+            : `${participants} ${participants === 1 ? "shop" : "shops"} joined`}
         </span>
         {!reached && size !== "sm" && (
           <span className="ml-auto whitespace-nowrap tabular">

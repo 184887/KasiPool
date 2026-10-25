@@ -36,7 +36,7 @@ export function Profile() {
   return (
     <Container className="max-w-2xl space-y-4">
       <PageHeader title="Profile" subtitle={loginToPhone(user.email) ?? user.email ?? undefined} />
-      <Section title="Business details">
+      <Section title="Shop details">
         {business ? (
           <BusinessForm userId={user.id} existing={business} onDone={() => {}} />
         ) : (

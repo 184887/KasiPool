@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Container } from "@/components/kp/AppShell";
-import { OrderTimeline, Countdown } from "@/components/kp/pool-bits";
+import { OrderTimeline, Countdown, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { settingsQuery, errMsg } from "@/lib/queries";
@@ -96,10 +96,11 @@ export function OrderPage() {
         <ArrowLeft className="size-4" /> My Pools
       </Link>
       <div className="flex items-center gap-3">
-        <img
-          src={pool.products?.image_url ?? undefined}
+        <ProductImage
+          src={pool.products?.image_url}
+          name={pool.products?.name}
           alt=""
-          className="size-16 rounded-sm border-2 border-ink object-cover"
+          className="size-16 shrink-0 rounded-sm border-2 border-ink object-cover"
           width={64}
           height={64}
         />
