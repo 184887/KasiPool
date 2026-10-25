@@ -30,7 +30,7 @@ const NAV = [
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/suppliers", label: "Suppliers", icon: Truck },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
-  { to: "/admin/collections", label: "Collections", icon: PackageCheck },
+  { to: "/admin/deliveries", label: "Deliveries", icon: PackageCheck },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/reports", label: "Reports", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },

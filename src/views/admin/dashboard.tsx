@@ -22,7 +22,7 @@ export function useAdminStats() {
         supabase
           .from("orders")
           .select(
-            "id, user_id, pool_id, status, payment_status, fulfilment_status, quantity, total, amount_paid, unit_price",
+            "id, user_id, pool_id, status, payment_status, fulfilment_status, problem_reported_at, quantity, total, amount_paid, unit_price",
           ),
         supabase.from("pool_costs").select("*"),
         supabase.from("purchase_orders").select("*"),
@@ -62,8 +62,9 @@ export function Dashboard() {
       ["awaiting_payment", "under_review", "issue"].includes(o.payment_status),
   );
   const review = orders.filter((o) => o.payment_status === "under_review");
-  const ready = orders.filter((o) => o.fulfilment_status === "ready");
-  const completed = orders.filter((o) => o.fulfilment_status === "collected");
+  const onTheWay = orders.filter((o) => o.fulfilment_status === "out_for_delivery");
+  const problems = orders.filter((o) => o.problem_reported_at);
+  const completed = orders.filter((o) => ["delivered", "received"].includes(o.fulfilment_status));
 
   const queue = [
     {
@@ -89,13 +90,18 @@ export function Dashboard() {
     { n: by("procurement").length, text: "pool(s) are awaiting stock receipt", to: "/admin/pools" },
     {
       n: by("stock_received").length,
-      text: "pool(s) need orders marked ready",
+      text: "pool(s) need orders sent out for delivery",
       to: "/admin/pools",
     },
     {
-      n: ready.length,
-      text: "customer order(s) are ready for collection",
-      to: "/admin/collections",
+      n: onTheWay.length,
+      text: "order(s) are out for delivery, waiting for the courier to confirm",
+      to: "/admin/deliveries",
+    },
+    {
+      n: problems.length,
+      text: "delivery problem(s) reported by shops",
+      to: "/admin/deliveries",
     },
     {
       n: by("refund_resolution").length,
@@ -154,7 +160,7 @@ export function Dashboard() {
           value={awaitingPay.length}
           hint={money(awaitingPay.reduce((s, o) => s + Number(o.total) - Number(o.amount_paid), 0))}
         />
-        <MetricCard label="Awaiting collection" value={ready.length} />
+        <MetricCard label="Out for delivery" value={onTheWay.length} />
         <MetricCard label="Completed orders" value={completed.length} />
         <MetricCard
           label="Total paid order value"

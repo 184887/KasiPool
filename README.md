@@ -3,14 +3,30 @@
 KasiPool is a mobile-first web app that lets small township businesses in Cape Town pool their
 stock orders to unlock wholesale prices. Businesses join a time-limited pool for a product. When
 the pool hits its target, each business confirms its order and pays. KasiPool then buys the stock
-from the supplier and arranges collection.
+from the supplier and a courier delivers it to each shop.
 
 There are two sides to the app:
 
-- **Customers** browse offers, join pools, confirm and pay for orders, and track them through to
-  collection.
-- **Admins** manage products, suppliers, pools, payments, purchase orders, collections, refunds
-  and WhatsApp campaigns.
+- **Customers** browse deals, join pools, confirm and pay for orders, and track them through to
+  delivery.
+- **Admins** manage products, suppliers, delivery zones, pools, payments, purchase orders,
+  deliveries and refunds.
+
+### Business rules
+
+Confirmed with the team on 2026-10-25:
+
+- **Pricing:** shops pay KasiPool, KasiPool pays the supplier. KasiPool keeps one global share of
+  the discount (Admin → Settings): `price = list - (1 - share) × (list - bulk)`.
+- **Pools:** joining is free. A pool closes as soon as it reaches its target; shops then pay in
+  full within the pool's payment window. If unpaid orders leave a gap, the pool reopens for the
+  gap until its original closing time, then fails and refunds paid shops if still short. No
+  cancelling after paying.
+- **Delivery:** couriers deliver to the shop's business address or an optional second address.
+  Admin-defined delivery zones decide who can join a pool, each with a flat fee per order.
+  Admins record what the courier reports; shops confirm receipt or report a problem.
+- **For now:** one login per shop, no business verification, in-app notifications only, EFT
+  payments verified by an admin, suppliers managed by admins.
 
 ## Tech stack
 
@@ -100,7 +116,7 @@ public/                    Static assets (logo, product images)
 
 ```
 draft → scheduled → open → awaiting_confirmation → funded → procurement
-      → stock_received → ready_for_collection → completed
+      → stock_received → out_for_delivery → completed
                        ↘ unsuccessful / cancelled / refund_resolution
 ```
 
@@ -112,7 +128,7 @@ client also calls it before it reads pools.
 
 These rules are also in [`AGENTS.md`](AGENTS.md):
 
-- All business logic (joining, closing, confirming, paying, procurement, collection, refunds)
+- All business logic (joining, closing, confirming, paying, procurement, delivery, refunds)
   lives in `SECURITY DEFINER` Postgres functions called with `supabase.rpc(...)`. The client
   never writes to participations, orders or payments directly.
 - Supplier costs live in `pool_costs`, which only admins can read. They are kept separate from

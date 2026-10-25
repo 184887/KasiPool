@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Clock, MapPin, Share2, Info, PartyPopper, ArrowLeft } from "lucide-react";
+import { Clock, Truck, Share2, Info, PartyPopper, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +24,7 @@ import { useAuth } from "@/lib/auth";
 import { poolQuery, errMsg } from "@/lib/queries";
 import { money, savings, dateTime, date } from "@/lib/format";
 import { POOL_STATUS } from "@/lib/status";
+import { shopZoneId } from "@/lib/delivery";
 
 const PENDING = "kp-pending-join";
 
@@ -86,6 +87,8 @@ export function Offer() {
   const st = POOL_STATUS[pool.status];
   const open = pool.status === "open" && !pool.is_sample;
   const maxQty = pool.max_per_customer ?? 999;
+  const zones = pool.pool_zones.flatMap((pz) => (pz.delivery_zones ? [pz.delivery_zones] : []));
+  const myZone = zones.find((z) => z.id === shopZoneId(business));
 
   async function join() {
     if (!user) {
@@ -186,7 +189,7 @@ export function Offer() {
               </p>
             )}
             <p className="mt-2 text-xs text-muted-foreground">
-              Fees: {pool.fee_note || "No additional fees"} · {pool.collection_points?.fee_note}
+              Fees: {pool.fee_note || "No additional fees"} · delivery fee depends on your area
             </p>
           </Section>
 
@@ -286,18 +289,30 @@ export function Offer() {
             </Section>
           )}
 
-          <Section title="How you'll get your stock">
+          <Section title="Delivery">
             <p className="flex gap-2 text-sm">
-              <MapPin className="size-4 shrink-0" aria-hidden="true" />
+              <Truck className="size-4 shrink-0" aria-hidden="true" />
               <span>
-                <b>{pool.collection_points?.name}</b>
-                <br />
-                {pool.collection_points?.area}
+                Delivered to your shop by our courier partner once the stock arrives. Delivers to:{" "}
+                <b>{zones.map((z) => z.name).join(", ") || "-"}</b>
               </span>
             </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {pool.collection_points?.instructions}
-            </p>
+            {myZone ? (
+              <p className="mt-2 text-sm">
+                Delivery fee to {myZone.name}: <b>{money(myZone.delivery_fee)}</b> per order, added
+                when you confirm.
+              </p>
+            ) : (
+              business &&
+              zones.length > 0 && (
+                <p className="mt-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
+                  This deal doesn&apos;t deliver to your area yet.{" "}
+                  <Link href="/profile" className="font-semibold underline">
+                    Check your delivery address
+                  </Link>
+                </p>
+              )
+            )}
             {pool.is_private && pool.invite_code && (
               <div className="mt-2 rounded-md bg-muted p-3 text-sm">
                 <p className="font-semibold">Private group, invite code {pool.invite_code}</p>
@@ -307,14 +322,6 @@ export function Offer() {
                 </p>
               </div>
             )}
-            {pool.collection_points?.latitude != null && !pool.is_private && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Open to businesses within {pool.max_distance_km} km of this collection point.
-              </p>
-            )}
-            <p className="mt-2 text-xs text-muted-foreground">
-              Collection dates will be confirmed once stock has arrived.
-            </p>
           </Section>
 
           <Button asChild variant="outline" className="w-full" size="lg">

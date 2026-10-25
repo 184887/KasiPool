@@ -36,7 +36,7 @@ export function StatusBadge({
   className?: string;
 }) {
   const label = typeof children === "string" ? children.toLowerCase() : "";
-  const completed = label === "completed" || label === "collected";
+  const completed = label === "completed" || label === "received";
   const Icon =
     label.includes("cancel") || label.includes("issue")
       ? CircleSlash
@@ -44,9 +44,9 @@ export function StatusBadge({
           label.includes("awaiting confirmation") ||
           label.includes("confirm your order")
         ? CircleDot
-        : label.includes("ready for collection")
+        : label.includes("out for delivery")
           ? PackageCheck
-          : label.includes("completed") || label.includes("collected")
+          : label.includes("completed") || label.includes("received") || label === "delivered"
             ? BadgeCheck
             : label.includes("paid") || label.includes("payment confirmed")
               ? CheckCircle2

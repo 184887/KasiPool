@@ -4,7 +4,7 @@ import { Terms } from "@/views/terms";
 export const metadata: Metadata = {
   title: "Terms of use (draft)",
   description:
-    "Draft KasiPool terms covering pools, confirmations, payments, refunds and collection.",
+    "Draft KasiPool terms covering pools, confirmations, payments, refunds and delivery.",
   openGraph: {
     title: "KasiPool terms (draft)",
     description: "Draft terms for the KasiPool collective purchasing platform.",

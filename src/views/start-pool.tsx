@@ -22,11 +22,8 @@ export function StartPool() {
   const ref = useQuery({
     queryKey: ["start-pool-refs"],
     queryFn: async () => {
-      const [p, cp] = await Promise.all([
-        supabase.from("products").select("*").eq("active", true).order("name"),
-        supabase.from("collection_points").select("*").eq("active", true),
-      ]);
-      return { products: p.data ?? [], points: cp.data ?? [] };
+      const p = await supabase.from("products").select("*").eq("active", true).order("name");
+      return { products: p.data ?? [] };
     },
   });
   const now = new Date();
@@ -39,7 +36,6 @@ export function StartPool() {
     max_per_customer: "",
     opens_at: isoToSastLocal(now.toISOString()),
     closes_at: isoToSastLocal(new Date(+now + 7 * 864e5).toISOString()),
-    collection_point_id: "",
     note: "",
     is_private: false,
   });
@@ -65,8 +61,7 @@ export function StartPool() {
     };
 
   async function submit() {
-    if (!f.product_id || !f.collection_point_id)
-      return toast.error("Choose a product and collection point");
+    if (!f.product_id) return toast.error("Choose a product");
     if (!(+f.min_qty > 0)) return toast.error("Enter a target quantity");
     setBusy(true);
     const { error } = await supabase.rpc("propose_pool", {
@@ -78,7 +73,6 @@ export function StartPool() {
       _max_per: f.max_per_customer ? +f.max_per_customer : null,
       _opens: sastLocalToIso(f.opens_at),
       _closes: sastLocalToIso(f.closes_at),
-      _collection_point: f.collection_point_id,
       _note: f.note || null,
       _private: f.is_private,
     });
@@ -178,20 +172,9 @@ export function StartPool() {
               />
             </Field>
           </div>
-          <Field label="Collection point *">
-            <select
-              className={inputCls}
-              value={f.collection_point_id}
-              onChange={set("collection_point_id")}
-            >
-              <option value="">Select…</option>
-              {ref.data.points.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <p className="text-sm text-muted-foreground">
+            The deal will deliver to your area. KasiPool can add nearby areas before publishing.
+          </p>
           <Field label="Note (optional)">
             <textarea className={inputCls} rows={3} value={f.note} onChange={set("note")} />
           </Field>

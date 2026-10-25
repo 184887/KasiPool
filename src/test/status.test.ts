@@ -28,8 +28,14 @@ describe("order progress", () => {
     expect(timelineStep(order)).toBe(2);
   });
 
-  it("reaches the final step when collected", () => {
-    expect(timelineStep({ ...order, payment_status: "paid", fulfilment_status: "collected" })).toBe(
+  it("asks the shop to confirm a delivery", () => {
+    const delivered = { ...order, payment_status: "paid", fulfilment_status: "delivered" };
+    expect(nextAction(delivered, true)).toBe("Confirm you received it");
+    expect(timelineStep(delivered)).toBe(5);
+  });
+
+  it("reaches the final step when received", () => {
+    expect(timelineStep({ ...order, payment_status: "paid", fulfilment_status: "received" })).toBe(
       6,
     );
   });

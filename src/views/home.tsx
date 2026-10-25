@@ -15,7 +15,7 @@ import { nextAction } from "@/lib/status";
 export const STEPS = [
   {
     title: "Choose a deal",
-    body: "Check the product, pack size, price, deadline and where to collect.",
+    body: "Check the product, pack size, price, deadline and delivery areas.",
   },
   {
     title: "Join the pool",
@@ -26,8 +26,8 @@ export const STEPS = [
     body: "If the pool reaches its target, check your total, then pay.",
   },
   {
-    title: "Collect your stock",
-    body: "Pick up at the collection point with your code.",
+    title: "Get it delivered",
+    body: "A courier brings your stock to your shop.",
   },
 ];
 
@@ -134,7 +134,7 @@ export function Home() {
   );
 }
 
-/** Banner for signed-in shops when an order is waiting on them (confirm, pay or collect). */
+/** Banner for signed-in shops when an order is waiting on them (confirm, pay or confirm delivery). */
 function NextStep({ userId }: { userId: string }) {
   const orders = useQuery(myOrdersQuery(userId));
   const settings = useQuery(settingsQuery);

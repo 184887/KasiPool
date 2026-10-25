@@ -10,11 +10,12 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-00000000ad01', 'admin@test.local', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-00000000c001', 'shop@test.local', 'authenticated', 'authenticated');
 insert into public.user_roles (user_id, role) values ('00000000-0000-0000-0000-00000000ad01', 'admin');
-insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province)
-values ('00000000-0000-0000-0000-00000000c001', 'Shop', 'Sipho', '+27600000002', 'Gugulethu', 'Cape Town', 'Western Cape');
+insert into public.delivery_zones (id, name) values ('00000000-0000-0000-0000-0000000000e1', 'Zone');
+insert into public.businesses (user_id, trading_name, rep_name, mobile, township, city, province, address, zone_id)
+values ('00000000-0000-0000-0000-00000000c001', 'Shop', 'Sipho', '+27600000002', 'Gugulethu', 'Cape Town', 'Western Cape',
+  '2 NY1', '00000000-0000-0000-0000-0000000000e1');
 insert into public.suppliers (id, name) values ('00000000-0000-0000-0000-0000000005e1', 'Supplier');
 insert into public.products (id, sku, name) values ('00000000-0000-0000-0000-00000000f001', 'TEST-1', 'Maize meal 10kg');
-insert into public.collection_points (id, name, area) values ('00000000-0000-0000-0000-0000000000c9', 'Point', 'Area');
 update public.app_settings set value = '{"discount_share_pct": 20}' where key = 'pricing';
 
 select is(public.pool_price(250, 200, 20), 210.00, 'pool_price: list 250, bulk 200, 20% share gives 210');
@@ -23,7 +24,7 @@ select is(public.pool_price(250, 200, 20), 210.00, 'pool_price: list 250, bulk 2
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select lives_ok(
   $$select public.propose_pool('00000000-0000-0000-0000-00000000f001', 'bag', 10, null, 1, null,
-      now(), now() + interval '7 days', '00000000-0000-0000-0000-0000000000c9', null, false)$$,
+      now(), now() + interval '7 days', null, false)$$,
   'a shop can propose a pool without a price'
 );
 select is((select price from public.pools where proposed_by = '00000000-0000-0000-0000-00000000c001'), null,

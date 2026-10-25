@@ -125,7 +125,7 @@ export function LocationPicker({
         </p>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Pools are limited to businesses near the collection point, so we need your location.
+          Optional: pin your shop on the map to help the driver find it.
         </p>
       )}
       <p className="text-[11px] text-muted-foreground">

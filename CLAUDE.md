@@ -8,8 +8,9 @@ Guidance for Claude Code in this repo. Architecture rules live in AGENTS.md and 
 
 KasiPool is a mobile-first Next.js app that lets small township businesses in Cape Town pool
 stock orders to reach wholesale prices. Customers join pools, confirm and pay once a pool hits
-its target, then collect their stock. Admins run products, suppliers, pools, payments and
-collections. See README.md for setup.
+its target, then get their stock delivered. Admins run products, suppliers, delivery zones,
+pools, payments and deliveries. The confirmed business rules are in README.md ("Business
+rules"); check changes against them and ask before changing one.
 
 ## Commands
 

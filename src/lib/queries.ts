@@ -29,7 +29,7 @@ export type AppSettings = {
 };
 
 export const POOL_SELECT =
-  "*, products(*, categories(name, slug)), collection_points(*), campaigns(name)";
+  "*, products(*, categories(name, slug)), pool_zones(delivery_zones(id, name, delivery_fee)), campaigns(name)";
 
 export const PUBLIC_STATUSES = ["open", "scheduled"];
 
@@ -87,6 +87,20 @@ export const catalogueQuery = queryOptions({
 export const categoriesQuery = queryOptions({
   queryKey: ["categories"],
   queryFn: async () => (await supabase.from("categories").select("*").order("sort")).data ?? [],
+});
+
+/** Active delivery zones, for shops picking their area */
+export const zonesQuery = queryOptions({
+  queryKey: ["delivery-zones"],
+  queryFn: async () =>
+    (
+      await supabase
+        .from("delivery_zones")
+        .select("*")
+        .eq("active", true)
+        .order("sort")
+        .order("name")
+    ).data ?? [],
 });
 
 export const settingsQuery = queryOptions({
