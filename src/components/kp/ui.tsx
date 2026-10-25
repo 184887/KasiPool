@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import {
   Loader2,
   Inbox,
-  AlertTriangle,
   ArrowLeftRight,
   BadgeCheck,
   CheckCircle2,
@@ -119,17 +118,6 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
       role="status"
     >
       <Loader2 className="size-5 animate-spin" /> {label}
-    </div>
-  );
-}
-
-export function ErrorBox({ message }: { message: string }) {
-  return (
-    <div
-      className="flex items-start gap-2 rounded-md border-2 border-destructive/40 bg-destructive-soft p-4 text-sm text-destructive"
-      role="alert"
-    >
-      <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {message}
     </div>
   );
 }

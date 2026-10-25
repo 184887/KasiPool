@@ -31,10 +31,8 @@ export type AppSettings = {
 export const POOL_SELECT =
   "*, products(*, categories(name, slug)), pool_zones(delivery_zones(id, name, delivery_fee)), campaigns(name)";
 
-export const PUBLIC_STATUSES = ["open", "scheduled"];
-
 async function refresh() {
-  // Idempotent lifecycle check (closes due pools). Also runs hourly on the backend.
+  // Idempotent lifecycle check (closes due pools). pg_cron also runs it every minute.
   await supabase.rpc("refresh_pool_states");
 }
 
@@ -82,11 +80,6 @@ export const catalogueQuery = queryOptions({
     if (error) throw error;
     return { products: products ?? [], categories: cats ?? [], pools: pools ?? [] };
   },
-});
-
-export const categoriesQuery = queryOptions({
-  queryKey: ["categories"],
-  queryFn: async () => (await supabase.from("categories").select("*").order("sort")).data ?? [],
 });
 
 /** Active delivery zones, for shops picking their area */
