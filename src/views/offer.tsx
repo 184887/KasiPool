@@ -163,11 +163,15 @@ export function Offer() {
         <div className="space-y-4">
           <Section>
             <p className="text-sm text-muted-foreground">KasiPool price per {pool.unit}</p>
-            <p className="font-headline text-6xl tabular">{money(pool.price)}</p>
+            {pool.price == null ? (
+              <p className="font-display text-2xl font-bold">Price to be confirmed</p>
+            ) : (
+              <p className="font-headline text-6xl tabular">{money(pool.price)}</p>
+            )}
             {s ? (
               <div className="mt-3 rounded-md bg-leaf-soft p-3 text-sm">
                 <p>
-                  Reference price: <b className="tabular">{money(pool.reference_price)}</b>
+                  Supplier list price: <b className="tabular">{money(pool.reference_price)}</b>
                 </p>
                 <p className="font-bold text-leaf">
                   Potential saving: {money(s.amount)} per {pool.unit} ({s.pct.toFixed(2)}%)

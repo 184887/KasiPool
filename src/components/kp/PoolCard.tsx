@@ -12,7 +12,8 @@ export type PoolWithProduct = {
   id: string;
   status: string;
   unit: string;
-  price: number;
+  /** Null only for unpublished drafts */
+  price: number | null;
   reference_price: number | null;
   min_qty: number;
   pledged_qty: number;
@@ -24,7 +25,7 @@ export type PoolWithProduct = {
 };
 
 export function whatsappShareUrl(p: PoolWithProduct) {
-  const s = savings(p.price, p.reference_price);
+  const s = savings(Number(p.price), p.reference_price);
   const link =
     typeof window !== "undefined" ? `${window.location.origin}/offers/${p.id}` : `/offers/${p.id}`;
   const msg = [

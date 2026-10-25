@@ -94,7 +94,7 @@ export function PoolsAdmin() {
                   {POOL_STATUS[p.status].admin}
                 </StatusBadge>
               </Td>
-              <Td className="tabular">{money(p.price)}</Td>
+              <Td className="tabular">{p.price == null ? "-" : money(p.price)}</Td>
               <Td className="tabular">
                 {p.pledged_qty}/{p.min_qty}{" "}
                 <span className="text-muted-foreground">({pct(p.pledged_qty, p.min_qty)}%)</span>
