@@ -38,7 +38,7 @@ export function StatusBadge({
   const label = typeof children === "string" ? children.toLowerCase() : "";
   const completed = label === "completed" || label === "received";
   const Icon =
-    label.includes("cancel") || label.includes("issue")
+    label.includes("cancel") || label.includes("issue") || label.includes("problem")
       ? CircleSlash
       : label.includes("target reached") ||
           label.includes("awaiting confirmation") ||
@@ -53,6 +53,8 @@ export function StatusBadge({
               : label === "confirmed"
                 ? CircleDot
                 : label.includes("awaiting payment") ||
+                    label.includes("waiting for payment") ||
+                    label.includes("checking payment") ||
                     label.includes("payment due") ||
                     label === "pay"
                   ? Clock3
@@ -60,9 +62,11 @@ export function StatusBadge({
                       label.includes("ordered") ||
                       label.includes("stock received")
                     ? ArrowLeftRight
-                    : label.includes("preparing")
+                    : label.includes("preparing") || label.includes("getting your stock")
                       ? ArrowLeftRight
-                      : label.includes("unsuccessful") || label.includes("below target")
+                      : label.includes("unsuccessful") ||
+                          label.includes("failed") ||
+                          label.includes("below target")
                         ? CircleMinus
                         : label.includes("open") || label.includes("scheduled")
                           ? Circle
@@ -153,7 +157,7 @@ export function MetricCard({
       >
         {value}
       </p>
-      {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-0.5 text-sm text-muted-foreground">{hint}</p>}
     </div>
   );
 }

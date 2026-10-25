@@ -38,9 +38,9 @@ export function Offers() {
 
   return (
     <Container>
-      <h1 className="font-headline text-5xl">Deals</h1>
+      <h1 className="font-headline text-4xl sm:text-5xl">Deals</h1>
       <p className="mt-1 text-muted-foreground">
-        Joining is free. You only pay if the pool reaches its target.
+        You do not pay when you join. You pay when the pool is full.
       </p>
       <div className="relative mt-5">
         <Search
@@ -83,10 +83,7 @@ export function Offers() {
           {term || category ? (
             <EmptyState title="Nothing matches" body="Try another search or category." />
           ) : (
-            <EmptyState
-              title="No deals yet"
-              body="New deals are added regularly. Check back soon."
-            />
+            <EmptyState title="No deals yet" body="We add new deals often. Come back soon." />
           )}
         </div>
       ) : (
@@ -95,7 +92,7 @@ export function Offers() {
             {openNow.length === 0 ? (
               <EmptyState
                 title="No open deals right now"
-                body="New deals are added regularly. Check back soon."
+                body="We add new deals often. Come back soon."
               />
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -119,7 +116,7 @@ export function Offers() {
           {noDeal.length > 0 && (
             <DealSection title="No deal yet" count={noDeal.length}>
               <p className="-mt-2 mb-3 text-muted-foreground">
-                Want one of these? Suggest a pool and other shops can join it.
+                Want one of these? Ask for a deal, and other shops can join it.
               </p>
               <ul className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink bg-card">
                 {noDeal.map((p) => (
@@ -139,7 +136,7 @@ export function Offers() {
                       </p>
                     </div>
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/start-pool?product=${p.id}`}>Suggest a pool</Link>
+                      <Link href={`/start-pool?product=${p.id}`}>Ask for a deal</Link>
                     </Button>
                   </li>
                 ))}

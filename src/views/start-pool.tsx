@@ -78,9 +78,7 @@ export function StartPool() {
     });
     setBusy(false);
     if (error) return toast.error(errMsg(error));
-    toast.success(
-      "Pool submitted for review. We'll publish it once the supplier price is confirmed.",
-    );
+    toast.success("Sent. We will check the price with the supplier, then open the deal.");
     nav.push("/my-pools");
   }
 
@@ -101,7 +99,7 @@ export function StartPool() {
     <Container className="max-w-2xl">
       <PageHeader
         title="Start a pool"
-        subtitle="Suggest a product for a group order. We get the supplier's bulk price, then publish the deal for other shops to join."
+        subtitle="Tell us what you want to buy with other shops. We get the price from the supplier, then open the deal."
       />
       <Section>
         <div className="space-y-4">
@@ -116,10 +114,10 @@ export function StartPool() {
             </select>
           </Field>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Purchasing unit *">
+            <Field label="Sold per (bag, box, case) *">
               <input className={inputCls} value={f.unit} onChange={set("unit")} />
             </Field>
-            <Field label="Minimum target quantity *">
+            <Field label="How many are needed in total *">
               <input
                 type="number"
                 min="1"
@@ -128,7 +126,7 @@ export function StartPool() {
                 onChange={set("min_qty")}
               />
             </Field>
-            <Field label="Maximum pool quantity">
+            <Field label="Most the pool can take">
               <input
                 type="number"
                 min="1"
@@ -137,7 +135,7 @@ export function StartPool() {
                 onChange={set("max_qty")}
               />
             </Field>
-            <Field label="Minimum per business">
+            <Field label="Least one shop can order">
               <input
                 type="number"
                 min="1"
@@ -146,7 +144,7 @@ export function StartPool() {
                 onChange={set("min_per_customer")}
               />
             </Field>
-            <Field label="Maximum per business">
+            <Field label="Most one shop can order">
               <input
                 type="number"
                 min="1"
@@ -173,7 +171,7 @@ export function StartPool() {
             </Field>
           </div>
           <p className="text-sm text-muted-foreground">
-            The deal will deliver to your area. KasiPool can add nearby areas before publishing.
+            We deliver this deal to your area. We can add areas near you.
           </p>
           <Field label="Note (optional)">
             <textarea className={inputCls} rows={3} value={f.note} onChange={set("note")} />
@@ -186,12 +184,12 @@ export function StartPool() {
               onChange={(e) => setF({ ...f, is_private: e.target.checked })}
             />
             <span>
-              <b>Private group:</b> hidden from public Deals. Only people you share the invite link
-              or code with can join, wherever they are.
+              <b>Private group:</b> other shops can't see this deal. Only shops you give the code to
+              can join.
             </span>
           </label>
           <Button variant="gold" size="lg" onClick={submit} disabled={busy}>
-            {busy ? "Submitting…" : "Submit for review"}
+            {busy ? "Sending…" : "Send"}
           </Button>
         </div>
       </Section>

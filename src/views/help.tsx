@@ -11,7 +11,7 @@ export function Help() {
   return (
     <LegalPage title="Help & contact">
       <p>
-        New to pooling? Read{" "}
+        New to KasiPool? Read{" "}
         <Link href="/how-it-works" className="font-semibold text-ember underline">
           how KasiPool works
         </Link>
@@ -29,8 +29,8 @@ export function Help() {
       )}
       <h2>Payments</h2>
       <p>
-        Always use your order reference when paying. KasiPool staff will verify your payment; you'll
-        see “Payment confirmed” in your account.
+        Always use your order number as the reference when you pay. KasiPool checks your payment,
+        then your order shows “Paid”.
       </p>
     </LegalPage>
   );

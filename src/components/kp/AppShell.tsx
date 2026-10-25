@@ -127,7 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             href={n.to}
             aria-current={isActive(n.to) ? "page" : undefined}
             className={cn(
-              "relative flex min-h-16 flex-col items-center justify-center gap-1 py-2 text-xs font-bold",
+              "relative flex min-h-16 flex-col items-center justify-center gap-1 py-2 text-sm font-bold",
               isActive(n.to) ? "text-ink" : "text-muted-foreground",
             )}
           >

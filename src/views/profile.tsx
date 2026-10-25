@@ -51,7 +51,7 @@ export function Profile() {
       {isAdmin && (
         <Section title="Administrator">
           <p className="text-sm text-muted-foreground">
-            You have administrator access. Your customer view and admin view use the same live data.
+            You are an administrator. The shop screens and admin screens use the same data.
           </p>
           <Button asChild className="mt-3">
             <Link href="/admin">

@@ -14,7 +14,7 @@ import { Loading, EmptyState, StatusBadge, PageHeader, SectionTitle } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { settingsQuery, errMsg, myOrdersQuery, type MyOrder } from "@/lib/queries";
-import { money, date, dateTime } from "@/lib/format";
+import { money, date, dateTime, qty } from "@/lib/format";
 import { POOL_STATUS, ORDER_STATUS, nextAction, FULFIL_STATUS, PAYMENT_STATUS } from "@/lib/status";
 
 const PSEL =
@@ -36,7 +36,7 @@ function JoinWithCode() {
     <div className="mb-4 flex gap-2">
       <Input
         className="h-11 uppercase"
-        placeholder="Have a private group invite code?"
+        placeholder="Got a group code? Type it here"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && go()}
@@ -84,16 +84,16 @@ export function MyPools() {
       <PageHeader title="My Pools" subtitle={business?.trading_name} />
       <div className="mb-4">
         <Button asChild variant="outline">
-          <Link href="/start-pool">Start a pool</Link>
+          <Link href="/start-pool">Ask for a deal</Link>
         </Button>
       </div>
       <JoinWithCode />
       {!business && (
         <div className="mb-4 rounded-md bg-warning-soft p-4 text-sm text-warning">
           <Link href="/onboarding" className="font-semibold underline">
-            Complete your business profile
+            Add your shop details
           </Link>{" "}
-          to join pools.
+          to join a pool.
         </div>
       )}
 
@@ -128,7 +128,7 @@ export function MyPools() {
                     <b>{money(o.total)}</b>
                   </p>
                   {o.pools?.payment_deadline && o.fulfilment_status !== "ready" && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Deadline {dateTime(o.pools.payment_deadline)}
                     </p>
                   )}
@@ -146,7 +146,7 @@ export function MyPools() {
         <SectionTitle>Active pools</SectionTitle>
         {(parts.data ?? []).length === 0 ? (
           <EmptyState
-            title="You haven't joined any open pools"
+            title="You are not in any open pools"
             action={
               <Button asChild variant="gold">
                 <Link href="/offers">Find a deal</Link>
@@ -175,15 +175,12 @@ export function MyPools() {
                     <div className="min-w-0 flex-1">
                       <p className="font-bold">{pool.products?.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        Your quantity:{" "}
-                        <b className="text-foreground">
-                          {p.quantity} {pool.unit}(s)
-                        </b>{" "}
+                        You ordered: <b className="text-foreground">{qty(p.quantity, pool.unit)}</b>{" "}
                         · est. {money(p.quantity * Number(pool.price))}
                       </p>
                       <div className="mt-1 flex items-center gap-2">
                         <StatusBadge tone={st.tone}>{st.customer}</StatusBadge>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           Closes {date(pool.closes_at)}
                         </span>
                       </div>
@@ -199,9 +196,8 @@ export function MyPools() {
                       size="sm"
                     />
                   </div>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Next: wait for the pool to reach its target. You can change your quantity until
-                    it closes.
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Next: wait for the pool to fill up. You can change your order until it closes.
                   </p>
                 </Link>
               );
@@ -243,8 +239,8 @@ function OrderList({ list }: { list: MyOrder[] }) {
           <Link key={o.id} href={`/orders/${o.id}`} className="flex items-center gap-3 p-4">
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{o.pools?.products?.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {o.ref ?? "No reference"} · {o.quantity} {o.pools?.unit}(s) ·{" "}
+              <p className="text-sm text-muted-foreground">
+                {o.ref ?? "No reference"} · {qty(o.quantity, o.pools?.unit ?? "")} ·{" "}
                 {o.payment_status === "paid" ? `Paid ${money(o.amount_paid)}` : money(o.total)}
                 {o.received_at && ` · Received ${date(o.received_at)}`}
               </p>

@@ -8,8 +8,8 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
         <b>Draft for review.</b> This content is a placeholder and must be reviewed by legal and
         operational advisers before KasiPool launches.
       </div>
-      <h1 className="font-headline text-5xl">{title}</h1>
-      <div className="mt-6 space-y-4 text-[15px] leading-relaxed [&_h2]:mt-6 [&_h2]:font-display [&_h2]:text-xl [&_h2]:font-bold">
+      <h1 className="font-headline text-4xl sm:text-5xl">{title}</h1>
+      <div className="mt-6 space-y-4 text-base leading-relaxed [&_h2]:mt-6 [&_h2]:font-display [&_h2]:text-xl [&_h2]:font-bold">
         {children}
       </div>
     </Container>

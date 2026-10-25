@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Minus, Plus, Users, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { pct } from "@/lib/format";
+import { pct, plural } from "@/lib/format";
 import { TIMELINE } from "@/lib/status";
 
 /** The deck's two interlocking rings: orange passes over green at the top crossing. */
@@ -46,7 +46,7 @@ export function PoolProgress({
   participants,
   unit,
   size = "md",
-  label = "pledged",
+  label = "ordered",
 }: {
   pledged: number;
   target: number;
@@ -73,7 +73,7 @@ export function PoolProgress({
         >
           {pledged}{" "}
           <span className="font-sans text-sm font-medium text-muted-foreground">
-            of {target} {unit}s {label}
+            of {target} {plural(unit, target)} {label}
           </span>
         </p>
         <span
@@ -104,11 +104,11 @@ export function PoolProgress({
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
         <span>
           <Users className="mr-1 inline size-3.5" aria-hidden="true" />
-          {participants} {participants === 1 ? "business" : "businesses"} pooling
+          {participants} {participants === 1 ? "shop" : "shops"} joined
         </span>
         {!reached && size !== "sm" && (
           <span className="ml-auto whitespace-nowrap tabular">
-            {Math.max(target - pledged, 0)} to go
+            {Math.max(target - pledged, 0)} more needed
           </span>
         )}
       </div>
@@ -220,7 +220,7 @@ export function OrderTimeline({ step, failed }: { step: number; failed?: string 
             >
               {label}
               {current && (
-                <span className="ml-2 rounded bg-gold-soft px-1.5 py-0.5 text-[11px] font-bold text-gold-foreground">
+                <span className="ml-2 rounded bg-gold-soft px-1.5 py-0.5 text-xs font-bold text-gold-foreground">
                   Current
                 </span>
               )}

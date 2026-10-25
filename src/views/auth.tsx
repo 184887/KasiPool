@@ -76,8 +76,7 @@ export function AuthPage() {
         });
         if (error) throw error;
         // No session means Supabase still requires email confirmation, which can't arrive
-        if (!data.session)
-          throw new Error("Registration isn't available right now. Please try later.");
+        if (!data.session) throw new Error("You can't register right now. Please try again later.");
       }
     } catch (err) {
       toast.error(authError(err));
@@ -99,13 +98,13 @@ export function AuthPage() {
         <div className="text-center">
           <Logo />
         </div>
-        <h1 className="mt-4 text-center font-headline text-4xl">
+        <h1 className="mt-4 text-center font-headline text-4xl sm:text-5xl">
           {mode === "login" ? "Welcome back" : "Register your business"}
         </h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">
           {mode === "login"
             ? "Log in with your mobile number and PIN."
-            : "Step 1 of 2: choose a 6-digit PIN for your mobile number."}
+            : "Step 1 of 2: choose a PIN with 6 numbers."}
         </p>
         <form onSubmit={submit} className="mt-6 space-y-3">
           <div>
@@ -122,7 +121,7 @@ export function AuthPage() {
             />
           </div>
           <div>
-            <Label htmlFor="pin">{mode === "login" ? "PIN" : "Choose a 6-digit PIN"}</Label>
+            <Label htmlFor="pin">{mode === "login" ? "PIN" : "Choose a PIN (6 numbers)"}</Label>
             <Input
               id="pin"
               type="password"
@@ -149,8 +148,8 @@ export function AuthPage() {
                 value={pin2}
                 onChange={(e) => setPin2(digits(e.target.value))}
               />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Keep your PIN secret. Don&apos;t use your birthday or 123456.
+              <p className="mt-1 text-sm text-muted-foreground">
+                Keep your PIN secret. Do not use your birthday or 123456.
               </p>
             </div>
           )}
@@ -181,8 +180,8 @@ export function AuthPage() {
           </button>
         </p>
       </div>
-      <p className="mt-4 text-center text-xs text-muted-foreground">
-        By continuing you agree to the{" "}
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        If you continue, you agree to the{" "}
         <Link href="/terms" className="underline">
           draft terms
         </Link>{" "}
@@ -209,8 +208,8 @@ function ForgotPin() {
         : null;
   return (
     <p className="mt-3 rounded-md bg-muted p-3 text-sm">
-      To reset your PIN, {reach ? <b>{reach}</b> : "contact KasiPool"} from the number you
-      registered with. We&apos;ll check it&apos;s you and set a new PIN.{" "}
+      To get a new PIN, {reach ? <b>{reach}</b> : "contact KasiPool"} from the number you registered
+      with. We will check it is you and give you a new PIN.{" "}
       <Link href="/help" className="font-semibold text-ember underline">
         Help & contact
       </Link>

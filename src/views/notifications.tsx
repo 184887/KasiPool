@@ -43,7 +43,7 @@ export function Notifications() {
       {!data?.length ? (
         <EmptyState
           title="No notifications yet"
-          body="We'll let you know when a pool you've joined changes."
+          body="We will tell you here when something changes in your pools."
         />
       ) : (
         <div className="space-y-2">
@@ -58,7 +58,7 @@ export function Notifications() {
             >
               <p className="font-semibold">{n.title}</p>
               {n.body && <p className="text-sm text-muted-foreground">{n.body}</p>}
-              <p className="mt-1 text-xs text-muted-foreground">{dateTime(n.created_at)}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{dateTime(n.created_at)}</p>
             </Link>
           ))}
         </div>

@@ -8,23 +8,20 @@ import { STEPS } from "@/views/home";
 const FAQ = [
   [
     "Do I pay when I join a pool?",
-    "No. Joining only registers your interest. You confirm and pay only if the pool reaches its target.",
+    "No. You pay only when the pool is full and you confirm your order.",
   ],
+  ["What if the pool does not fill up?", "The deal stops and you pay nothing."],
   [
-    "What if the pool doesn't reach its target?",
-    "The deal is marked unsuccessful and you owe nothing.",
-  ],
-  [
-    "Can I change my quantity?",
-    "Yes, while the pool is open you can change or withdraw your interest.",
+    "Can I change my order?",
+    "Yes. While the pool is open, you can change how many you want, or leave the pool.",
   ],
   [
     "How is payment checked?",
-    "A KasiPool administrator verifies each payment against our bank records. A screenshot alone is not proof of payment.",
+    "KasiPool checks every payment in our bank account. A screenshot is not enough.",
   ],
   [
-    "What if fewer businesses pay than confirmed?",
-    "Stock is only ordered if enough paid orders meet the supplier minimum. Otherwise any payments are refunded.",
+    "What if some shops don't pay?",
+    "The pool opens again for other shops until the closing date. If it is still not full, we pay back everyone who paid.",
   ],
   [
     "How do I get my stock?",
@@ -35,9 +32,9 @@ const FAQ = [
 export function HowItWorks() {
   return (
     <Container className="max-w-3xl">
-      <h1 className="font-headline text-5xl">How KasiPool works</h1>
+      <h1 className="font-headline text-4xl sm:text-5xl">How KasiPool works</h1>
       <p className="mt-2 text-muted-foreground">
-        Many businesses. One bulk order. Better prices for everyone.
+        Many shops. One big order. Better prices for everyone.
       </p>
       <ol className="mt-8 space-y-6">
         {STEPS.map((s, i) => (
