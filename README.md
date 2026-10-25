@@ -20,8 +20,8 @@ There are two sides to the app:
 | UI         | Tailwind CSS 4, [shadcn/ui](https://ui.shadcn.com) (Radix), lucide icons   |
 | Data       | [Supabase](https://supabase.com) (Postgres, Auth, Storage), TanStack Query |
 | Backend    | Postgres `SECURITY DEFINER` functions + Supabase Edge Functions (Deno)     |
-| Payments   | Yoco Checkout (optional)                                                   |
-| Messaging  | Clickatell SMS (phone sign-in), Meta WhatsApp Cloud API (campaigns)        |
+| Payments   | EFT (bank transfer), verified by an admin                                  |
+| Messaging  | In-app notifications; Clickatell SMS hook kept for future sign-in codes    |
 | Tests/lint | Vitest, Testing Library, ESLint, Prettier                                  |
 
 ## Getting started
@@ -89,7 +89,7 @@ src/
     format.ts              Money/date formatting (ZAR, Africa/Johannesburg)
 supabase/
   migrations/              SQL migrations, applied in timestamp order
-  functions/               Edge Functions (Yoco checkout/webhook, SMS hook, WhatsApp)
+  functions/               Edge Functions (Clickatell SMS hook, not yet in use)
   config.toml              Supabase CLI config
 public/                    Static assets (logo, product images)
 ```
@@ -104,10 +104,9 @@ draft → scheduled → open → awaiting_confirmation → funded → procuremen
                        ↘ unsuccessful / cancelled / refund_resolution
 ```
 
-`refresh_pool_states()` closes pools that are past their deadline. The client calls it before it
-reads pools. **Nothing schedules it yet.** If nobody opens the site, a due pool stays open until
-someone does. To fix this, schedule it with `pg_cron` in Supabase, for example
-`select cron.schedule('refresh-pools', '0 * * * *', 'select public.refresh_pool_states()');`.
+`refresh_pool_states()` opens scheduled pools, closes pools that hit their target or deadline, and
+settles payment deadlines. `pg_cron` runs it every minute (job `refresh-pool-states`), and the
+client also calls it before it reads pools.
 
 ### Architecture rules
 
@@ -147,10 +146,13 @@ removed from the sign-in page for now; the provider code is in git history.
 Migrations are plain SQL files in `supabase/migrations/`, managed by the Supabase CLI.
 
 ```sh
-supabase link --project-ref <project-ref>
-supabase db push                       # apply any pending migrations
 supabase migration new <name>          # create a new migration file
-supabase gen types typescript --linked > src/integrations/supabase/types.ts
+supabase start                         # local Supabase in Docker, applies all migrations
+supabase migration up --local          # apply new migrations to the local stack
+supabase test db                       # pgTAP tests in supabase/tests/
+node scripts/gen-types.mjs             # regenerate src/integrations/supabase/types.ts
+supabase link --project-ref <project-ref>
+supabase db push                       # apply pending migrations to the live project
 ```
 
 Without `supabase link`, pass the connection string instead, e.g.
@@ -162,33 +164,24 @@ dashboard's Connect panel: the direct `db.<ref>.supabase.co` host is IPv6-only.
 
 ## Edge Functions and third-party providers
 
-| Function                 | Purpose                                    | JWT check |
-| ------------------------ | ------------------------------------------ | --------- |
-| `create-yoco-checkout`   | Start a Yoco payment for a confirmed order | user      |
-| `yoco-webhook`           | Record payments from signed Yoco webhooks  | off       |
-| `clickatell-sms-hook`    | Send Supabase Auth OTPs over Clickatell    | off       |
-| `send-whatsapp-campaign` | Send opted-in WhatsApp campaigns (admins)  | user      |
+| Function              | Purpose                                 | JWT check |
+| --------------------- | --------------------------------------- | --------- |
+| `clickatell-sms-hook` | Send Supabase Auth OTPs over Clickatell | off       |
+
+Card payments (Yoco) and WhatsApp campaign sending were removed on 2026-10-25 (EFT only for
+now); their code is in git history.
 
 Secrets are listed in `supabase/functions/.env.example`. Set them with
 `supabase secrets set ...`, never as `NEXT_PUBLIC_*` variables. Deploy with:
 
 ```sh
-supabase functions deploy create-yoco-checkout
-supabase functions deploy yoco-webhook --no-verify-jwt
 supabase functions deploy clickatell-sms-hook --no-verify-jwt
-supabase functions deploy send-whatsapp-campaign
 ```
 
 Then:
 
-- **Yoco:** set `APP_URL` to your site's origin. Register
-  `https://<project-ref>.supabase.co/functions/v1/yoco-webhook` as a webhook in Yoco and save its
-  signing secret as `YOCO_WEBHOOK_SECRET`. Finally, turn on online payments in **Admin →
-  Settings**. A payment only counts once a verified webhook arrives. The browser return URL is
-  not trusted.
 - **Clickatell:** enable phone auth in Supabase. Point the Send SMS hook at the
   `clickatell-sms-hook` function and save the hook secret as `SEND_SMS_HOOK_SECRET`.
-- **WhatsApp:** set the `META_WHATSAPP_*` secrets. Messages only go to businesses that opted in.
 
 ## Deployment
 

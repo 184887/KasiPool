@@ -1,7 +1,4 @@
 project_id = "spjmlcodmjdihbxwueot"
 
-[functions.yoco-webhook]
-verify_jwt = false
-
 [functions.clickatell-sms-hook]
 verify_jwt = false
