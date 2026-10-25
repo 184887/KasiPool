@@ -3,6 +3,7 @@ import { MapPin, Search, LocateFixed } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { mapsUrl } from "@/lib/delivery";
 
 export type PickedLocation = { latitude: number; longitude: number; address: string };
 
@@ -115,18 +116,24 @@ export function LocationPicker({
       )}
       {latitude != null && longitude != null ? (
         <p className="flex gap-2 text-sm">
-          <MapPin className="size-4 shrink-0 text-primary" />
+          <MapPin className="size-4 shrink-0 text-leaf" />
           <span>
-            {address}
+            <b>Pin added.</b> {address}
             <br />
-            <span className="text-sm text-muted-foreground">
-              {latitude.toFixed(5)}, {longitude.toFixed(5)}
-            </span>
+            <a
+              href={mapsUrl(latitude, longitude) ?? undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center font-semibold text-ember underline underline-offset-4"
+            >
+              Check it on the map
+            </a>
           </span>
         </p>
       ) : (
         <p className="text-sm text-muted-foreground">
-          You can also mark your shop on the map. This helps the driver.
+          This helps the driver find you. Best: stand in your shop and tap “Use my current
+          location”.
         </p>
       )}
       <p className="text-sm text-muted-foreground">We use OpenStreetMap to search for places.</p>

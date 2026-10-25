@@ -3,13 +3,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, StatusBadge } from "@/components/kp/ui";
 import { inputCls } from "@/components/kp/admin";
 import { errMsg } from "@/lib/queries";
 import { dateTime } from "@/lib/format";
+import { mapsUrl } from "@/lib/delivery";
 import { FULFIL_STATUS } from "@/lib/status";
 
 type Filter = "open" | "problems" | "done";
@@ -112,6 +113,16 @@ export function Deliveries() {
                   <span className="text-muted-foreground"> · {o.delivery_zones.name}</span>
                 )}
               </p>
+              {mapsUrl(o.delivery_latitude, o.delivery_longitude) && (
+                <a
+                  href={mapsUrl(o.delivery_latitude, o.delivery_longitude)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ember underline underline-offset-4"
+                >
+                  <MapPin className="size-4" aria-hidden="true" /> Open in Google Maps
+                </a>
+              )}
               {o.courier_ref && (
                 <p className="text-xs text-muted-foreground">Courier ref {o.courier_ref}</p>
               )}
