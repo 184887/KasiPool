@@ -15,15 +15,15 @@ import { nextAction } from "@/lib/status";
 export const STEPS = [
   {
     title: "Choose a deal",
-    body: "Check the product, pack size, price, deadline and delivery areas.",
+    body: "Look at the product, the price and the closing date.",
   },
   {
     title: "Join the pool",
-    body: "Choose your quantity. Joining shows interest; it is not a payment.",
+    body: "Choose how many you want. You don't pay yet.",
   },
   {
     title: "Confirm & pay",
-    body: "If the pool reaches its target, check your total, then pay.",
+    body: "When the pool is full, check your total and pay.",
   },
   {
     title: "Get it delivered",
@@ -59,8 +59,8 @@ export function Home() {
             </span>
           </h1>
           <p className="mt-5 max-w-md text-lg text-paper/85">
-            For spaza shops, tuck shops and local traders: join one big order and get the bulk
-            price. Joining is free.
+            For spaza shops and small traders. Order together and pay the bulk price. You pay only
+            when the pool is full.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Button asChild size="xl" variant="gold">
@@ -89,7 +89,7 @@ export function Home() {
         ) : closingSoon.length === 0 ? (
           <EmptyState
             title="No open deals right now"
-            body="New deals are added regularly. Check back soon."
+            body="We add new deals often. Come back soon."
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -112,8 +112,8 @@ export function Home() {
           ))}
         </ol>
         <p className="mt-8 rounded-md bg-leaf-soft p-4 font-semibold text-leaf">
-          Joining is free. You only pay if the pool reaches its target. If it doesn&apos;t, you owe
-          nothing.
+          You do not pay when you join. You pay only when the pool is full. If the pool does not
+          fill up, you pay nothing.
         </p>
       </Container>
 

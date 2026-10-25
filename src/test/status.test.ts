@@ -23,14 +23,14 @@ describe("order progress", () => {
   };
 
   it("asks for payment once confirmed", () => {
-    expect(nextAction(order, true)).toBe("Make payment");
-    expect(nextAction(order, false)).toBe("Wait for payment instructions");
+    expect(nextAction(order, true)).toBe("Pay now");
+    expect(nextAction(order, false)).toBe("Wait for bank details");
     expect(timelineStep(order)).toBe(2);
   });
 
   it("asks the shop to confirm a delivery", () => {
     const delivered = { ...order, payment_status: "paid", fulfilment_status: "delivered" };
-    expect(nextAction(delivered, true)).toBe("Confirm you received it");
+    expect(nextAction(delivered, true)).toBe("Confirm delivery");
     expect(timelineStep(delivered)).toBe(5);
   });
 

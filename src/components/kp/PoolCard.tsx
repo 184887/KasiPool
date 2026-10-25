@@ -30,9 +30,9 @@ export function whatsappShareUrl(p: PoolWithProduct) {
     typeof window !== "undefined" ? `${window.location.origin}/offers/${p.id}` : `/offers/${p.id}`;
   const msg = [
     `KasiPool deal: ${p.products?.name ?? ""}.`,
-    `${money(p.price)} per ${p.unit}${s ? ` (potential saving ${money(s.amount)} vs reference price)` : ""}.`,
-    `Pool closes ${dateTime(p.closes_at)}.`,
-    `Pool with other local businesses to get a better bulk price. View the deal: ${link}`,
+    `${money(p.price)} per ${p.unit}${s ? ` (you save ${money(s.amount)})` : ""}.`,
+    `Closes ${dateTime(p.closes_at)}.`,
+    `Order together with other shops and pay the bulk price. See the deal: ${link}`,
   ].join(" ");
   return `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
@@ -81,7 +81,7 @@ export function PoolCard({ pool }: { pool: PoolWithProduct }) {
               <span className="text-sm text-muted-foreground line-through tabular">
                 {money(pool.reference_price)}
               </span>
-              <span className="text-sm font-bold text-leaf">-{s.pct.toFixed(1)}%</span>
+              <span className="text-sm font-bold text-leaf">-{Math.round(s.pct)}%</span>
             </>
           )}
         </div>

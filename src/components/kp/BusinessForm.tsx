@@ -63,14 +63,11 @@ export function BusinessForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const mobile = normaliseSaMobile(f.mobile);
-    if (!mobile)
-      return toast.error(
-        "Enter a valid South African mobile number, e.g. 072 123 4567 or +27 72 123 4567",
-      );
+    if (!mobile) return toast.error("Enter a South African cellphone number, like 072 123 4567");
     if (!f.address.trim() || !f.zone_id)
-      return toast.error("Enter your business address and choose its delivery area");
+      return toast.error("Enter your shop address and choose your area");
     if (f.deliver_to === "other" && (!f.delivery_address.trim() || !f.delivery_zone_id))
-      return toast.error("Enter the delivery address and choose its area");
+      return toast.error("Enter the other address and choose its area");
     if (!terms) return toast.error("Please accept the terms and privacy notice");
     setBusy(true);
     const row = {
@@ -87,7 +84,7 @@ export function BusinessForm({
     setBusy(false);
     if (error) return toast.error(errMsg(error));
     await qc.invalidateQueries({ queryKey: ["my-business"] });
-    toast.success("Business profile saved");
+    toast.success("Saved");
     onDone();
   }
 
@@ -95,7 +92,7 @@ export function BusinessForm({
   return (
     <form onSubmit={submit} className="space-y-3">
       <div>
-        <Label htmlFor="tn">Business / trading name *</Label>
+        <Label htmlFor="tn">Shop name *</Label>
         <Input
           id="tn"
           required
@@ -106,7 +103,7 @@ export function BusinessForm({
         />
       </div>
       <div>
-        <Label htmlFor="rn">Owner or representative name *</Label>
+        <Label htmlFor="rn">Your name *</Label>
         <Input
           id="rn"
           required
@@ -118,7 +115,7 @@ export function BusinessForm({
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <Label htmlFor="mob">Mobile number *</Label>
+          <Label htmlFor="mob">Cellphone number *</Label>
           <Input
             id="mob"
             required
@@ -135,7 +132,7 @@ export function BusinessForm({
         </div>
       </div>
       <div>
-        <Label htmlFor="cat">Business type</Label>
+        <Label htmlFor="cat">Type of shop</Label>
         <select
           id="cat"
           className="mt-1 h-12 w-full rounded-md border border-input bg-card px-3"
@@ -149,7 +146,7 @@ export function BusinessForm({
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
-          <Label htmlFor="tw">Cape Town township *</Label>
+          <Label htmlFor="tw">Township *</Label>
           <Input
             id="tw"
             required
@@ -180,20 +177,20 @@ export function BusinessForm({
       <fieldset className="space-y-3 rounded-md border-2 border-ink p-3">
         <legend className="px-1 font-display font-bold">Delivery</legend>
         <div>
-          <Label htmlFor="ad">Business address *</Label>
+          <Label htmlFor="ad">Shop address *</Label>
           <textarea
             id="ad"
             required
             rows={2}
             className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
-            placeholder="Street and number, plus a landmark the driver can find"
+            placeholder="Street, number, and a place nearby the driver can find"
             value={f.address}
             onChange={(e) => setF({ ...f, address: e.target.value })}
           />
         </div>
         <ZoneSelect
           id="zn"
-          label="Delivery area *"
+          label="Your area *"
           value={f.zone_id}
           onChange={(v) => setF({ ...f, zone_id: v })}
           zones={zones.data}
@@ -217,25 +214,25 @@ export function BusinessForm({
             onCheckedChange={(v) => setF({ ...f, deliver_to: v ? "other" : "business" })}
             className="mt-0.5"
           />
-          <span>Deliver my stock to a different address</span>
+          <span>Deliver my stock to another address</span>
         </label>
         {f.deliver_to === "other" && (
           <>
             <div>
-              <Label htmlFor="dad">Delivery address *</Label>
+              <Label htmlFor="dad">Other address *</Label>
               <textarea
                 id="dad"
                 required
                 rows={2}
                 className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
-                placeholder="Where should the driver drop off your stock?"
+                placeholder="Where must the driver bring your stock?"
                 value={f.delivery_address}
                 onChange={(e) => setF({ ...f, delivery_address: e.target.value })}
               />
             </div>
             <ZoneSelect
               id="dzn"
-              label="Area of the delivery address *"
+              label="Area of the other address *"
               value={f.delivery_zone_id}
               onChange={(v) => setF({ ...f, delivery_zone_id: v })}
               zones={zones.data}
@@ -244,7 +241,7 @@ export function BusinessForm({
         )}
       </fieldset>
       <label className="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm">
-        <span>Send me deal updates on WhatsApp (marketing opt-in)</span>
+        <span>Send me new deals on WhatsApp</span>
         <Switch
           checked={f.marketing_opt_in}
           onCheckedChange={(v) => setF({ ...f, marketing_opt_in: v })}
@@ -304,10 +301,10 @@ function ZoneSelect({
           </option>
         ))}
       </select>
-      {zone?.areas && <p className="mt-1 text-xs text-muted-foreground">Covers: {zone.areas}</p>}
+      {zone?.areas && <p className="mt-1 text-sm text-muted-foreground">Covers: {zone.areas}</p>}
       {zones && zones.length === 0 && (
-        <p className="mt-1 text-xs text-warning">
-          KasiPool hasn't set up delivery areas yet. Please check back soon.
+        <p className="mt-1 text-sm text-warning">
+          KasiPool has no delivery areas yet. Please come back soon.
         </p>
       )}
     </div>

@@ -38,6 +38,17 @@ export function savings(price: number, ref: number | null | undefined) {
   return { amount, pct: (amount / ref) * 100 };
 }
 
+/** "bag" -> "bags", "box" -> "boxes"; leaves the unit as is for a quantity of 1 */
+export function plural(unit: string, n = 2): string {
+  if (n === 1 || !unit) return unit;
+  return /(s|x|z|ch|sh)$/i.test(unit) ? `${unit}es` : `${unit}s`;
+}
+
+/** "10 bags", "1 carton" */
+export function qty(n: number, unit: string): string {
+  return `${n} ${plural(unit, n)}`;
+}
+
 export function pct(part: number, whole: number) {
   if (!whole) return 0;
   return Math.min(100, Math.round((part / whole) * 100));

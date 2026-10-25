@@ -38,7 +38,7 @@ export function LocationPicker({
       setHits(data);
       if (!data.length) toast.error("No matching places found. Try a nearby suburb or landmark.");
     } catch {
-      toast.error("Address search is unavailable. Try again, or use your current location.");
+      toast.error("Search is not working now. Try again, or use where you are now.");
     } finally {
       setBusy(false);
     }
@@ -68,7 +68,7 @@ export function LocationPicker({
       },
       () => {
         setBusy(false);
-        toast.error("Could not get your location. Please allow location access or search instead.");
+        toast.error("We could not find where you are. Allow location on your phone, or search.");
       },
       { timeout: 10000 },
     );
@@ -80,7 +80,7 @@ export function LocationPicker({
       <div className="flex gap-2">
         <Input
           className="h-12"
-          placeholder="Search your street or suburb, e.g. Mandela Park, Khayelitsha"
+          placeholder="Search your street or area, like Mandela Park"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
@@ -118,19 +118,17 @@ export function LocationPicker({
           <span>
             {address}
             <br />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {latitude.toFixed(5)}, {longitude.toFixed(5)}
             </span>
           </span>
         </p>
       ) : (
-        <p className="text-xs text-muted-foreground">
-          Optional: pin your shop on the map to help the driver find it.
+        <p className="text-sm text-muted-foreground">
+          You can also mark your shop on the map. This helps the driver.
         </p>
       )}
-      <p className="text-[11px] text-muted-foreground">
-        Searches are sent to OpenStreetMap to find coordinates.
-      </p>
+      <p className="text-xs text-muted-foreground">We use OpenStreetMap to search for places.</p>
     </div>
   );
 }

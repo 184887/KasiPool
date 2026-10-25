@@ -14,7 +14,7 @@ import { OrderTimeline, Countdown } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { settingsQuery, errMsg } from "@/lib/queries";
-import { money, dateTime } from "@/lib/format";
+import { money, dateTime, qty } from "@/lib/format";
 import { PAYMENT_STATUS, ORDER_STATUS, timelineStep } from "@/lib/status";
 
 export function OrderPage() {
@@ -64,7 +64,7 @@ export function OrderPage() {
     const { error } = await supabase.rpc("confirm_delivery_received", { _order: orderId });
     setBusy(false);
     if (error) return toast.error(errMsg(error));
-    toast.success("Thanks for confirming");
+    toast.success("Thank you");
     qc.invalidateQueries();
   }
   async function reportProblem() {
@@ -75,7 +75,7 @@ export function OrderPage() {
     });
     setBusy(false);
     if (error) return toast.error(errMsg(error));
-    toast.success("Sent. KasiPool will contact you.");
+    toast.success("Sent. KasiPool will contact you soon.");
     setProblem(null);
     qc.invalidateQueries();
   }
@@ -83,7 +83,7 @@ export function OrderPage() {
     if (!window.confirm("Decline this order? You won't be able to undo this.")) return;
     const { error } = await supabase.rpc("decline_order", { _order: orderId });
     if (error) return toast.error(errMsg(error));
-    toast.success("Order declined");
+    toast.success("Order cancelled");
     qc.invalidateQueries();
   }
 
@@ -104,9 +104,9 @@ export function OrderPage() {
           height={64}
         />
         <div>
-          <h1 className="font-headline text-4xl">{pool.products?.name}</h1>
+          <h1 className="font-headline text-4xl sm:text-5xl">{pool.products?.name}</h1>
           <p className="text-sm text-muted-foreground">
-            {o.ref ? `Order ${o.ref}` : "Awaiting confirmation"}
+            {o.ref ? `Order ${o.ref}` : "Please confirm"}
           </p>
         </div>
       </div>
@@ -116,8 +116,8 @@ export function OrderPage() {
           <p className="text-sm">The pool reached its target. Please review and confirm.</p>
           <dl className="mt-3 space-y-1.5 text-sm">
             <Row k="Product" v={`${pool.products?.name} (${pool.products?.pack_size})`} />
-            <Row k="Quantity" v={`${o.quantity} ${pool.unit}(s)`} />
-            <Row k="Final unit price" v={money(o.unit_price)} />
+            <Row k="Quantity" v={qty(o.quantity, pool.unit)} />
+            <Row k="Price for each" v={money(o.unit_price)} />
             <Row k="Goods" v={money(o.quantity * Number(o.unit_price))} />
             <Row
               k={`Delivery${o.delivery_zones ? ` (${o.delivery_zones.name})` : ""}`}
@@ -135,9 +135,9 @@ export function OrderPage() {
             />
           </dl>
           <p className="mt-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">
-            By confirming you agree to buy this quantity at this price and to pay in full before the
-            deadline. Stock is ordered only if enough businesses pay. If the pool is not funded, any
-            payment is refunded. Your confirmed price will not change.
+            When you confirm, you agree to buy this amount at this price and to pay all of it before
+            the deadline. We only order the stock if enough shops pay. If not, we pay your money
+            back. Your price will not change.
           </p>
           <label className="mt-3 flex items-start gap-3 text-sm">
             <Checkbox checked={accept} onCheckedChange={(v) => setAccept(!!v)} className="mt-0.5" />
@@ -154,7 +154,7 @@ export function OrderPage() {
               Decline
             </Button>
             <Button size="lg" variant="gold" onClick={confirm} disabled={!accept || busy}>
-              {busy ? "Confirming…" : "Confirm my order"}
+              {busy ? "Please wait…" : "Confirm my order"}
             </Button>
           </div>
         </Section>
@@ -171,10 +171,10 @@ export function OrderPage() {
           <dl className="space-y-1.5 text-sm">
             <Row k="Order number" v={o.ref} />
             <Row
-              k="Amount payable"
+              k="Amount to pay"
               v={<b className="text-lg">{money(Number(o.total) - Number(o.amount_paid))}</b>}
             />
-            {Number(o.amount_paid) > 0 && <Row k="Verified so far" v={money(o.amount_paid)} />}
+            {Number(o.amount_paid) > 0 && <Row k="Paid so far" v={money(o.amount_paid)} />}
             <Row k="Payment deadline" v={dateTime(pool.payment_deadline)} />
           </dl>
           {pay?.configured ? (
@@ -188,7 +188,7 @@ export function OrderPage() {
               </dl>
               <div className="mt-3 flex items-center justify-between rounded-md border-2 border-ink bg-card p-3">
                 <div>
-                  <p className="text-xs text-muted-foreground">Use this payment reference</p>
+                  <p className="text-sm text-muted-foreground">Use this payment reference</p>
                   <p className="font-headline text-3xl tabular">{o.payment_reference}</p>
                 </div>
                 <Button
@@ -203,16 +203,16 @@ export function OrderPage() {
                   <Copy />
                 </Button>
               </div>
-              {pay.notes && <p className="mt-2 text-xs">{pay.notes}</p>}
-              <p className="mt-2 text-xs text-muted-foreground">
-                KasiPool staff verify every payment against our bank records. Your status will
-                change to “Paid” once verified.
+              {pay.notes && <p className="mt-2 text-sm">{pay.notes}</p>}
+              <p className="mt-2 text-sm text-muted-foreground">
+                KasiPool checks every payment in our bank account. When we find it, your order shows
+                “Paid”.
               </p>
             </div>
           ) : (
             <div className="mt-4 rounded-md border-2 border-warning/40 bg-warning-soft p-4 text-sm text-warning">
-              <b>Payment instructions are not yet available.</b> Please do not pay yet. KasiPool
-              will notify you once official payment details have been set up.
+              <b>We don't have bank details for you yet.</b> Please do not pay yet. We will tell you
+              when you can pay.
             </div>
           )}
         </Section>
@@ -234,12 +234,12 @@ export function OrderPage() {
           ) : (
             <p className="text-sm">
               {o.fulfilment_status === "delivered"
-                ? "The courier says your stock was delivered. Please confirm you received it."
+                ? "The courier says they delivered your stock. Did you get it?"
                 : "Your stock is on its way."}
             </p>
           )}
           <dl className="mt-3 space-y-1.5 text-sm">
-            <Row k="Quantity" v={`${o.allocated_qty} ${pool.unit}(s)`} />
+            <Row k="Quantity" v={qty(o.allocated_qty, pool.unit)} />
             <Row k="Deliver to" v={o.delivery_address ?? "-"} />
             {o.courier_ref && <Row k="Courier reference" v={o.courier_ref} />}
             {o.received_at && <Row k="Received" v={dateTime(o.received_at)} />}
@@ -296,21 +296,21 @@ export function OrderPage() {
             >
               <div>
                 <p className="font-semibold">{money(r.amount)}</p>
-                <p className="text-xs text-muted-foreground">{r.reason}</p>
+                <p className="text-sm text-muted-foreground">{r.reason}</p>
               </div>
               <StatusBadge tone={r.status === "completed" ? "success" : "warning"}>
                 {r.status === "completed" ? "Refunded" : "Refund due"}
               </StatusBadge>
             </div>
           ))}
-          <p className="mt-2 text-xs text-muted-foreground">
-            Refunds are paid back to the account you paid from. Contact KasiPool if you need help.
+          <p className="mt-2 text-sm text-muted-foreground">
+            We pay refunds back to the account you paid from. Contact KasiPool if you need help.
           </p>
         </Section>
       )}
 
       {o.confirmed_at && (
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground">
           Confirmed {dateTime(o.confirmed_at)} · terms {o.terms_version}
         </p>
       )}

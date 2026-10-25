@@ -22,7 +22,7 @@ import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { poolQuery, errMsg } from "@/lib/queries";
-import { money, savings, dateTime, date } from "@/lib/format";
+import { money, savings, dateTime, date, qty as qtyOf, plural } from "@/lib/format";
 import { POOL_STATUS } from "@/lib/status";
 import { shopZoneId } from "@/lib/delivery";
 
@@ -116,10 +116,10 @@ export function Offer() {
   }
 
   async function withdraw() {
-    if (!confirm("Withdraw your interest from this pool?")) return;
+    if (!confirm("Leave this pool?")) return;
     const { error } = await supabase.rpc("withdraw_from_pool", { _pool: poolId });
     if (error) return toast.error(errMsg(error));
-    toast.success("You've withdrawn from this pool.");
+    toast.success("You've left this pool.");
     qc.invalidateQueries();
   }
 
@@ -135,8 +135,7 @@ export function Offer() {
         <div className="mb-4 rounded-md border-2 border-ink bg-sun p-4 text-ink">
           <p className="font-display text-lg font-bold">This is a sample deal</p>
           <p className="text-sm">
-            It shows how KasiPool works. The prices and progress are examples, and you can&apos;t
-            join it.
+            It shows how KasiPool works. The prices are examples. You can&apos;t join it.
           </p>
         </div>
       )}
@@ -181,25 +180,29 @@ export function Offer() {
             {s ? (
               <div className="mt-3 rounded-md bg-leaf-soft p-3 text-sm">
                 <p>
-                  Supplier list price: <b className="tabular">{money(pool.reference_price)}</b>
+                  Normal price: <b className="tabular">{money(pool.reference_price)}</b>
                 </p>
                 <p className="font-bold text-leaf">
-                  Potential saving: {money(s.amount)} per {pool.unit} ({s.pct.toFixed(2)}%)
+                  You save {money(s.amount)} per {pool.unit} ({Math.round(s.pct)}%)
                 </p>
                 {pool.reference_source && (
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Source: {pool.reference_source}
                     {pool.reference_date && ` (${date(pool.reference_date)})`}
                   </p>
                 )}
               </div>
             ) : (
-              <p className="mt-2 text-xs text-muted-foreground">
-                No verified reference price available, so no saving is claimed.
+              <p className="mt-2 text-sm text-muted-foreground">
+                We don&apos;t know the normal price, so we can&apos;t show a saving.
               </p>
             )}
-            <p className="mt-2 text-xs text-muted-foreground">
-              Fees: {pool.fee_note || "No additional fees"} · delivery fee depends on your area
+            <p className="mt-2 text-sm text-muted-foreground">
+              Other fees:{" "}
+              {!pool.fee_note || /^no (additional|other) fees$/i.test(pool.fee_note)
+                ? "none"
+                : pool.fee_note}
+              . The delivery fee depends on your area.
             </p>
           </Section>
 
@@ -213,10 +216,8 @@ export function Offer() {
             />
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-md bg-muted p-3">
-                <p className="text-muted-foreground">Minimum target</p>
-                <p className="font-bold">
-                  {pool.min_qty} {pool.unit}s
-                </p>
+                <p className="text-muted-foreground">Needed in total</p>
+                <p className="font-bold">{qtyOf(pool.min_qty, pool.unit)}</p>
               </div>
               <div className="rounded-md bg-muted p-3">
                 <p className="text-muted-foreground">Closes</p>
@@ -234,21 +235,21 @@ export function Offer() {
                 <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>
                   {pool.status === "open"
-                    ? "The requested quantity has reached the target. Joining is still interest, not a payment. KasiPool checks the deal when it closes."
-                    : "The deal has closed at its target. KasiPool is checking the conditions. Nothing has been purchased or charged yet."}
+                    ? "The pool is full. It is closing now."
+                    : "The pool is full. Shops are now confirming and paying."}
                 </span>
               </p>
             )}
             {open && pool.reopened_at && (
               <p className="mt-3 rounded-md bg-gold-soft p-3 text-sm text-ink">
-                <b>Open again to fill the gap.</b> Some shops didn&apos;t pay, so this deal needs{" "}
-                {Math.max(pool.min_qty - pool.pledged_qty, 0)} more {pool.unit}(s) by{" "}
+                <b>Open again.</b> Some shops did not pay. This deal needs{" "}
+                {qtyOf(Math.max(pool.min_qty - pool.pledged_qty, 0), pool.unit)} more by{" "}
                 {dateTime(pool.closes_at)}.
               </p>
             )}
             {pool.status === "unsuccessful" && (
               <p className="mt-3 rounded-md bg-destructive-soft p-3 text-sm text-destructive">
-                {pool.outcome_note ?? "This deal did not reach its target."} No payment is required.
+                Not enough shops joined in time. You do not need to pay.
               </p>
             )}
           </Section>
@@ -268,11 +269,11 @@ export function Offer() {
             <Section>
               {active && (
                 <p className="mb-3 rounded-md bg-leaf-soft p-3 text-sm font-semibold text-leaf">
-                  You're in this pool with {active.quantity} {pool.unit}(s). Change your quantity
-                  below.
+                  You are in this pool with {qtyOf(active.quantity, pool.unit)}. You can change the
+                  number below.
                 </p>
               )}
-              <p className="mb-2 font-display text-lg font-bold">How many {pool.unit}s?</p>
+              <p className="mb-2 font-display text-lg font-bold">How many {plural(pool.unit)}?</p>
               <div className="flex flex-wrap items-center gap-4">
                 <QuantityStepper
                   value={qty}
@@ -281,18 +282,18 @@ export function Offer() {
                   max={maxQty}
                 />
                 <div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {qty} × {money(pool.price)}
                   </p>
                   <p className="font-headline text-3xl tabular">
                     {money(qty * Number(pool.price))}
                   </p>
-                  <p className="text-xs text-muted-foreground">Potential order value</p>
+                  <p className="text-sm text-muted-foreground">Potential order value</p>
                 </div>
               </div>
               {pool.max_per_customer && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Maximum {pool.max_per_customer} per business.
+                <p className="mt-2 text-sm text-muted-foreground">
+                  You can order up to {qtyOf(pool.max_per_customer, pool.unit)}.
                 </p>
               )}
               <Button
@@ -307,18 +308,20 @@ export function Offer() {
                   : busy
                     ? "Saving…"
                     : active
-                      ? "Update my quantity"
+                      ? "Change my order"
                       : "Join this pool"}
               </Button>
               {active && (
                 <Button variant="ghost" className="mt-2 w-full text-destructive" onClick={withdraw}>
-                  Withdraw my interest
+                  Leave this pool
                 </Button>
               )}
-              <p className="mt-3 flex gap-2 text-xs text-muted-foreground">
-                <Info className="size-4 shrink-0" /> Joining only shows interest. No payment is
-                required now. You'll be asked to confirm and pay only if the pool qualifies. Subject
-                to the deal terms and supplier availability.
+              <p className="mt-3 flex gap-2 text-sm text-muted-foreground">
+                <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <span>
+                  You do not pay now. When the pool is full, we ask you to confirm and pay. The deal
+                  also depends on the supplier having stock.
+                </span>
               </p>
             </Section>
           )}
@@ -327,20 +330,26 @@ export function Offer() {
             <p className="flex gap-2 text-sm">
               <Truck className="size-4 shrink-0" aria-hidden="true" />
               <span>
-                Delivered to your shop by our courier partner once the stock arrives. Delivers to:{" "}
-                <b>{zones.map((z) => z.name).join(", ") || "-"}</b>
+                A courier brings the stock to your shop.{" "}
+                {zones.length > 0 ? (
+                  <>
+                    We deliver this deal to: <b>{zones.map((z) => z.name).join(", ")}</b>
+                  </>
+                ) : (
+                  "We will add the delivery areas soon."
+                )}
               </span>
             </p>
             {myZone ? (
               <p className="mt-2 text-sm">
-                Delivery fee to {myZone.name}: <b>{money(myZone.delivery_fee)}</b> per order, added
-                when you confirm.
+                Delivery to {myZone.name} costs <b>{money(myZone.delivery_fee)}</b> per order. We
+                add it to your total.
               </p>
             ) : (
               business &&
               zones.length > 0 && (
                 <p className="mt-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
-                  This deal doesn&apos;t deliver to your area yet.{" "}
+                  We don&apos;t deliver this deal to your area yet.{" "}
                   <Link href="/profile" className="font-semibold underline">
                     Check your delivery address
                   </Link>
@@ -350,7 +359,7 @@ export function Offer() {
             {pool.is_private && pool.invite_code && (
               <div className="mt-2 rounded-md bg-muted p-3 text-sm">
                 <p className="font-semibold">Private group, invite code {pool.invite_code}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Share this link:{" "}
                   {`${typeof window !== "undefined" ? window.location.origin : ""}/join/${pool.invite_code}`}
                 </p>
@@ -373,12 +382,11 @@ export function Offer() {
               <PartyPopper className="size-7 text-ink" />
             </div>
             <DialogTitle className="text-center font-headline text-3xl font-normal">
-              {success?.updated ? "Quantity updated!" : "You've joined the pool!"}
+              {success?.updated ? "Order changed!" : "You joined the pool!"}
             </DialogTitle>
             <DialogDescription className="text-center">
-              You've registered interest in {success?.qty} {pool.unit}(s) of{" "}
-              {pool.products?.name.toLowerCase()}. We'll let you know when the pool qualifies and
-              it's time to confirm your order.
+              You are in for {qtyOf(success?.qty ?? 0, pool.unit)} of {pool.products?.name}. When
+              the pool is full, we will tell you. Then you confirm and pay.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:justify-center">
