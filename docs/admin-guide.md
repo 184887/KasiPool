@@ -145,8 +145,9 @@ all its refunds are done.
      real email and a password, and tick **Auto Confirm User**.
   2. An existing admin enters that email in **Admin → Settings → Administrators** and taps Grant.
   3. They log in at `/admin/login` (or tap **Admin** in the top banner).
-     Remove access with the same form. If someone forgets their password, set a new one in the
-     Supabase dashboard (Authentication → Users).
+     Remove access with the same form. Change your own password, or log out, in **Admin →
+     Account**. If someone forgets their password, set a new one in the Supabase dashboard
+     (Authentication → Users).
 - One login is one shop. Businesses aren't verified before joining.
 
 ## Automatic jobs

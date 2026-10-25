@@ -15,6 +15,7 @@ import {
   BarChart3,
   Settings,
   Megaphone,
+  UserCog,
   ArrowLeft,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,7 @@ const NAV = [
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/reports", label: "Reports", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/admin/account", label: "Account", icon: UserCog },
 ] as const;
 
 export function AdminLayout({ children }: { children: ReactNode }) {
