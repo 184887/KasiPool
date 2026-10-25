@@ -128,7 +128,21 @@ export const myOrdersQuery = (userId: string | undefined) =>
     queryFn: () => getMyOrders(userId!),
   });
 
+/** An error whose message is written for shops and safe to show as is. */
+export class FriendlyError extends Error {}
+
+/**
+ * Text to show for an error. Only our own messages are shown: ones the database functions raise
+ * on purpose (`raise exception`, code P0001) and FriendlyError. Anything else (constraint, table
+ * or permission errors) would leak internal details, so it gets a plain message and goes to the
+ * console instead.
+ */
 export function errMsg(e: unknown): string {
-  if (e && typeof e === "object" && "message" in e) return String(e.message);
+  if (e instanceof FriendlyError) return e.message;
+  if (e && typeof e === "object" && "message" in e) {
+    if ("code" in e && e.code === "P0001") return String(e.message);
+    if (e instanceof TypeError) return "No connection. Check your data and try again.";
+  }
+  console.error(e);
   return "Something went wrong. Please try again.";
 }

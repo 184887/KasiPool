@@ -105,7 +105,7 @@ export function AdminLoginPage() {
               {busy ? "Please wait…" : "Log in"}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Forgot your password? Ask another admin to reset it in Supabase.
+              Forgot your password? Ask another KasiPool admin to reset it.
             </p>
           </form>
         )}
