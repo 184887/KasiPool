@@ -84,6 +84,9 @@ Run lint, typecheck, test and build before committing. Format with `npx prettier
   maps to `<27...>@phone.kasipool.co.za` via `src/lib/phone-auth.ts`. Always go through
   `phoneToLogin` / `loginToPhone`; never show the hidden address in the UI.
 - Supabase **Confirm email** must stay off, and `phone.kasipool.co.za` must never get MX records.
+- Admins (the KasiPool team) use real email + password at `/admin/login` (`src/views/admin/login.tsx`)
+  and need no shop profile. `src/app/admin/` sits outside `(authenticated)`: `AdminLayout` does its
+  own gate and sends signed-out or non-admin users to `/admin/login`.
 
 ### Supabase agent skills
 

@@ -4,8 +4,9 @@ How KasiPool works from the admin side, what to set up, and what is still to do.
 2026-10-25, after the schema review (PRs #11 to #14). The business rules behind this guide are in
 the README under "Business rules"; check with the team before changing any of them.
 
-Admin pages are under **Admin** in the app (`/admin`): Dashboard, Pools, Campaigns, Products,
-Suppliers, Payments, Deliveries, Customers, Reports and Settings.
+Admin pages are under `/admin`: Dashboard, Pools, Campaigns, Products, Suppliers, Payments,
+Deliveries, Customers, Reports and Settings. Team members log in at `/admin/login` (the **Admin**
+button in the top banner) with their email and password, not a phone number and PIN.
 
 ## Before shops can use the app
 
@@ -139,8 +140,13 @@ all its refunds are done.
   dashboard under Authentication → Users. Set a new 6-digit password for it there if the
   dashboard offers that; otherwise a developer can set it with the Supabase admin API. Tell the
   shop the new PIN. (A self-service reset needs SMS, see "Still to do".)
-- **Admins:** the first admin claims the role on their Profile page. After that, grant or remove
-  admin access by mobile number in Admin → Settings → Administrators.
+- **Admins:** to add a team member:
+  1. In the Supabase dashboard: Authentication → Users → Add user → Create new user, with their
+     real email and a password, and tick **Auto Confirm User**.
+  2. An existing admin enters that email in **Admin → Settings → Administrators** and taps Grant.
+  3. They log in at `/admin/login` (or tap **Admin** in the top banner).
+     Remove access with the same form. If someone forgets their password, set a new one in the
+     Supabase dashboard (Authentication → Users).
 - One login is one shop. Businesses aren't verified before joining.
 
 ## Automatic jobs

@@ -39,20 +39,25 @@ const NAV = [
 export function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const nav = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const isLogin = pathname === "/admin/login";
   const allowed = useQuery({
     queryKey: ["is-admin", user?.id],
-    enabled: !!user,
+    enabled: !!user && !isLogin,
     queryFn: async () => {
       const { data } = await supabase.rpc("has_role", { _user_id: user!.id, _role: "admin" });
       return !!data;
     },
   });
+  // Signed out or not an admin: send to the team login, which explains what to do
   useEffect(() => {
-    if (allowed.data === false) nav.replace("/profile");
-  }, [allowed.data, nav]);
+    if (isLogin || loading) return;
+    if (!user || allowed.data === false)
+      nav.replace(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
+  }, [isLogin, loading, user, allowed.data, nav, pathname]);
   const active = (to: string) =>
     to === "/admin" ? pathname === "/admin" : pathname.startsWith(to);
+  if (isLogin) return <>{children}</>;
   if (!allowed.data) return <Loading />;
   return (
     <div className="min-h-screen">

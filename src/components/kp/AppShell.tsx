@@ -66,14 +66,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-1">
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="flex h-10 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 hover:bg-paper/10 hover:text-paper"
-              >
-                <Shield className="size-4" /> <span className="hidden sm:inline">Admin</span>
-              </Link>
-            )}
+            <Link
+              href={isAdmin ? "/admin" : "/admin/login"}
+              aria-label="Admin"
+              className="flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 hover:bg-paper/10 hover:text-paper"
+            >
+              <Shield className="size-4" aria-hidden="true" />
+              <span>Admin</span>
+            </Link>
             {user ? (
               <Link
                 href="/notifications"
