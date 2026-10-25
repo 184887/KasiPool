@@ -5,11 +5,12 @@ import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Copy, PackageCheck } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Copy, PackageCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Container } from "@/components/kp/AppShell";
+import { useConfirm } from "@/components/kp/ConfirmDialog";
 import { OrderTimeline, Countdown, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +36,7 @@ export function OrderPage() {
   const [accept, setAccept] = useState(false);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  const [ask, confirmDialog] = useConfirm();
 
   if (isLoading) return <Loading />;
   if (!o)
@@ -78,7 +80,14 @@ export function OrderPage() {
     qc.invalidateQueries();
   }
   async function decline() {
-    if (!window.confirm("Decline this order? You won't be able to undo this.")) return;
+    const ok = await ask({
+      title: "Decline this order?",
+      body: "You won't get this stock, and you can't undo this.",
+      confirmLabel: "Decline order",
+      cancelLabel: "Keep my order",
+      danger: true,
+    });
+    if (ok === false) return;
     const { error } = await supabase.rpc("decline_order", { _order: orderId });
     if (error) return toast.error(errMsg(error));
     toast.success("Order cancelled");
@@ -89,9 +98,9 @@ export function OrderPage() {
     <Container className="max-w-2xl space-y-4">
       <Link
         href="/my-pools"
-        className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground"
+        className="-ml-2 inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-ink"
       >
-        <ArrowLeft className="size-4" /> My Pools
+        <ArrowLeft className="size-4" aria-hidden="true" /> My Pools
       </Link>
       <div className="flex items-center gap-3">
         <ProductImage
@@ -132,10 +141,10 @@ export function OrderPage() {
           </dl>
           <p className="mt-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">
             When you confirm, you agree to buy this amount at this price and to pay all of it before
-            the deadline. We only order the stock if enough shops pay. If not, we pay your money
-            back. Your price will not change.
+            the deadline. We only order the stock if enough businesses pay. If not, we pay your
+            money back. Your price will not change.
           </p>
-          <label className="mt-3 flex items-start gap-3 text-sm">
+          <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
             <Checkbox checked={accept} onCheckedChange={(v) => setAccept(!!v)} className="mt-0.5" />
             <span>
               I accept the{" "}
@@ -226,7 +235,9 @@ export function OrderPage() {
           className={o.fulfilment_status === "received" ? undefined : "border-4 border-leaf"}
         >
           {o.fulfilment_status === "received" ? (
-            <p className="font-headline text-3xl text-leaf">Completed ✓</p>
+            <p className="flex items-center gap-2 font-headline text-3xl text-leaf">
+              <BadgeCheck className="size-7" aria-hidden="true" /> Completed
+            </p>
           ) : (
             <p className="text-sm">
               {o.fulfilment_status === "delivered"
@@ -266,7 +277,7 @@ export function OrderPage() {
               <textarea
                 id="problem"
                 rows={3}
-                className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm"
+                className="w-full rounded-md border-2 border-input bg-card px-3 py-2 text-base"
                 placeholder="e.g. 2 cases missing, or nothing arrived"
                 value={problem}
                 onChange={(e) => setProblem(e.target.value)}
@@ -310,6 +321,7 @@ export function OrderPage() {
           Confirmed {dateTime(o.confirmed_at)} · terms {o.terms_version}
         </p>
       )}
+      {confirmDialog}
     </Container>
   );
 }

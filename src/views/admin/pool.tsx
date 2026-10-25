@@ -12,6 +12,7 @@ import { Loading, PageHeader, StatusBadge, Section, MetricCard } from "@/compone
 import { DataTable, Td, Field, inputCls } from "@/components/kp/admin";
 import { PoolProgress } from "@/components/kp/pool-bits";
 import { PaymentDialog, type PaymentDialogOrder } from "@/components/kp/PaymentDialog";
+import { useConfirm } from "@/components/kp/ConfirmDialog";
 import { LocationPicker, type PickedLocation } from "@/components/kp/LocationPicker";
 import { DEFAULT_RADIUS_KM, mapsUrl } from "@/lib/delivery";
 import type { Tables } from "@/integrations/supabase/types";
@@ -74,6 +75,7 @@ export function PoolAdmin() {
   const [recv, setRecv] = useState({ qty: "", note: "" });
   const [courier, setCourier] = useState("");
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
+  const [ask, confirmDialog] = useConfirm();
 
   if (isLoading || !data) return <Loading />;
   const { pool, cost, parts, orders, po, location } = data;
@@ -129,7 +131,7 @@ export function PoolAdmin() {
         <MetricCard
           label="Interested (pledged)"
           value={`${pool.pledged_qty} / ${pool.min_qty}`}
-          hint={`${pool.participant_count} businesses`}
+          hint={`${pool.participant_count} ${pool.participant_count === 1 ? "business" : "businesses"}`}
         />
         <MetricCard label="Confirmed" value={pool.confirmed_qty} hint="units" />
         <MetricCard
@@ -159,7 +161,7 @@ export function PoolAdmin() {
         />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_380px]">
+      <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <Section
           title="Participants & orders"
           action={
@@ -348,25 +350,28 @@ export function PoolAdmin() {
             {pool.status === "open" && (
               <div className="space-y-2 text-sm">
                 <p>
-                  Customers are registering interest. The pool closes automatically when the target
-                  or deadline is reached.
+                  Businesses are joining. The pool closes automatically when the target or deadline
+                  is reached.
                 </p>
                 {pool.reopened_at && (
                   <p className="rounded-md bg-gold-soft p-2">
                     Reopened {dateTime(pool.reopened_at)} after unpaid orders expired.{" "}
                     {pool.paid_qty} already paid; {Math.max(pool.min_qty - pool.pledged_qty, 0)}{" "}
-                    more needed by the closing time, or paid shops are refunded.
+                    more needed by the closing time, or paid businesses are refunded.
                   </p>
                 )}
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() =>
-                    confirm(
-                      "Close this pool now? It will qualify only if the minimum is reached.",
-                    ) &&
-                    call(() => supabase.rpc("admin_close_now", { _pool: poolId }), "Pool closed")
-                  }
+                  onClick={async () => {
+                    const ok = await ask({
+                      title: "Close this pool now?",
+                      body: "It only goes ahead if the minimum is reached. Businesses can't join after this.",
+                      confirmLabel: "Close pool",
+                    });
+                    if (ok !== false)
+                      call(() => supabase.rpc("admin_close_now", { _pool: poolId }), "Pool closed");
+                  }}
                 >
                   Close pool now
                 </Button>
@@ -375,20 +380,26 @@ export function PoolAdmin() {
             {pool.status === "awaiting_confirmation" && (
               <div className="space-y-2 text-sm">
                 <p>
-                  Customers are confirming and paying. Deadline:{" "}
+                  Businesses are confirming and paying. Deadline:{" "}
                   <b>{dateTime(pool.payment_deadline)}</b>. At the deadline the system checks paid
                   quantity against the minimum automatically.
                 </p>
                 <Button
                   className="w-full"
                   disabled={pool.paid_qty < pool.min_qty}
-                  onClick={() =>
-                    confirm("Finalise funding now? All unpaid orders will expire.") &&
-                    call(
-                      () => supabase.rpc("admin_finalise_funding", { _pool: poolId }),
-                      "Funding finalised",
-                    )
-                  }
+                  onClick={async () => {
+                    const ok = await ask({
+                      title: "Finalise funding now?",
+                      body: "All unpaid orders will expire.",
+                      confirmLabel: "Finalise funding",
+                      danger: true,
+                    });
+                    if (ok !== false)
+                      call(
+                        () => supabase.rpc("admin_finalise_funding", { _pool: poolId }),
+                        "Funding finalised",
+                      );
+                  }}
                 >
                   Finalise funding now ({pool.paid_qty}/{pool.min_qty} paid)
                 </Button>
@@ -566,8 +577,15 @@ export function PoolAdmin() {
               <Button
                 variant="ghost"
                 className="mt-3 w-full text-destructive"
-                onClick={() => {
-                  const r = prompt("Reason for cancelling?");
+                onClick={async () => {
+                  const r = await ask({
+                    title: "Cancel this pool?",
+                    body: "Everyone in it is told, and paid businesses are refunded. You can't undo this.",
+                    confirmLabel: "Cancel pool",
+                    cancelLabel: "Keep pool",
+                    danger: true,
+                    input: { label: "Reason (businesses see this)", required: true },
+                  });
                   if (r)
                     call(
                       () => supabase.rpc("admin_cancel_pool", { _pool: poolId, _reason: r }),
@@ -623,6 +641,7 @@ export function PoolAdmin() {
         </div>
       </div>
       <PaymentDialog order={payOrder} onClose={() => setPayOrder(null)} />
+      {confirmDialog}
     </>
   );
 }

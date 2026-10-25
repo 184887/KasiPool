@@ -85,12 +85,15 @@ export function Home() {
       <Container className="pt-8">
         <div className="mb-4 flex items-end justify-between gap-4 border-b-4 border-ink pb-2">
           <h2 className="font-headline text-3xl">Closing soon</h2>
-          <Link href="/offers" className="font-semibold text-ember">
-            See all deals <ArrowRight className="inline size-4" aria-hidden="true" />
+          <Link
+            href="/offers"
+            className="-mb-2 inline-flex min-h-11 items-center gap-1 font-semibold text-ember hover:underline"
+          >
+            See all deals <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
         {pools.isLoading ? (
-          <Loading />
+          <Loading inline />
         ) : closingSoon.length === 0 ? (
           <EmptyState
             title="No open deals right now"

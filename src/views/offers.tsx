@@ -86,7 +86,7 @@ export function Offers() {
       </div>
 
       {loading ? (
-        <Loading />
+        <Loading inline />
       ) : nothing ? (
         <div className="mt-6">
           {term || category ? (
@@ -125,7 +125,7 @@ export function Offers() {
           {noDeal.length > 0 && (
             <DealSection title="No deal yet" count={noDeal.length}>
               <p className="-mt-2 mb-3 text-muted-foreground">
-                Want one of these? Ask for a deal, and other shops can join it.
+                Want one of these? Ask for a deal, and other businesses near you can join it.
               </p>
               <ul className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink bg-card">
                 {noDeal.map((p) => (

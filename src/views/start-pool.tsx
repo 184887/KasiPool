@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -72,7 +73,8 @@ export function StartPool() {
 
   async function submit() {
     if (!f.product_id) return toast.error("Choose a product");
-    if (!(+f.min_qty > 0)) return toast.error("Enter a target quantity");
+    if (!f.unit.trim()) return toast.error("Say how it is sold, like bag or box");
+    if (!(+f.min_qty > 0)) return toast.error("Enter how many are needed in total");
     setBusy(true);
     const { error } = await supabase.rpc("propose_pool", {
       _product: f.product_id,
@@ -108,7 +110,7 @@ export function StartPool() {
   return (
     <Container className="max-w-2xl">
       <PageHeader
-        title="Start a pool"
+        title="Ask for a deal"
         subtitle="Tell us what you want to buy with other businesses. We get the price from the supplier, then open the deal."
       />
       <Section>
@@ -123,55 +125,24 @@ export function StartPool() {
               ))}
             </select>
           </Field>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Sold per (bag, box, case) *">
               <input className={inputCls} value={f.unit} onChange={set("unit")} />
             </Field>
-            <Field label="How many are needed in total *">
+            <Field
+              label="How many are needed in total? *"
+              hint="All the businesses together. We check this with the supplier."
+            >
               <input
                 type="number"
+                inputMode="numeric"
                 min="1"
                 className={inputCls}
                 value={f.min_qty}
                 onChange={set("min_qty")}
               />
             </Field>
-            <Field label="Most the pool can take">
-              <input
-                type="number"
-                min="1"
-                className={inputCls}
-                value={f.max_qty}
-                onChange={set("max_qty")}
-              />
-            </Field>
-            <Field label="Least one shop can order">
-              <input
-                type="number"
-                min="1"
-                className={inputCls}
-                value={f.min_per_customer}
-                onChange={set("min_per_customer")}
-              />
-            </Field>
-            <Field label="Most one shop can order">
-              <input
-                type="number"
-                min="1"
-                className={inputCls}
-                value={f.max_per_customer}
-                onChange={set("max_per_customer")}
-              />
-            </Field>
-            <Field label="Opens (SAST)">
-              <input
-                type="datetime-local"
-                className={inputCls}
-                value={f.opens_at}
-                onChange={set("opens_at")}
-              />
-            </Field>
-            <Field label="Closes (SAST)">
+            <Field label="Last day to join">
               <input
                 type="datetime-local"
                 className={inputCls}
@@ -180,6 +151,55 @@ export function StartPool() {
               />
             </Field>
           </div>
+          <details className="group rounded-md border-2 border-ink/20">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-3 font-semibold [&::-webkit-details-marker]:hidden">
+              More options (not needed)
+              <ChevronDown
+                className="size-5 transition-transform group-open:rotate-180"
+                aria-hidden="true"
+              />
+            </summary>
+            <div className="grid gap-4 border-t-2 border-ink/20 p-3 sm:grid-cols-2">
+              <Field label="Most the pool can take">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  className={inputCls}
+                  value={f.max_qty}
+                  onChange={set("max_qty")}
+                />
+              </Field>
+              <Field label="Smallest order per business">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  className={inputCls}
+                  value={f.min_per_customer}
+                  onChange={set("min_per_customer")}
+                />
+              </Field>
+              <Field label="Biggest order per business">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  className={inputCls}
+                  value={f.max_per_customer}
+                  onChange={set("max_per_customer")}
+                />
+              </Field>
+              <Field label="Opens">
+                <input
+                  type="datetime-local"
+                  className={inputCls}
+                  value={f.opens_at}
+                  onChange={set("opens_at")}
+                />
+              </Field>
+            </div>
+          </details>
           {nearby && (
             <p className="rounded-md bg-gold-soft p-3 text-sm text-ink">
               <b>There is already a deal for this product {distanceText(nearby.d!)} away.</b> Join
@@ -197,12 +217,18 @@ export function StartPool() {
             you can join, so the driver can deliver to all of you.
           </p>
           <Field label="Note (optional)">
-            <textarea className={inputCls} rows={3} value={f.note} onChange={set("note")} />
+            <textarea
+              className={inputCls + " h-24 py-2"}
+              rows={3}
+              placeholder="e.g. We need it before month end"
+              value={f.note}
+              onChange={set("note")}
+            />
           </Field>
-          <label className="flex items-start gap-3 rounded-lg border p-3 text-sm">
+          <label className="flex cursor-pointer items-start gap-3 rounded-md border-2 border-ink/20 p-3 text-sm">
             <input
               type="checkbox"
-              className="mt-0.5"
+              className="mt-0.5 size-5 shrink-0 accent-ink"
               checked={f.is_private}
               onChange={(e) => setF({ ...f, is_private: e.target.checked })}
             />
@@ -211,8 +237,14 @@ export function StartPool() {
               the code to can join.
             </span>
           </label>
-          <Button variant="gold" size="lg" onClick={submit} disabled={busy}>
-            {busy ? "Sending…" : "Send"}
+          <Button
+            variant="gold"
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={submit}
+            disabled={busy}
+          >
+            {busy ? "Sending…" : "Send my request"}
           </Button>
         </div>
       </Section>

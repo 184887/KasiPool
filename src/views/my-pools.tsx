@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ChevronRight, AlertCircle } from "lucide-react";
+import { ChevronRight, AlertCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/kp/AppShell";
@@ -33,18 +33,25 @@ function JoinWithCode() {
     nav.push(`/offers/${data}`);
   }
   return (
-    <div className="mb-4 flex gap-2">
-      <Input
-        className="h-12 uppercase placeholder:normal-case"
-        placeholder="Group code"
-        aria-label="Group code"
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && go()}
-      />
-      <Button variant="outline" disabled={busy} onClick={go}>
-        Join group
-      </Button>
+    <div className="mb-6">
+      <label htmlFor="group-code" className="text-sm font-semibold">
+        Got a private group code?
+      </label>
+      <div className="mt-1 flex gap-2">
+        <Input
+          id="group-code"
+          className="h-12 min-w-0 uppercase placeholder:normal-case"
+          placeholder="e.g. AB12CD"
+          autoCapitalize="characters"
+          autoComplete="off"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && go()}
+        />
+        <Button variant="outline" className="shrink-0" disabled={busy || !code.trim()} onClick={go}>
+          {busy ? "Checking…" : "Join group"}
+        </Button>
+      </div>
     </div>
   );
 }
@@ -83,16 +90,10 @@ export function MyPools() {
   return (
     <Container className="max-w-3xl">
       <PageHeader title="My Pools" subtitle={business?.trading_name} />
-      <div className="mb-4">
-        <Button asChild variant="outline">
-          <Link href="/start-pool">Ask for a deal</Link>
-        </Button>
-      </div>
-      <JoinWithCode />
       {!business && (
         <div className="mb-4 rounded-md bg-warning-soft p-4 text-sm text-warning">
           <Link href="/onboarding" className="font-semibold underline">
-            Add your shop details
+            Add your business details
           </Link>{" "}
           to join a pool.
         </div>
@@ -216,13 +217,22 @@ export function MyPools() {
         </section>
       )}
 
-      <section>
-        <SectionTitle>Previous orders</SectionTitle>
-        {previous.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No previous orders yet.</p>
-        ) : (
+      {previous.length > 0 && (
+        <section className="mb-8">
+          <SectionTitle>Previous orders</SectionTitle>
           <OrderList list={previous} />
-        )}
+        </section>
+      )}
+
+      <section>
+        <SectionTitle>More</SectionTitle>
+        <JoinWithCode />
+        <p className="text-sm font-semibold">Need a product that has no deal near you?</p>
+        <Button asChild variant="outline" className="mt-1 w-full sm:w-auto">
+          <Link href="/start-pool">
+            <Plus aria-hidden="true" /> Ask for a deal
+          </Link>
+        </Button>
       </section>
     </Container>
   );

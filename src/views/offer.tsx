@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Clock, Truck, Share2, Info, PartyPopper, ArrowLeft, MapPin } from "lucide-react";
+import { Clock, Truck, Share2, Info, PartyPopper, ArrowLeft, MapPin, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Container } from "@/components/kp/AppShell";
+import { useConfirm } from "@/components/kp/ConfirmDialog";
 import { whatsappShareUrl } from "@/components/kp/PoolCard";
 import { PoolProgress, Countdown, QuantityStepper, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
@@ -39,6 +40,7 @@ export function Offer() {
   const [success, setSuccess] = useState<{ qty: number; updated: boolean } | null>(null);
   const distances = useQuery(poolDistancesQuery(user?.id));
   const settings = useQuery(settingsQuery);
+  const [ask, confirmDialog] = useConfirm();
 
   const mine = useQuery({
     queryKey: ["my-participation", poolId, user?.id],
@@ -124,7 +126,14 @@ export function Offer() {
   }
 
   async function withdraw() {
-    if (!confirm("Leave this pool?")) return;
+    const ok = await ask({
+      title: "Leave this pool?",
+      body: "Your place in the pool goes. You can join again while it is open.",
+      confirmLabel: "Leave pool",
+      cancelLabel: "Stay in",
+      danger: true,
+    });
+    if (ok === false) return;
     const { error } = await supabase.rpc("withdraw_from_pool", { _pool: poolId });
     if (error) return toast.error(errMsg(error));
     toast.success("You've left this pool.");
@@ -135,9 +144,9 @@ export function Offer() {
     <Container className="max-w-5xl">
       <Link
         href="/offers"
-        className="mb-3 inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground"
+        className="mb-1 -ml-2 inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-ink"
       >
-        <ArrowLeft className="size-4" /> All deals
+        <ArrowLeft className="size-4" aria-hidden="true" /> All deals
       </Link>
       {pool.is_sample && (
         <div className="mb-4 rounded-md border-2 border-ink bg-sun p-4 text-ink">
@@ -207,7 +216,7 @@ export function Offer() {
               {!pool.fee_note || /^no (additional|other) fees$/i.test(pool.fee_note)
                 ? "none"
                 : pool.fee_note}
-              . The delivery fee depends on your area.
+              .
             </p>
           </Section>
 
@@ -241,20 +250,20 @@ export function Offer() {
                 <span>
                   {pool.status === "open"
                     ? "The pool is full. It is closing now."
-                    : "The pool is full. Shops are now confirming and paying."}
+                    : "The pool is full. Businesses are now confirming and paying."}
                 </span>
               </p>
             )}
             {open && pool.reopened_at && (
               <p className="mt-3 rounded-md bg-gold-soft p-3 text-sm text-ink">
-                <b>Open again.</b> Some shops did not pay. This deal needs{" "}
+                <b>Open again.</b> Some businesses did not pay. This deal needs{" "}
                 {qtyOf(Math.max(pool.min_qty - pool.pledged_qty, 0), pool.unit)} more by{" "}
                 {dateTime(pool.closes_at)}.
               </p>
             )}
             {pool.status === "unsuccessful" && (
               <p className="mt-3 rounded-md bg-destructive-soft p-3 text-sm text-destructive">
-                Not enough shops joined in time. You do not need to pay.
+                Not enough businesses joined in time. You do not need to pay.
               </p>
             )}
           </Section>
@@ -389,12 +398,26 @@ export function Offer() {
               </p>
             )}
             {pool.is_private && pool.invite_code && (
-              <div className="mt-2 rounded-md bg-muted p-3 text-sm">
-                <p className="font-semibold">Private group, invite code {pool.invite_code}</p>
-                <p className="text-sm text-muted-foreground">
-                  Share this link:{" "}
-                  {`${typeof window !== "undefined" ? window.location.origin : ""}/join/${pool.invite_code}`}
-                </p>
+              <div className="mt-2 flex items-center gap-3 rounded-md bg-muted p-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">Private group, code {pool.invite_code}</p>
+                  <p className="break-all text-muted-foreground">
+                    {`${typeof window !== "undefined" ? window.location.origin : ""}/join/${pool.invite_code}`}
+                  </p>
+                </div>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Copy the invite link"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/join/${pool.invite_code}`,
+                    );
+                    toast.success("Link copied. Send it to the businesses in your group.");
+                  }}
+                >
+                  <Copy />
+                </Button>
               </div>
             )}
           </Section>
@@ -431,6 +454,7 @@ export function Offer() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {confirmDialog}
     </Container>
   );
 }

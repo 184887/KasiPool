@@ -50,7 +50,7 @@ export function Field({
     <label className="block text-sm">
       <span className="font-semibold">{label}</span>
       <div className="mt-1">{children}</div>
-      {hint && <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>}
+      {hint && <span className="mt-1 block text-sm text-muted-foreground">{hint}</span>}
     </label>
   );
 }
