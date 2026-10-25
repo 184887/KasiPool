@@ -49,7 +49,7 @@ select lives_ok($$select public.admin_publish_pool('00000000-0000-0000-0000-0000
 -- Joining checks the delivery zone
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c003');
 select throws_like($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 4)$$,
-  '%doesn''t deliver to Test zone G%', 'a shop outside the zones can''t join');
+  '%don''t deliver this deal to Test zone G%', 'a shop outside the zones can''t join');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select lives_ok($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 6)$$, 'shop A joins');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
@@ -108,7 +108,7 @@ select is((select count(*)::int from public.notifications
   'admins are notified about the problem');
 select throws_like($$select public.confirm_delivery_received(
   (select id from public.orders where user_id = '00000000-0000-0000-0000-00000000c001'))$$,
-  '%not out for delivery%', 'a shop can''t confirm someone else''s order');
+  '%not on the way yet%', 'a shop can''t confirm someone else''s order');
 
 -- Shop A confirms its delivered order
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');

@@ -1,5 +1,5 @@
 begin;
-select plan(15);
+select plan(17);
 
 create function pg_temp.act_as(uid uuid) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, true);
@@ -65,12 +65,17 @@ select is((select status from public.orders where user_id = '00000000-0000-0000-
 select is((select payment_status from public.orders where user_id = '00000000-0000-0000-0000-00000000c001'
   and pool_id = '00000000-0000-0000-0000-0000000000b1'), 'paid', 'the paid order is kept');
 select ok(exists(select 1 from public.notifications where user_id = '00000000-0000-0000-0000-00000000c001'
-  and title = 'Deal reopened to fill the gap'), 'the paid shop is told about the reopen');
+  and title = 'The deal is open again'), 'the paid shop is told about the reopen');
+select ok(exists(select 1 from public.notifications where user_id = '00000000-0000-0000-0000-00000000c001'
+  and body like '%It needs 4 cases more.%'), 'the reopen message says how many are needed, in plain words');
+select ok(exists(select 1 from public.notifications where user_id = '00000000-0000-0000-0000-00000000c001'
+  and body = 'You want 6 cases. You do not pay now. We will tell you when the pool is full.'),
+  'the join message uses a proper plural');
 
 -- Who can join the reopened pool
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
 select throws_like($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 4)$$,
-  '%wasn''t completed%', 'a shop whose order expired can''t rejoin');
+  '%did not pay for your last order%', 'a shop whose order expired can''t rejoin');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select throws_like($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 2)$$,
   '%already have an order%', 'a shop that paid can''t join twice');
