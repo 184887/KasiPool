@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { Field, inputCls } from "@/components/kp/admin";
-import { LocationPicker } from "@/components/kp/LocationPicker";
+import { DeliveryZonesAdmin } from "@/components/kp/DeliveryZonesAdmin";
 import { settingsQuery, errMsg, type ContactSettings, type PaymentSettings } from "@/lib/queries";
 import type { Json } from "@/integrations/supabase/types";
 import { phoneToLogin } from "@/lib/phone-auth";
@@ -15,24 +15,10 @@ import { phoneToLogin } from "@/lib/phone-auth";
 export function Settings() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery(settingsQuery);
-  const points = useQuery({
-    queryKey: ["admin-points"],
-    queryFn: async () =>
-      (await supabase.from("collection_points").select("*").order("created_at")).data ?? [],
-  });
   const [pay, setPay] = useState<PaymentSettings | null | undefined>(null);
   const [contact, setContact] = useState<ContactSettings | null | undefined>(null);
   const [share, setShare] = useState("");
   const [mobile, setMobile] = useState("");
-  const [cp, setCp] = useState({
-    name: "",
-    area: "",
-    address: "",
-    instructions: "",
-    fee_note: "No collection fee",
-    latitude: "",
-    longitude: "",
-  });
   useEffect(() => {
     if (data) {
       setPay(data.payment);
@@ -61,26 +47,6 @@ export function Settings() {
       );
     toast.success(make ? "Admin access granted" : "Admin access removed");
     setMobile("");
-  }
-  async function addPoint() {
-    if (!cp.name || !cp.area) return toast.error("Name and area required");
-    if (!!cp.latitude !== !!cp.longitude) return toast.error("Enter both latitude and longitude");
-    const { error } = await supabase.from("collection_points").insert({
-      ...cp,
-      latitude: cp.latitude ? +cp.latitude : null,
-      longitude: cp.longitude ? +cp.longitude : null,
-    });
-    if (error) return toast.error(errMsg(error));
-    setCp({
-      name: "",
-      area: "",
-      address: "",
-      instructions: "",
-      fee_note: "No collection fee",
-      latitude: "",
-      longitude: "",
-    });
-    qc.invalidateQueries({ queryKey: ["admin-points"] });
   }
   const p =
     (k: Exclude<keyof PaymentSettings, "configured">) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -227,66 +193,7 @@ export function Settings() {
           </div>
         </Section>
 
-        <Section title="Collection points">
-          <ul className="mb-3 divide-y text-sm">
-            {(points.data ?? []).map((x) => (
-              <li key={x.id} className="py-2">
-                <b>{x.name}</b>
-                <p className="text-xs text-muted-foreground">
-                  {x.area} · {x.fee_note}
-                </p>
-              </li>
-            ))}
-          </ul>
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <Field label="Name">
-                <input
-                  className={inputCls}
-                  value={cp.name}
-                  onChange={(e) => setCp({ ...cp, name: e.target.value })}
-                />
-              </Field>
-              <Field label="Area">
-                <input
-                  className={inputCls}
-                  value={cp.area}
-                  onChange={(e) => setCp({ ...cp, area: e.target.value })}
-                />
-              </Field>
-            </div>
-            <Field label="Instructions">
-              <input
-                className={inputCls}
-                value={cp.instructions}
-                onChange={(e) => setCp({ ...cp, instructions: e.target.value })}
-              />
-            </Field>
-            <LocationPicker
-              latitude={cp.latitude ? +cp.latitude : null}
-              longitude={cp.longitude ? +cp.longitude : null}
-              address={cp.address}
-              onPick={(l) =>
-                setCp({
-                  ...cp,
-                  latitude: String(l.latitude),
-                  longitude: String(l.longitude),
-                  address: l.address,
-                })
-              }
-            />
-            <Field label="Fee note">
-              <input
-                className={inputCls}
-                value={cp.fee_note}
-                onChange={(e) => setCp({ ...cp, fee_note: e.target.value })}
-              />
-            </Field>
-            <Button variant="outline" onClick={addPoint}>
-              Add collection point
-            </Button>
-          </div>
-        </Section>
+        <DeliveryZonesAdmin />
       </div>
     </>
   );

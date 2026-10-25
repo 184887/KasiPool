@@ -33,10 +33,12 @@ export function Terms() {
         Deals are subject to supplier availability. If a supplier delivers less than ordered,
         affected quantities are refunded.
       </p>
-      <h2>6. Collection</h2>
+      <h2>6. Delivery</h2>
       <p>
-        Goods are collected at the stated collection point with your collection code. Collection
-        dates are confirmed once stock arrives.
+        Goods are delivered by a courier to the delivery address in your profile, in a delivery area
+        the deal serves. The delivery fee for your area is shown before you confirm and is added to
+        your order total. Delivery dates are confirmed once stock arrives. Please confirm in the app
+        when you receive your stock, or report a problem.
       </p>
     </LegalPage>
   );

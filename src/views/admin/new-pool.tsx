@@ -18,7 +18,7 @@ const STEPS = [
   "Product & supplier",
   "Pricing",
   "Quantities",
-  "Dates & collection",
+  "Dates & delivery",
   "Review & publish",
 ];
 
@@ -28,17 +28,17 @@ export function NewPool() {
   const ref = useQuery({
     queryKey: ["pool-refs"],
     queryFn: async () => {
-      const [c, p, s, cp] = await Promise.all([
+      const [c, p, s, z] = await Promise.all([
         supabase.from("campaigns").select("*").order("created_at", { ascending: false }),
         supabase.from("products").select("*").eq("active", true).order("name"),
         supabase.from("suppliers").select("*").eq("active", true).order("name"),
-        supabase.from("collection_points").select("*").eq("active", true),
+        supabase.from("delivery_zones").select("*").eq("active", true).order("sort").order("name"),
       ]);
       return {
         campaigns: c.data ?? [],
         products: p.data ?? [],
         suppliers: s.data ?? [],
-        points: cp.data ?? [],
+        zones: z.data ?? [],
       };
     },
   });
@@ -59,14 +59,13 @@ export function NewPool() {
     max_qty: "",
     min_per_customer: "1",
     max_per_customer: "",
-    max_distance_km: "15",
     opens_at: isoToSastLocal(now.toISOString()),
     closes_at: isoToSastLocal(new Date(+now + 7 * 864e5).toISOString()),
-    collection_point_id: "",
     fulfilment_note: "",
     confirm_window_hours: "24",
   });
   const [busy, setBusy] = useState(false);
+  const [zoneIds, setZoneIds] = useState<string[]>([]);
   if (ref.isLoading || !ref.data) return <Loading />;
   const set =
     (k: keyof typeof f) =>
@@ -97,7 +96,7 @@ export function NewPool() {
     if (s === 4) {
       if (new Date(sastLocalToIso(f.closes_at)) <= new Date(sastLocalToIso(f.opens_at)))
         return "Closing must be after opening";
-      if (!f.collection_point_id) return "Choose a collection point";
+      if (zoneIds.length === 0) return "Choose at least one delivery zone";
     }
     return null;
   }
@@ -144,10 +143,8 @@ export function NewPool() {
           max_qty: f.max_qty ? +f.max_qty : null,
           min_per_customer: +f.min_per_customer || 1,
           max_per_customer: f.max_per_customer ? +f.max_per_customer : null,
-          max_distance_km: +f.max_distance_km || 15,
           opens_at: sastLocalToIso(f.opens_at),
           closes_at: sastLocalToIso(f.closes_at),
-          collection_point_id: f.collection_point_id,
           fulfilment_note: f.fulfilment_note || null,
           confirm_window_hours: +f.confirm_window_hours || 24,
         })
@@ -158,6 +155,10 @@ export function NewPool() {
         .from("pool_costs")
         .insert({ pool_id: pool.id, supplier_cost: +f.supplier_cost });
       if (ce) throw ce;
+      const { error: ze } = await supabase
+        .from("pool_zones")
+        .insert(zoneIds.map((zone_id) => ({ pool_id: pool.id, zone_id })));
+      if (ze) throw ze;
       if (publish) {
         const { error: pe } = await supabase.rpc("admin_publish_pool", { _pool: pool.id });
         if (pe) throw pe;
@@ -335,18 +336,6 @@ export function NewPool() {
                   onChange={set("max_per_customer")}
                 />
               </Field>
-              <Field
-                label="Max distance from collection point (km)"
-                hint="Applies when the collection point has coordinates"
-              >
-                <input
-                  type="number"
-                  min="1"
-                  className={inputCls}
-                  value={f.max_distance_km}
-                  onChange={set("max_distance_km")}
-                />
-              </Field>
             </div>
           )}
           {step === 4 && (
@@ -378,20 +367,36 @@ export function NewPool() {
                   onChange={set("confirm_window_hours")}
                 />
               </Field>
-              <Field label="Collection point *">
-                <select
-                  className={inputCls}
-                  value={f.collection_point_id}
-                  onChange={set("collection_point_id")}
-                >
-                  <option value="">Select…</option>
-                  {ref.data.points.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
+              <fieldset>
+                <legend className="mb-1 text-sm font-medium">Delivers to *</legend>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {ref.data.zones.map((z) => (
+                    <label
+                      key={z.id}
+                      className="flex items-center gap-2 rounded-md border-2 border-ink/20 p-2 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={zoneIds.includes(z.id)}
+                        onChange={(e) =>
+                          setZoneIds(
+                            e.target.checked
+                              ? [...zoneIds, z.id]
+                              : zoneIds.filter((id) => id !== z.id),
+                          )
+                        }
+                      />
+                      <span>
+                        {z.name}{" "}
+                        <span className="text-muted-foreground">({money(z.delivery_fee)})</span>
+                      </span>
+                    </label>
                   ))}
-                </select>
-              </Field>
+                </div>
+                {ref.data.zones.length === 0 && (
+                  <p className="text-sm text-warning">Add delivery zones in Settings first.</p>
+                )}
+              </fieldset>
               <Field label="Expected supplier fulfilment">
                 <textarea
                   className={inputCls + " h-20 py-2"}

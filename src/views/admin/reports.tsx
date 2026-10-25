@@ -10,9 +10,7 @@ export function Reports() {
   const { pools, parts, orders, costs, pos } = data;
   const published = pools.filter((p) => p.status !== "draft");
   const funded = pools.filter((p) =>
-    ["funded", "procurement", "stock_received", "ready_for_collection", "completed"].includes(
-      p.status,
-    ),
+    ["funded", "procurement", "stock_received", "out_for_delivery", "completed"].includes(p.status),
   );
   const failed = pools.filter((p) => ["unsuccessful", "refund_resolution"].includes(p.status));
   const interestQty = parts.filter((p) => p.status !== "withdrawn").length;
@@ -27,10 +25,10 @@ export function Reports() {
     0,
   );
   const volume = pos.reduce((s, p) => s + p.quantity, 0);
-  const readyOrCollected = orders.filter((o) =>
-    ["ready", "collected"].includes(o.fulfilment_status),
+  const dispatched = orders.filter((o) =>
+    ["out_for_delivery", "delivered", "received"].includes(o.fulfilment_status),
   );
-  const collected = orders.filter((o) => o.fulfilment_status === "collected");
+  const delivered = dispatched.filter((o) => o.fulfilment_status !== "out_for_delivery");
   const perUser = new Map<string, number>();
   orders
     .filter((o) => o.status === "confirmed")
@@ -78,8 +76,8 @@ export function Reports() {
         />
         <MetricCard
           label="Order fulfilment"
-          value={`${pct(collected.length, readyOrCollected.length)}%`}
-          hint={`${collected.length} of ${readyOrCollected.length} ready orders collected`}
+          value={`${pct(delivered.length, dispatched.length)}%`}
+          hint={`${delivered.length} of ${dispatched.length} dispatched orders delivered`}
         />
         <MetricCard
           label="Repeat customers"

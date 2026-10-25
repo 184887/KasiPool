@@ -79,6 +79,11 @@ export type Database = {
           category: string | null;
           city: string;
           created_at: string;
+          deliver_to: string;
+          delivery_address: string | null;
+          delivery_latitude: number | null;
+          delivery_longitude: number | null;
+          delivery_zone_id: string | null;
           email: string | null;
           id: string;
           latitude: number | null;
@@ -93,6 +98,7 @@ export type Database = {
           township: string;
           trading_name: string;
           user_id: string;
+          zone_id: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -100,6 +106,11 @@ export type Database = {
           category?: string | null;
           city: string;
           created_at?: string;
+          deliver_to?: string;
+          delivery_address?: string | null;
+          delivery_latitude?: number | null;
+          delivery_longitude?: number | null;
+          delivery_zone_id?: string | null;
           email?: string | null;
           id?: string;
           latitude?: number | null;
@@ -114,12 +125,18 @@ export type Database = {
           township: string;
           trading_name: string;
           user_id: string;
+          zone_id?: string | null;
         };
         Update: {
           address?: string | null;
           category?: string | null;
           city?: string;
           created_at?: string;
+          deliver_to?: string;
+          delivery_address?: string | null;
+          delivery_latitude?: number | null;
+          delivery_longitude?: number | null;
+          delivery_zone_id?: string | null;
           email?: string | null;
           id?: string;
           latitude?: number | null;
@@ -134,8 +151,24 @@ export type Database = {
           township?: string;
           trading_name?: string;
           user_id?: string;
+          zone_id?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "businesses_delivery_zone_id_fkey";
+            columns: ["delivery_zone_id"];
+            isOneToOne: false;
+            referencedRelation: "delivery_zones";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "businesses_zone_id_fkey";
+            columns: ["zone_id"];
+            isOneToOne: false;
+            referencedRelation: "delivery_zones";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       campaigns: {
         Row: {
@@ -181,43 +214,34 @@ export type Database = {
         };
         Relationships: [];
       };
-      collection_points: {
+      delivery_zones: {
         Row: {
           active: boolean;
-          address: string | null;
-          area: string;
+          areas: string | null;
           created_at: string;
-          fee_note: string | null;
+          delivery_fee: number;
           id: string;
-          instructions: string | null;
-          latitude: number | null;
-          longitude: number | null;
           name: string;
+          sort: number;
         };
         ComputedFields: never;
         Insert: {
           active?: boolean;
-          address?: string | null;
-          area: string;
+          areas?: string | null;
           created_at?: string;
-          fee_note?: string | null;
+          delivery_fee?: number;
           id?: string;
-          instructions?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           name: string;
+          sort?: number;
         };
         Update: {
           active?: boolean;
-          address?: string | null;
-          area?: string;
+          areas?: string | null;
           created_at?: string;
-          fee_note?: string | null;
+          delivery_fee?: number;
           id?: string;
-          instructions?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           name?: string;
+          sort?: number;
         };
         Relationships: [];
       };
@@ -257,22 +281,29 @@ export type Database = {
           allocated_qty: number;
           amount_paid: number;
           business_id: string;
-          collected_at: string | null;
-          collected_by: string | null;
-          collection_code: string | null;
           confirmed_at: string | null;
+          courier_ref: string | null;
           created_at: string;
           declined_at: string | null;
+          delivered_at: string | null;
+          delivery_address: string | null;
+          delivery_fee: number;
+          delivery_latitude: number | null;
+          delivery_longitude: number | null;
+          delivery_zone_id: string | null;
           failure_reason: string | null;
           fulfilment_status: string;
           id: string;
+          out_for_delivery_at: string | null;
           paid_at: string | null;
           participation_id: string | null;
           payment_reference: string | null;
           payment_status: string;
           pool_id: string;
+          problem_note: string | null;
+          problem_reported_at: string | null;
           quantity: number;
-          ready_at: string | null;
+          received_at: string | null;
           ref: string | null;
           status: string;
           terms_version: string | null;
@@ -285,22 +316,29 @@ export type Database = {
           allocated_qty?: number;
           amount_paid?: number;
           business_id: string;
-          collected_at?: string | null;
-          collected_by?: string | null;
-          collection_code?: string | null;
           confirmed_at?: string | null;
+          courier_ref?: string | null;
           created_at?: string;
           declined_at?: string | null;
+          delivered_at?: string | null;
+          delivery_address?: string | null;
+          delivery_fee?: number;
+          delivery_latitude?: number | null;
+          delivery_longitude?: number | null;
+          delivery_zone_id?: string | null;
           failure_reason?: string | null;
           fulfilment_status?: string;
           id?: string;
+          out_for_delivery_at?: string | null;
           paid_at?: string | null;
           participation_id?: string | null;
           payment_reference?: string | null;
           payment_status?: string;
           pool_id: string;
+          problem_note?: string | null;
+          problem_reported_at?: string | null;
           quantity: number;
-          ready_at?: string | null;
+          received_at?: string | null;
           ref?: string | null;
           status?: string;
           terms_version?: string | null;
@@ -312,22 +350,29 @@ export type Database = {
           allocated_qty?: number;
           amount_paid?: number;
           business_id?: string;
-          collected_at?: string | null;
-          collected_by?: string | null;
-          collection_code?: string | null;
           confirmed_at?: string | null;
+          courier_ref?: string | null;
           created_at?: string;
           declined_at?: string | null;
+          delivered_at?: string | null;
+          delivery_address?: string | null;
+          delivery_fee?: number;
+          delivery_latitude?: number | null;
+          delivery_longitude?: number | null;
+          delivery_zone_id?: string | null;
           failure_reason?: string | null;
           fulfilment_status?: string;
           id?: string;
+          out_for_delivery_at?: string | null;
           paid_at?: string | null;
           participation_id?: string | null;
           payment_reference?: string | null;
           payment_status?: string;
           pool_id?: string;
+          problem_note?: string | null;
+          problem_reported_at?: string | null;
           quantity?: number;
-          ready_at?: string | null;
+          received_at?: string | null;
           ref?: string | null;
           status?: string;
           terms_version?: string | null;
@@ -341,6 +386,13 @@ export type Database = {
             columns: ["business_id"];
             isOneToOne: false;
             referencedRelation: "businesses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_delivery_zone_id_fkey";
+            columns: ["delivery_zone_id"];
+            isOneToOne: false;
+            referencedRelation: "delivery_zones";
             referencedColumns: ["id"];
           },
           {
@@ -501,12 +553,42 @@ export type Database = {
           },
         ];
       };
+      pool_zones: {
+        Row: {
+          pool_id: string;
+          zone_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          pool_id: string;
+          zone_id: string;
+        };
+        Update: {
+          pool_id?: string;
+          zone_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pool_zones_pool_id_fkey";
+            columns: ["pool_id"];
+            isOneToOne: false;
+            referencedRelation: "pools";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pool_zones_zone_id_fkey";
+            columns: ["zone_id"];
+            isOneToOne: false;
+            referencedRelation: "delivery_zones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       pools: {
         Row: {
           campaign_id: string | null;
           closed_at: string | null;
           closes_at: string;
-          collection_point_id: string | null;
           confirm_window_hours: number;
           confirmed_qty: number;
           created_at: string;
@@ -517,7 +599,6 @@ export type Database = {
           invite_code: string | null;
           is_private: boolean;
           is_sample: boolean;
-          max_distance_km: number;
           max_per_customer: number | null;
           max_qty: number | null;
           min_per_customer: number;
@@ -545,7 +626,6 @@ export type Database = {
           campaign_id?: string | null;
           closed_at?: string | null;
           closes_at: string;
-          collection_point_id?: string | null;
           confirm_window_hours?: number;
           confirmed_qty?: number;
           created_at?: string;
@@ -556,7 +636,6 @@ export type Database = {
           invite_code?: string | null;
           is_private?: boolean;
           is_sample?: boolean;
-          max_distance_km?: number;
           max_per_customer?: number | null;
           max_qty?: number | null;
           min_per_customer?: number;
@@ -583,7 +662,6 @@ export type Database = {
           campaign_id?: string | null;
           closed_at?: string | null;
           closes_at?: string;
-          collection_point_id?: string | null;
           confirm_window_hours?: number;
           confirmed_qty?: number;
           created_at?: string;
@@ -594,7 +672,6 @@ export type Database = {
           invite_code?: string | null;
           is_private?: boolean;
           is_sample?: boolean;
-          max_distance_km?: number;
           max_per_customer?: number | null;
           max_qty?: number | null;
           min_per_customer?: number;
@@ -623,13 +700,6 @@ export type Database = {
             columns: ["campaign_id"];
             isOneToOne: false;
             referencedRelation: "campaigns";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "pools_collection_point_id_fkey";
-            columns: ["collection_point_id"];
-            isOneToOne: false;
-            referencedRelation: "collection_points";
             referencedColumns: ["id"];
           },
           {
@@ -880,7 +950,6 @@ export type Database = {
     Functions: {
       admin_cancel_pool: { Args: { _pool: string; _reason: string }; Returns: undefined };
       admin_close_now: { Args: { _pool: string }; Returns: undefined };
-      admin_collect: { Args: { _code: string; _order: string }; Returns: undefined };
       admin_complete_refund: { Args: { _reference: string; _refund: string }; Returns: undefined };
       admin_create_po: {
         Args: {
@@ -895,10 +964,11 @@ export type Database = {
         Args: { _amount: number; _order: string; _reason: string };
         Returns: undefined;
       };
+      admin_dispatch_pool: { Args: { _courier_ref: string; _pool: string }; Returns: number };
       admin_exists: { Args: Record<PropertyKey, never>; Returns: boolean };
       admin_finalise_funding: { Args: { _pool: string }; Returns: string };
       admin_flag_payment_issue: { Args: { _note: string; _order: string }; Returns: undefined };
-      admin_mark_ready: { Args: { _pool: string }; Returns: number };
+      admin_mark_delivered: { Args: { _note: string; _order: string }; Returns: undefined };
       admin_publish_pool: { Args: { _pool: string }; Returns: undefined };
       admin_receive_stock: {
         Args: { _note: string; _pool: string; _received: number };
@@ -914,22 +984,34 @@ export type Database = {
         };
         Returns: undefined;
       };
+      admin_resolve_delivery_problem: {
+        Args: { _note: string; _order: string };
+        Returns: undefined;
+      };
       admin_resolve_failed_pool: { Args: { _note: string; _pool: string }; Returns: undefined };
       admin_set_role: { Args: { _email: string; _make_admin: boolean }; Returns: undefined };
       audit: {
         Args: { _action: string; _details?: Json; _entity: string; _id: string };
         Returns: undefined;
       };
+      check_delivery_zone: {
+        Args: {
+          _b: Omit<
+            Database["public"]["Tables"]["businesses"]["Row"],
+            Database["public"]["Tables"]["businesses"]["ComputedFields"]
+          >;
+          _pool: string;
+        };
+        Returns: undefined;
+      };
       claim_first_admin: { Args: Record<PropertyKey, never>; Returns: undefined };
       claim_pool_invite: { Args: { _code: string }; Returns: string };
       close_pool: { Args: { _pool: string }; Returns: undefined };
+      complete_pool_if_delivered: { Args: { _pool: string }; Returns: undefined };
+      confirm_delivery_received: { Args: { _order: string }; Returns: undefined };
       confirm_order: { Args: { _accept: boolean; _order: string }; Returns: string };
       decline_order: { Args: { _order: string }; Returns: undefined };
       discount_share_pct: { Args: Record<PropertyKey, never>; Returns: number };
-      distance_km: {
-        Args: { _lat1: number; _lat2: number; _lng1: number; _lng2: number };
-        Returns: number;
-      };
       finalise_funding: { Args: { _pool: string }; Returns: string };
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"]; _user_id: string };
@@ -941,11 +1023,11 @@ export type Database = {
         Args: { _body: string; _link: string; _title: string; _user: string };
         Returns: undefined;
       };
+      notify_admins: { Args: { _body: string; _link: string; _title: string }; Returns: undefined };
       pool_price: { Args: { _bulk: number; _list: number; _share_pct: number }; Returns: number };
       propose_pool: {
         Args: {
           _closes: string;
-          _collection_point: string;
           _max_per: number | null;
           _max_qty: number | null;
           _min_per: number | null;
@@ -960,6 +1042,8 @@ export type Database = {
       };
       recalc_pool: { Args: { _pool: string }; Returns: undefined };
       refresh_pool_states: { Args: Record<PropertyKey, never>; Returns: undefined };
+      report_delivery_problem: { Args: { _note: string; _order: string }; Returns: undefined };
+      set_order_delivery: { Args: { _order: string }; Returns: undefined };
       withdraw_from_pool: { Args: { _pool: string }; Returns: undefined };
     };
     Enums: {

@@ -5,9 +5,10 @@ import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Copy, MapPin } from "lucide-react";
+import { ArrowLeft, Copy, PackageCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Container } from "@/components/kp/AppShell";
 import { OrderTimeline, Countdown } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
@@ -20,12 +21,6 @@ export function OrderPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const qc = useQueryClient();
   const settings = useQuery(settingsQuery);
-  const [paymentReturnStartedAt] = useState(() =>
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("payment") === "return"
-      ? Date.now()
-      : null,
-  );
   const { data: o, isLoading } = useQuery({
     queryKey: ["order", orderId],
     queryFn: async () =>
@@ -33,21 +28,15 @@ export function OrderPage() {
         await supabase
           .from("orders")
           .select(
-            "*, pools(*, products(name, image_url, pack_size), collection_points(*)), refunds(*)",
+            "*, pools(*, products(name, image_url, pack_size)), delivery_zones(name), refunds(*)",
           )
           .eq("id", orderId)
           .maybeSingle()
       ).data,
-    refetchInterval: (query) =>
-      typeof window !== "undefined" &&
-      paymentReturnStartedAt !== null &&
-      Date.now() - paymentReturnStartedAt < 120_000 &&
-      (query.state.data === undefined || query.state.data?.payment_status === "awaiting_payment")
-        ? 2_000
-        : false,
   });
   const [accept, setAccept] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
 
   if (isLoading) return <Loading />;
   if (!o)
@@ -68,6 +57,26 @@ export function OrderPage() {
     setBusy(false);
     if (error) return toast.error(errMsg(error));
     toast.success("Order confirmed");
+    qc.invalidateQueries();
+  }
+  async function received() {
+    setBusy(true);
+    const { error } = await supabase.rpc("confirm_delivery_received", { _order: orderId });
+    setBusy(false);
+    if (error) return toast.error(errMsg(error));
+    toast.success("Thanks for confirming");
+    qc.invalidateQueries();
+  }
+  async function reportProblem() {
+    setBusy(true);
+    const { error } = await supabase.rpc("report_delivery_problem", {
+      _order: orderId,
+      _note: problem ?? "",
+    });
+    setBusy(false);
+    if (error) return toast.error(errMsg(error));
+    toast.success("Sent. KasiPool will contact you.");
+    setProblem(null);
     qc.invalidateQueries();
   }
   async function decline() {
@@ -109,8 +118,13 @@ export function OrderPage() {
             <Row k="Product" v={`${pool.products?.name} (${pool.products?.pack_size})`} />
             <Row k="Quantity" v={`${o.quantity} ${pool.unit}(s)`} />
             <Row k="Final unit price" v={money(o.unit_price)} />
+            <Row k="Goods" v={money(o.quantity * Number(o.unit_price))} />
+            <Row
+              k={`Delivery${o.delivery_zones ? ` (${o.delivery_zones.name})` : ""}`}
+              v={money(o.delivery_fee)}
+            />
             <Row k="Order total" v={<b className="text-lg">{money(o.total)}</b>} />
-            <Row k="Collection" v={pool.collection_points?.name ?? "-"} />
+            <Row k="Deliver to" v={o.delivery_address ?? "-"} />
             <Row
               k="Confirm & pay by"
               v={
@@ -204,36 +218,68 @@ export function OrderPage() {
         </Section>
       )}
 
-      {o.fulfilment_status === "ready" && (
-        <Section title="Ready for collection" className="border-4 border-leaf">
-          <p className="text-sm">Show this code at the collection point:</p>
-          <p className="my-3 rounded-md bg-leaf-soft py-4 text-center font-headline text-5xl tracking-[0.2em] text-leaf tabular">
-            {o.collection_code}
-          </p>
-          <p className="text-sm">
-            You'll collect{" "}
-            <b>
-              {o.allocated_qty} {pool.unit}(s)
-            </b>{" "}
-            of {pool.products?.name}.
-          </p>
-          <p className="mt-2 flex gap-2 text-sm">
-            <MapPin className="size-4 shrink-0" aria-hidden="true" />
-            <span>
-              <b>{pool.collection_points?.name}</b>
-              <br />
-              {pool.collection_points?.area}
-              <br />
-              <span className="text-muted-foreground">{pool.collection_points?.instructions}</span>
-            </span>
-          </p>
-        </Section>
-      )}
-
-      {o.fulfilment_status === "collected" && (
-        <Section>
-          <p className="font-headline text-3xl text-leaf">Completed ✓</p>
-          <p className="text-sm text-muted-foreground">Collected {dateTime(o.collected_at)}.</p>
+      {["out_for_delivery", "delivered", "received"].includes(o.fulfilment_status) && (
+        <Section
+          title={
+            o.fulfilment_status === "received"
+              ? "Received"
+              : o.fulfilment_status === "delivered"
+                ? "Delivered"
+                : "Out for delivery"
+          }
+          className={o.fulfilment_status === "received" ? undefined : "border-4 border-leaf"}
+        >
+          {o.fulfilment_status === "received" ? (
+            <p className="font-headline text-3xl text-leaf">Completed ✓</p>
+          ) : (
+            <p className="text-sm">
+              {o.fulfilment_status === "delivered"
+                ? "The courier says your stock was delivered. Please confirm you received it."
+                : "Your stock is on its way."}
+            </p>
+          )}
+          <dl className="mt-3 space-y-1.5 text-sm">
+            <Row k="Quantity" v={`${o.allocated_qty} ${pool.unit}(s)`} />
+            <Row k="Deliver to" v={o.delivery_address ?? "-"} />
+            {o.courier_ref && <Row k="Courier reference" v={o.courier_ref} />}
+            {o.received_at && <Row k="Received" v={dateTime(o.received_at)} />}
+          </dl>
+          {o.fulfilment_status !== "received" && (
+            <Button
+              size="xl"
+              variant="gold"
+              className="mt-4 w-full"
+              onClick={received}
+              disabled={busy}
+            >
+              <PackageCheck /> I received my stock
+            </Button>
+          )}
+          {o.problem_reported_at ? (
+            <p className="mt-3 rounded-md bg-warning-soft p-3 text-sm text-warning">
+              You reported a problem on {dateTime(o.problem_reported_at)}: {o.problem_note}.
+              KasiPool will contact you.
+            </p>
+          ) : problem === null ? (
+            <Button variant="ghost" className="mt-2 w-full" onClick={() => setProblem("")}>
+              Report a problem with this delivery
+            </Button>
+          ) : (
+            <div className="mt-3 space-y-2">
+              <Label htmlFor="problem">What went wrong?</Label>
+              <textarea
+                id="problem"
+                rows={3}
+                className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm"
+                placeholder="e.g. 2 cases missing, or nothing arrived"
+                value={problem}
+                onChange={(e) => setProblem(e.target.value)}
+              />
+              <Button variant="outline" className="w-full" onClick={reportProblem} disabled={busy}>
+                Send to KasiPool
+              </Button>
+            </div>
+          )}
         </Section>
       )}
 

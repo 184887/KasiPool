@@ -22,7 +22,7 @@ export function Onboarding() {
         <p className="text-sm font-bold text-ember">Step 2 of 2</p>
         <h1 className="font-headline text-4xl">Tell us about your business</h1>
         <p className="mb-5 mt-1 text-sm text-muted-foreground">
-          This helps us arrange collection and contact you about your orders.
+          We use this to deliver your stock and contact you about your orders.
         </p>
         <BusinessForm
           userId={user.id}

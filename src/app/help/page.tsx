@@ -3,7 +3,7 @@ import { Help } from "@/views/help";
 
 export const metadata: Metadata = {
   title: "Help & contact",
-  description: "Get help with pools, payments and collection on KasiPool.",
+  description: "Get help with pools, payments and delivery on KasiPool.",
   openGraph: {
     title: "KasiPool help",
     description: "Answers and contact details for KasiPool customers.",

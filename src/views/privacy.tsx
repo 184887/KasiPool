@@ -7,14 +7,15 @@ export function Privacy() {
     <LegalPage title="Privacy notice">
       <h2>What we collect</h2>
       <p>
-        Your business name, representative name, mobile number, optional email, business category
-        and location. We collect only what is needed to run pools, process orders and arrange
-        collection.
+        Your business name, representative name, mobile number, optional email, business category,
+        business address and delivery address. We collect only what is needed to run pools, process
+        orders and arrange delivery.
       </p>
       <h2>How we use it</h2>
       <p>
-        To manage your participation, confirm orders, verify payments, coordinate collection and
-        send in-app notifications. Other businesses never see your details or quantities.
+        To manage your participation, confirm orders, verify payments, arrange delivery and send
+        in-app notifications. We share your delivery address and phone number with our courier
+        partner only to deliver your order. Other businesses never see your details or quantities.
       </p>
       <h2>Marketing</h2>
       <p>

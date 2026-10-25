@@ -62,7 +62,7 @@ export function Customers() {
           "Pools joined",
           "Orders",
           "Unpaid",
-          "Collected",
+          "Delivered",
           "Total paid",
           "Registered",
         ]}
@@ -92,7 +92,7 @@ export function Customers() {
                 {os.filter((o) => o.status === "confirmed" && o.payment_status !== "paid").length}
               </Td>
               <Td className="tabular">
-                {os.filter((o) => o.fulfilment_status === "collected").length}
+                {os.filter((o) => ["delivered", "received"].includes(o.fulfilment_status)).length}
               </Td>
               <Td className="tabular">
                 {money(os.reduce((s, o) => s + Number(o.amount_paid), 0))}

@@ -21,6 +21,11 @@ export function PoolAdmin() {
   const { poolId } = useParams<{ poolId: string }>();
   const qc = useQueryClient();
   const settings = useQuery(settingsQuery);
+  const allZones = useQuery({
+    queryKey: ["admin-zones"],
+    queryFn: async () =>
+      (await supabase.from("delivery_zones").select("*").order("sort").order("name")).data ?? [],
+  });
   const suppliers = useQuery({
     queryKey: ["admin-suppliers-active"],
     queryFn: async () =>
@@ -34,7 +39,9 @@ export function PoolAdmin() {
       const [p, c, parts, orders, po] = await Promise.all([
         supabase
           .from("pools")
-          .select("*, products(*), suppliers(name), campaigns(name), collection_points(name)")
+          .select(
+            "*, products(*), suppliers(name), campaigns(name), pool_zones(zone_id, delivery_zones(name))",
+          )
           .eq("id", poolId)
           .single(),
         supabase.from("pool_costs").select("*").eq("pool_id", poolId).maybeSingle(),
@@ -67,6 +74,7 @@ export function PoolAdmin() {
     expected: "",
   });
   const [recv, setRecv] = useState({ qty: "", note: "" });
+  const [courier, setCourier] = useState("");
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
 
   if (isLoading || !data) return <Loading />;
@@ -115,7 +123,7 @@ export function PoolAdmin() {
       </Link>
       <PageHeader
         title={pool.products?.name ?? "Pool"}
-        subtitle={`${pool.campaigns?.name ?? "No campaign"} · Supplier: ${pool.suppliers?.name ?? "-"} · ${pool.collection_points?.name ?? ""}`}
+        subtitle={`${pool.campaigns?.name ?? "No campaign"} · Supplier: ${pool.suppliers?.name ?? "-"} · Delivers to ${pool.pool_zones.map((pz) => pz.delivery_zones?.name).join(", ") || "-"}`}
         actions={<StatusBadge tone={st.tone}>{st.admin}</StatusBadge>}
       />
 
@@ -291,6 +299,38 @@ export function PoolAdmin() {
                     />
                   </Field>
                 </div>
+                <fieldset>
+                  <legend className="mb-1 text-sm font-medium">Delivers to</legend>
+                  <div className="grid grid-cols-2 gap-1 text-sm">
+                    {(allZones.data ?? []).map((z) => {
+                      const on = pool.pool_zones.some((pz) => pz.zone_id === z.id);
+                      return (
+                        <label key={z.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={() =>
+                              call(
+                                () =>
+                                  on
+                                    ? supabase
+                                        .from("pool_zones")
+                                        .delete()
+                                        .eq("pool_id", poolId)
+                                        .eq("zone_id", z.id)
+                                    : supabase
+                                        .from("pool_zones")
+                                        .insert({ pool_id: poolId, zone_id: z.id }),
+                                on ? `Removed ${z.name}` : `Added ${z.name}`,
+                              )
+                            }
+                          />
+                          {z.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </fieldset>
                 {preview && (
                   <p className="text-sm text-muted-foreground">
                     Shops would pay <b className="text-ink">{money(preview.price)}</b> and save{" "}
@@ -474,21 +514,34 @@ export function PoolAdmin() {
               </div>
             )}
             {pool.status === "stock_received" && (
-              <Button
-                className="w-full"
-                onClick={() =>
-                  call(
-                    () => supabase.rpc("admin_mark_ready", { _pool: poolId }),
-                    "Orders marked ready; customers notified",
-                  )
-                }
-              >
-                Mark allocated orders ready for collection
-              </Button>
+              <div className="space-y-2">
+                <Field label="Courier reference (optional)">
+                  <input
+                    className={inputCls}
+                    value={courier}
+                    onChange={(e) => setCourier(e.target.value)}
+                  />
+                </Field>
+                <Button
+                  className="w-full"
+                  onClick={() =>
+                    call(
+                      () =>
+                        supabase.rpc("admin_dispatch_pool", {
+                          _pool: poolId,
+                          _courier_ref: courier,
+                        }),
+                      "Orders sent out for delivery; shops notified",
+                    )
+                  }
+                >
+                  Send allocated orders out for delivery
+                </Button>
+              </div>
             )}
-            {pool.status === "ready_for_collection" && (
+            {pool.status === "out_for_delivery" && (
               <Button asChild className="w-full">
-                <Link href="/admin/collections">Go to collections</Link>
+                <Link href="/admin/deliveries">Record deliveries</Link>
               </Button>
             )}
             {pool.status === "refund_resolution" && (

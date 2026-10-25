@@ -27,8 +27,8 @@ const FAQ = [
     "Stock is only ordered if enough paid orders meet the supplier minimum. Otherwise any payments are refunded.",
   ],
   [
-    "Where do I collect?",
-    "At the collection point shown on each deal. Bring your collection code.",
+    "How do I get my stock?",
+    "A courier delivers it to the address in your profile. Each deal shows the areas it delivers to and the delivery fee for your area. When it arrives, tap 'I received my stock' on your order.",
   ],
 ];
 

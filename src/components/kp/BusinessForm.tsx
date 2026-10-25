@@ -8,9 +8,9 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { PROVINCES, normaliseSaMobile } from "@/lib/format";
-import { errMsg } from "@/lib/queries";
+import { errMsg, zonesQuery } from "@/lib/queries";
 import { LocationPicker } from "./LocationPicker";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const CATS = [
   "Spaza / tuck shop",
@@ -36,6 +36,7 @@ export function BusinessForm({
   onDone: () => void;
 }) {
   const qc = useQueryClient();
+  const zones = useQuery(zonesQuery);
   const [f, setF] = useState({
     trading_name: existing?.trading_name ?? "",
     rep_name: existing?.rep_name ?? "",
@@ -46,6 +47,10 @@ export function BusinessForm({
     city: existing?.city ?? "Cape Town",
     province: existing?.province ?? "Western Cape",
     address: existing?.address ?? "",
+    zone_id: existing?.zone_id ?? "",
+    deliver_to: existing?.deliver_to ?? "business",
+    delivery_address: existing?.delivery_address ?? "",
+    delivery_zone_id: existing?.delivery_zone_id ?? "",
     latitude: existing?.latitude ?? (null as number | null),
     longitude: existing?.longitude ?? (null as number | null),
     marketing_opt_in: existing?.marketing_opt_in ?? false,
@@ -62,11 +67,20 @@ export function BusinessForm({
       return toast.error(
         "Enter a valid South African mobile number, e.g. 072 123 4567 or +27 72 123 4567",
       );
-    if (f.latitude == null || f.longitude == null)
-      return toast.error("Search for your address and select it to set your location");
+    if (!f.address.trim() || !f.zone_id)
+      return toast.error("Enter your business address and choose its delivery area");
+    if (f.deliver_to === "other" && (!f.delivery_address.trim() || !f.delivery_zone_id))
+      return toast.error("Enter the delivery address and choose its area");
     if (!terms) return toast.error("Please accept the terms and privacy notice");
     setBusy(true);
-    const row = { ...f, mobile, email: f.email || null, address: f.address || null };
+    const row = {
+      ...f,
+      mobile,
+      email: f.email || null,
+      address: f.address.trim(),
+      delivery_address: f.delivery_address.trim() || null,
+      delivery_zone_id: f.delivery_zone_id || null,
+    };
     const { error } = existing
       ? await supabase.from("businesses").update(row).eq("id", existing.id)
       : await supabase.from("businesses").insert({ ...row, user_id: userId });
@@ -163,12 +177,72 @@ export function BusinessForm({
           </select>
         </div>
       </div>
-      <LocationPicker
-        latitude={f.latitude}
-        longitude={f.longitude}
-        address={f.address}
-        onPick={(l) => setF((prev) => ({ ...prev, ...l }))}
-      />
+      <fieldset className="space-y-3 rounded-md border-2 border-ink p-3">
+        <legend className="px-1 font-display font-bold">Delivery</legend>
+        <div>
+          <Label htmlFor="ad">Business address *</Label>
+          <textarea
+            id="ad"
+            required
+            rows={2}
+            className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
+            placeholder="Street and number, plus a landmark the driver can find"
+            value={f.address}
+            onChange={(e) => setF({ ...f, address: e.target.value })}
+          />
+        </div>
+        <ZoneSelect
+          id="zn"
+          label="Delivery area *"
+          value={f.zone_id}
+          onChange={(v) => setF({ ...f, zone_id: v })}
+          zones={zones.data}
+        />
+        <LocationPicker
+          latitude={f.latitude}
+          longitude={f.longitude}
+          address={f.address}
+          onPick={(l) =>
+            setF((prev) => ({
+              ...prev,
+              latitude: l.latitude,
+              longitude: l.longitude,
+              address: prev.address.trim() ? prev.address : l.address,
+            }))
+          }
+        />
+        <label className="flex items-start gap-3 text-sm">
+          <Checkbox
+            checked={f.deliver_to === "other"}
+            onCheckedChange={(v) => setF({ ...f, deliver_to: v ? "other" : "business" })}
+            className="mt-0.5"
+          />
+          <span>Deliver my stock to a different address</span>
+        </label>
+        {f.deliver_to === "other" && (
+          <>
+            <div>
+              <Label htmlFor="dad">Delivery address *</Label>
+              <textarea
+                id="dad"
+                required
+                rows={2}
+                className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
+                placeholder="Where should the driver drop off your stock?"
+                value={f.delivery_address}
+                onChange={(e) => setF({ ...f, delivery_address: e.target.value })}
+              />
+            </div>
+            <ZoneSelect
+              id="dzn"
+              label="Area of the delivery address *"
+              value={f.delivery_zone_id}
+              onChange={(v) => setF({ ...f, delivery_zone_id: v })}
+              zones={zones.data}
+            />
+          </>
+        )}
+      </fieldset>
       <label className="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm">
         <span>Send me deal updates on WhatsApp (marketing opt-in)</span>
         <Switch
@@ -196,5 +270,46 @@ export function BusinessForm({
         {busy ? "Saving…" : existing ? "Save changes" : "Finish registration"}
       </Button>
     </form>
+  );
+}
+
+function ZoneSelect({
+  id,
+  label,
+  value,
+  onChange,
+  zones,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (zoneId: string) => void;
+  zones: Tables<"delivery_zones">[] | undefined;
+}) {
+  const zone = zones?.find((z) => z.id === value);
+  return (
+    <div>
+      <Label htmlFor={id}>{label}</Label>
+      <select
+        id={id}
+        required
+        className="mt-1 h-12 w-full rounded-md border border-input bg-card px-3"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">Choose your area…</option>
+        {(zones ?? []).map((z) => (
+          <option key={z.id} value={z.id}>
+            {z.name}
+          </option>
+        ))}
+      </select>
+      {zone?.areas && <p className="mt-1 text-xs text-muted-foreground">Covers: {zone.areas}</p>}
+      {zones && zones.length === 0 && (
+        <p className="mt-1 text-xs text-warning">
+          KasiPool hasn't set up delivery areas yet. Please check back soon.
+        </p>
+      )}
+    </div>
   );
 }

@@ -17,9 +17,9 @@ export const POOL_STATUS: Record<string, { customer: string; admin: string; tone
   },
   procurement: { customer: "Preparing your stock", admin: "Procurement in progress", tone: "info" },
   stock_received: { customer: "Preparing your stock", admin: "Stock received", tone: "info" },
-  ready_for_collection: {
-    customer: "Ready for collection",
-    admin: "Ready for collection",
+  out_for_delivery: {
+    customer: "Out for delivery",
+    admin: "Out for delivery",
     tone: "success",
   },
   completed: { customer: "Completed", admin: "Completed", tone: "success" },
@@ -56,8 +56,9 @@ export const FULFIL_STATUS: Record<string, { label: string; tone: Tone }> = {
   ordered: { label: "Stock ordered", tone: "info" },
   allocated: { label: "Stock allocated", tone: "info" },
   short: { label: "Partially allocated", tone: "warning" },
-  ready: { label: "Ready for collection", tone: "success" },
-  collected: { label: "Collected", tone: "success" },
+  out_for_delivery: { label: "Out for delivery", tone: "info" },
+  delivered: { label: "Delivered", tone: "success" },
+  received: { label: "Received", tone: "success" },
 };
 
 type OrderLike = { status: string; payment_status: string; fulfilment_status: string };
@@ -69,7 +70,8 @@ export function nextAction(o: OrderLike, paymentConfigured: boolean): string | n
   if (o.payment_status === "awaiting_payment")
     return paymentConfigured ? "Make payment" : "Wait for payment instructions";
   if (o.payment_status === "issue") return "Resolve payment issue";
-  if (o.fulfilment_status === "ready") return "Collect your stock";
+  if (o.fulfilment_status === "out_for_delivery" || o.fulfilment_status === "delivered")
+    return "Confirm you received it";
   return null;
 }
 
@@ -79,13 +81,13 @@ export const TIMELINE = [
   "Order confirmed",
   "Payment verified",
   "Stock ordered",
-  "Ready for collection",
-  "Collected",
+  "Out for delivery",
+  "Received",
 ] as const;
 
 export function timelineStep(o: OrderLike): number {
-  if (o.fulfilment_status === "collected") return 6;
-  if (o.fulfilment_status === "ready") return 5;
+  if (o.fulfilment_status === "received") return 6;
+  if (["out_for_delivery", "delivered"].includes(o.fulfilment_status)) return 5;
   if (["ordered", "allocated", "short"].includes(o.fulfilment_status)) return 4;
   if (o.payment_status === "paid") return 3;
   if (o.status === "confirmed") return 2;

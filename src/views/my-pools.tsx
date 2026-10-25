@@ -75,8 +75,7 @@ export function MyPools() {
   const all = orders.data ?? [];
   const action = all.filter((o) => nextAction(o, payCfg));
   const inProgress = all.filter(
-    (o) =>
-      !nextAction(o, payCfg) && o.status === "confirmed" && o.fulfilment_status !== "collected",
+    (o) => !nextAction(o, payCfg) && o.status === "confirmed" && o.fulfilment_status !== "received",
   );
   const previous = all.filter((o) => !action.includes(o) && !inProgress.includes(o));
 
@@ -245,7 +244,7 @@ function OrderList({ list }: { list: MyOrder[] }) {
               <p className="text-xs text-muted-foreground">
                 {o.ref ?? "No reference"} · {o.quantity} {o.pools?.unit}(s) ·{" "}
                 {o.payment_status === "paid" ? `Paid ${money(o.amount_paid)}` : money(o.total)}
-                {o.collected_at && ` · Collected ${date(o.collected_at)}`}
+                {o.received_at && ` · Received ${date(o.received_at)}`}
               </p>
             </div>
             <StatusBadge tone={label.tone}>{label.label}</StatusBadge>

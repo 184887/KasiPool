@@ -1,6 +1,6 @@
 ## Architecture rules
 
-- Pool lifecycle, quantity aggregation, payments, procurement and collection logic live in SECURITY DEFINER Postgres functions (called via supabase.rpc); the client never writes participations/orders/payments directly, so rules are enforced server-side.
+- Pool lifecycle, quantity aggregation, payments, procurement and delivery logic live in SECURITY DEFINER Postgres functions (called via supabase.rpc); the client never writes participations/orders/payments directly, so rules are enforced server-side.
 - `refresh_pool_states()` moves pools through their lifecycle; pg_cron runs it every minute (job `refresh-pool-states`) and the client also calls it before reading pools.
 - Supplier costs live in `pool_costs` (admin-only RLS), separate from the publicly readable `pools` table.
 - Interest (participations), orders, payments, purchase orders and refunds are separate tables; never collapse them into one status field.
