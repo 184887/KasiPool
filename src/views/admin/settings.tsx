@@ -10,7 +10,6 @@ import { Field, inputCls } from "@/components/kp/admin";
 import { DeliveryZonesAdmin } from "@/components/kp/DeliveryZonesAdmin";
 import { settingsQuery, errMsg, type ContactSettings, type PaymentSettings } from "@/lib/queries";
 import type { Json } from "@/integrations/supabase/types";
-import { phoneToLogin } from "@/lib/phone-auth";
 
 export function Settings() {
   const qc = useQueryClient();
@@ -18,7 +17,7 @@ export function Settings() {
   const [pay, setPay] = useState<PaymentSettings | null | undefined>(null);
   const [contact, setContact] = useState<ContactSettings | null | undefined>(null);
   const [share, setShare] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
   useEffect(() => {
     if (data) {
       setPay(data.payment);
@@ -37,16 +36,16 @@ export function Settings() {
     qc.invalidateQueries({ queryKey: ["settings"] });
   }
   async function role(make: boolean) {
-    // Accounts sign in by phone; admin_set_role looks them up by their hidden login address
-    const login = phoneToLogin(mobile);
-    if (!login) return toast.error("Enter a valid South African mobile number");
+    // Team members sign in at /admin/login with their own email address
+    const login = email.trim();
+    if (!/^[^s@]+@[^s@]+.[^s@]+$/.test(login)) return toast.error("Enter an email address");
     const { error } = await supabase.rpc("admin_set_role", { _email: login, _make_admin: make });
     if (error)
       return toast.error(
         /no account/i.test(error.message) ? "No account with that number" : errMsg(error),
       );
     toast.success(make ? "Admin access granted" : "Admin access removed");
-    setMobile("");
+    setEmail("");
   }
   const p =
     (k: Exclude<keyof PaymentSettings, "configured">) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -172,21 +171,22 @@ export function Settings() {
 
         <Section title="Administrators">
           <p className="mb-2 text-sm text-muted-foreground">
-            Grant or remove admin access for an existing account, by its mobile number.
+            Team members log in at /admin/login with their email and password. Create their login in
+            Supabase (Authentication, Users, Add user, tick Auto Confirm), then grant access here.
           </p>
           <div className="flex gap-2">
             <input
               className={inputCls}
-              type="tel"
-              placeholder="072 123 4567"
-              aria-label="Mobile number"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
+              type="email"
+              placeholder="name@kasipool.co.za"
+              aria-label="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <Button onClick={() => role(true)} disabled={!mobile}>
+            <Button onClick={() => role(true)} disabled={!email}>
               Grant
             </Button>
-            <Button variant="outline" onClick={() => role(false)} disabled={!mobile}>
+            <Button variant="outline" onClick={() => role(false)} disabled={!email}>
               Remove
             </Button>
           </div>

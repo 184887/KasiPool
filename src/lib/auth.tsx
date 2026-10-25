@@ -8,6 +8,7 @@ type AuthCtx = {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  rolesLoading: boolean;
   business: Tables<"businesses"> | null;
   businessLoading: boolean;
   signOut: () => Promise<void>;
@@ -17,6 +18,7 @@ const Ctx = createContext<AuthCtx>({
   user: null,
   loading: true,
   isAdmin: false,
+  rolesLoading: false,
   business: null,
   businessLoading: false,
   signOut: async () => {},
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         isAdmin: !!roles.data?.includes("admin"),
+        rolesLoading: !!user && roles.isLoading,
         business: biz.data ?? null,
         businessLoading: !!user && biz.isLoading,
         signOut: async () => {
