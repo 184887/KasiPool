@@ -1,6 +1,9 @@
 begin;
 select plan(12);
 
+-- Start from no requests, whatever the local database holds (rolled back at the end)
+delete from public.admin_requests;
+
 create function pg_temp.act_as(uid uuid) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, true);
 $$;

@@ -21,6 +21,14 @@ import { discountSplit } from "@/lib/pricing";
 import { money, dateTime, date, sastLocalToIso, isoToSastLocal } from "@/lib/format";
 import { POOL_STATUS, PAYMENT_STATUS, ORDER_STATUS, FULFIL_STATUS } from "@/lib/status";
 
+/** admin_skip_ahead result -> message */
+const SKIP_RESULT: Record<string, string> = {
+  opened: "Pool is open",
+  funded: "Pool is funded",
+  reopened: "Pool reopened for the missing amount",
+  failed: "Pool failed. Refund any paid businesses in Payments.",
+};
+
 export function PoolAdmin() {
   const { poolId } = useParams<{ poolId: string }>();
   const qc = useQueryClient();
@@ -84,6 +92,15 @@ export function PoolAdmin() {
     const { error } = await fn();
     if (error) return toast.error(errMsg(error));
     toast.success(ok);
+    qc.invalidateQueries();
+  };
+  // Testing tool: jump to the next time-based step instead of waiting for it
+  const skipAhead = async (title: string, body: string) => {
+    const ok = await ask({ title, body, confirmLabel: "Skip ahead", danger: true });
+    if (ok === false) return;
+    const { data: res, error } = await supabase.rpc("admin_skip_ahead", { _pool: poolId });
+    if (error) return toast.error(errMsg(error));
+    toast.success(SKIP_RESULT[res] ?? "Done");
     qc.invalidateQueries();
   };
   const orderByPart = new Map(orders.map((o) => [o.participation_id, o]));
@@ -347,6 +364,25 @@ export function PoolAdmin() {
                 </Button>
               </div>
             )}
+            {pool.status === "scheduled" && (
+              <div className="space-y-2 text-sm">
+                <p>
+                  Opens {dateTime(pool.opens_at)}. Businesses can see it then and start joining.
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    skipAhead(
+                      "Open this pool now?",
+                      "For testing. Businesses can join straight away instead of at the opening time.",
+                    )
+                  }
+                >
+                  Testing: open now
+                </Button>
+              </div>
+            )}
             {pool.status === "open" && (
               <div className="space-y-2 text-sm">
                 <p>
@@ -408,6 +444,18 @@ export function PoolAdmin() {
                     Available once paid quantity meets the minimum.
                   </p>
                 )}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    skipAhead(
+                      "End the payment time now?",
+                      "For testing. Unpaid orders close now. If enough is paid the pool is funded; if not, it reopens for the gap before its closing time, or fails and paid businesses are refunded.",
+                    )
+                  }
+                >
+                  Testing: end payment time now
+                </Button>
               </div>
             )}
             {pool.status === "funded" && (

@@ -87,6 +87,9 @@ what protect the data.
 | `npm run typecheck` | TypeScript type check             |
 | `npm test`          | Run the Vitest suite once         |
 | `npm run format`    | Format everything with Prettier   |
+| `npm run test-data` | Load test shops and pools (local) |
+
+To try every flow with test shops and pools at each stage, see [docs/testing.md](docs/testing.md).
 
 ### Admin accounts
 
