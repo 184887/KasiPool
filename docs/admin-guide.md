@@ -78,9 +78,8 @@ Record payments in Admin → Payments (or **Record payment** on the pool page). 
 it is recorded as verified against the bank statement. Overpayments create a refund automatically.
 
 If everything is paid before the deadline, you can **Finalise funding now** on the pool page.
-Otherwise the system settles it at the deadline. For testing, **Testing: end payment time now**
-settles it straight away (see [testing](testing.md)); don't use it on real deals, because it
-closes the orders of shops that still had time to pay.
+Otherwise the system settles it at the deadline. On test pools, **Testing: end payment time now**
+settles it straight away (see [testing](testing.md)). Real deals don't have this button.
 
 ### 4. If some shops don't pay: the pool reopens
 
@@ -174,8 +173,6 @@ deadlines (fund, reopen or fail). Nobody needs to have the site open.
   database in case they come back.
 - **Real supplier prices:** the first real deals (2026-10-26) use estimated prices and a stand-in
   supplier. Get real quotes before verifying payments; see [testing](testing.md).
-- **Testing buttons** on the pool page ("Testing: open now", "Testing: end payment time now"):
-  remove them before launch.
 - **Delivery fees:** to be decided by the team; change the flat fee in Settings, or ask a
   developer for fees by distance (the map pins make that possible).
 - **`www.kasipool.co.za`:** its DNS still points at the old holding page; change the `www` record

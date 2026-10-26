@@ -89,7 +89,8 @@ what protect the data.
 | `npm run format`    | Format everything with Prettier   |
 | `npm run test-data` | Load test shops and pools (local) |
 
-To try every flow with test shops and pools at each stage, see [docs/testing.md](docs/testing.md).
+To try every flow on the live app with test shops and pools at each stage (reset them in Admin →
+Settings → Test data), see [docs/testing.md](docs/testing.md).
 
 ### Admin accounts
 

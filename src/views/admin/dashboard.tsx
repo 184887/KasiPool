@@ -14,19 +14,28 @@ export function useAdminStats() {
     queryKey: ["admin-stats"],
     queryFn: async () => {
       await supabase.rpc("refresh_pool_states");
+      // Test shops and test pools (Settings -> Test data) stay out of the numbers
       const [pools, biz, parts, orders, costs, pos] = await Promise.all([
         supabase
           .from("pools")
-          .select("id, status, min_qty, pledged_qty, paid_qty, price, created_at"),
-        supabase.from("businesses").select("id, user_id"),
-        supabase.from("participations").select("user_id, status, pool_id"),
+          .select("id, status, min_qty, pledged_qty, paid_qty, price, created_at")
+          .eq("is_test", false),
+        supabase.from("businesses").select("id, user_id").eq("is_test", false),
+        supabase
+          .from("participations")
+          .select("user_id, status, pool_id, pools!inner(is_test)")
+          .eq("pools.is_test", false),
         supabase
           .from("orders")
           .select(
-            "id, user_id, pool_id, status, payment_status, fulfilment_status, problem_reported_at, quantity, total, amount_paid, unit_price",
-          ),
-        supabase.from("pool_costs").select("*"),
-        supabase.from("purchase_orders").select("*"),
+            "id, user_id, pool_id, status, payment_status, fulfilment_status, problem_reported_at, quantity, total, amount_paid, unit_price, pools!inner(is_test)",
+          )
+          .eq("pools.is_test", false),
+        supabase.from("pool_costs").select("*, pools!inner(is_test)").eq("pools.is_test", false),
+        supabase
+          .from("purchase_orders")
+          .select("*, pools!inner(is_test)")
+          .eq("pools.is_test", false),
       ]);
       return {
         pools: pools.data ?? [],

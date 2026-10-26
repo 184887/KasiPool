@@ -117,6 +117,7 @@ export type Database = {
           delivery_zone_id: string | null;
           email: string | null;
           id: string;
+          is_test: boolean;
           latitude: number | null;
           longitude: number | null;
           marketing_opt_in: boolean;
@@ -144,6 +145,7 @@ export type Database = {
           delivery_zone_id?: string | null;
           email?: string | null;
           id?: string;
+          is_test?: boolean;
           latitude?: number | null;
           longitude?: number | null;
           marketing_opt_in?: boolean;
@@ -170,6 +172,7 @@ export type Database = {
           delivery_zone_id?: string | null;
           email?: string | null;
           id?: string;
+          is_test?: boolean;
           latitude?: number | null;
           longitude?: number | null;
           marketing_opt_in?: boolean;
@@ -666,6 +669,7 @@ export type Database = {
           invite_code: string | null;
           is_private: boolean;
           is_sample: boolean;
+          is_test: boolean;
           max_per_customer: number | null;
           max_qty: number | null;
           min_per_customer: number;
@@ -704,6 +708,7 @@ export type Database = {
           invite_code?: string | null;
           is_private?: boolean;
           is_sample?: boolean;
+          is_test?: boolean;
           max_per_customer?: number | null;
           max_qty?: number | null;
           min_per_customer?: number;
@@ -741,6 +746,7 @@ export type Database = {
           invite_code?: string | null;
           is_private?: boolean;
           is_sample?: boolean;
+          is_test?: boolean;
           max_per_customer?: number | null;
           max_qty?: number | null;
           min_per_customer?: number;
@@ -1054,6 +1060,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      admin_reset_test_data: { Args: { _load?: boolean }; Returns: string };
       admin_resolve_delivery_problem: {
         Args: { _note: string; _order: string };
         Returns: undefined;
@@ -1085,6 +1092,7 @@ export type Database = {
         Returns: boolean;
       };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      is_test_shop: { Args: Record<PropertyKey, never>; Returns: boolean };
       join_pool: { Args: { _pool: string; _qty: number }; Returns: Json };
       my_pool_distances: {
         Args: Record<PropertyKey, never>;

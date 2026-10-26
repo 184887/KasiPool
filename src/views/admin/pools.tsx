@@ -87,6 +87,11 @@ export function PoolsAdmin() {
                 >
                   {p.products?.name}
                 </Link>
+                {p.is_test && (
+                  <StatusBadge tone="muted" className="ml-2">
+                    Test
+                  </StatusBadge>
+                )}
               </Td>
               <Td className="text-muted-foreground">{p.campaigns?.name ?? "-"}</Td>
               <Td>
