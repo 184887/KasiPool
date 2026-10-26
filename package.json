@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test-data": "node scripts/test-data.mjs",
+    "test-data:clear": "node scripts/test-data.mjs clear"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",

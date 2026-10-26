@@ -1065,6 +1065,7 @@ export type Database = {
         Returns: undefined;
       };
       admin_set_role: { Args: { _email: string; _make_admin: boolean }; Returns: undefined };
+      admin_skip_ahead: { Args: { _pool: string }; Returns: string };
       audit: {
         Args: { _action: string; _details?: Json; _entity: string; _id: string };
         Returns: undefined;
