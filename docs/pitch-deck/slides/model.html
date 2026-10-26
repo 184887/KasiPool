@@ -1,19 +1,192 @@
-<section id="model" data-transition="fade" style="background:#F3F0EA;color:#1C1A17;font-family:'Archivo', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px;align-items:stretch;justify-content:flex-start">
-<h2 style="font-family:'Anton', Arial, sans-serif;font-weight:400;font-size:80px;line-height:1.1;color:#1C1A17">No saving, no fee</h2>
-<div style="display:flex;align-items:flex-start;gap:24px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:0 0 32px 0"><p style="font-family:'Anton', Arial, sans-serif;font-weight:400;font-size:200px;line-height:1.1;color:#1C1A17">B</p><p style="font-size:28px;font-weight:700;line-height:1.4;color:#1C1A17">What you’d pay alone</p></div><p style="font-family:'Anton', Arial, sans-serif;font-weight:400;font-size:200px;line-height:1.1;color:#A64A14;width:120px;text-align:center">−</p><div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:0 0 32px 0"><p style="font-family:'Anton', Arial, sans-serif;font-weight:400;font-size:200px;line-height:1.1;color:#1C1A17">P</p><p style="font-size:28px;font-weight:700;line-height:1.4;color:#1C1A17">Pooled cost, incl. payment, packing and delivery</p></div><p style="font-family:'Anton', Arial, sans-serif;font-weight:400;font-size:200px;line-height:1.1;color:#A64A14;width:120px;text-align:center">=</p><div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F2892B;padding:0 32px 32px 32px"><p style="font-family:'Anton', Arial, sans-serif;font-weight:400;font-size:200px;line-height:1.1;color:#1C1A17">S</p><p style="font-size:28px;font-weight:700;line-height:1.4;color:#1C1A17">Saving</p></div>
-</div>
-<div style="display:flex;gap:64px">
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #1C1A17;padding:24px 0 0 0">
-<h3 style="font-family:'Bricolage Grotesque', Arial, sans-serif;font-weight:800;font-size:44px;line-height:1.1">KasiPool’s fee: an agreed share of the saving</h3>
-<p style="font-size:28px;line-height:1.4;color:#4D4943">Shown before you pay. Rate to be set: [__%]</p>
-</div>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #1C1A17;padding:24px 0 0 0">
-<h3 style="font-family:'Bricolage Grotesque', Arial, sans-serif;font-weight:800;font-size:44px;line-height:1.1">The shop owner keeps the rest</h3>
-<p style="font-size:28px;line-height:1.4;color:#4D4943">Every offer shows the price alone, the costs, our fee and the final total.</p>
-</div>
-</div>
-<p style="position:absolute;left:128px;bottom:64px;width:1500px;font-size:24px;color:#4D4943">No warehouse and no stock of our own: trusted partners handle packing and delivery.</p>
-<p style="position:absolute;right:128px;bottom:64px;width:100px;font-size:24px;font-weight:700;color:#4D4943;text-align:right">7</p>
-<aside>This replaces the 1.5% supplier commission from V1. Say it as: what you’d pay alone, minus the pooled cost, is the saving. We take an agreed share of it, and nothing if there is no saving. We only charge on measurable cash savings for the same product, pack size and quantity, not on estimates of time saved. An offer that can’t show worthwhile value is rejected or revised.</aside>
+<section
+  id="model"
+  data-transition="fade"
+  style="
+    background: #f3f0ea;
+    color: #1c1a17;
+    font-family: &quot;Archivo&quot;, Arial, sans-serif;
+    padding: 128px 128px 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: stretch;
+    justify-content: flex-start;
+  "
+>
+  <h2
+    style="
+      font-family: &quot;Anton&quot;, Arial, sans-serif;
+      font-weight: 400;
+      font-size: 80px;
+      line-height: 1.1;
+      color: #1c1a17;
+    "
+  >
+    No saving, no fee
+  </h2>
+  <div style="display: flex; align-items: flex-start; gap: 24px">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 0 0 32px 0">
+      <p
+        style="
+          font-family: &quot;Anton&quot;, Arial, sans-serif;
+          font-weight: 400;
+          font-size: 200px;
+          line-height: 1.1;
+          color: #1c1a17;
+        "
+      >
+        B
+      </p>
+      <p style="font-size: 28px; font-weight: 700; line-height: 1.4; color: #1c1a17">
+        What you’d pay alone
+      </p>
+    </div>
+    <p
+      style="
+        font-family: &quot;Anton&quot;, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 200px;
+        line-height: 1.1;
+        color: #a64a14;
+        width: 120px;
+        text-align: center;
+      "
+    >
+      −
+    </p>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 0 0 32px 0">
+      <p
+        style="
+          font-family: &quot;Anton&quot;, Arial, sans-serif;
+          font-weight: 400;
+          font-size: 200px;
+          line-height: 1.1;
+          color: #1c1a17;
+        "
+      >
+        P
+      </p>
+      <p style="font-size: 28px; font-weight: 700; line-height: 1.4; color: #1c1a17">
+        Pooled cost, incl. payment, packing and delivery
+      </p>
+    </div>
+    <p
+      style="
+        font-family: &quot;Anton&quot;, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 200px;
+        line-height: 1.1;
+        color: #a64a14;
+        width: 120px;
+        text-align: center;
+      "
+    >
+      =
+    </p>
+    <div
+      style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: #f2892b;
+        padding: 0 32px 32px 32px;
+      "
+    >
+      <p
+        style="
+          font-family: &quot;Anton&quot;, Arial, sans-serif;
+          font-weight: 400;
+          font-size: 200px;
+          line-height: 1.1;
+          color: #1c1a17;
+        "
+      >
+        S
+      </p>
+      <p style="font-size: 28px; font-weight: 700; line-height: 1.4; color: #1c1a17">Saving</p>
+    </div>
+  </div>
+  <div style="display: flex; gap: 64px">
+    <div
+      style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-top: 4px solid #1c1a17;
+        padding: 24px 0 0 0;
+      "
+    >
+      <h3
+        style="
+          font-family: &quot;Bricolage Grotesque&quot;, Arial, sans-serif;
+          font-weight: 800;
+          font-size: 44px;
+          line-height: 1.1;
+        "
+      >
+        KasiPool’s fee: an agreed share of the saving
+      </h3>
+      <p style="font-size: 28px; line-height: 1.4; color: #4d4943">
+        Shown before you pay. Rate to be set: [__%]
+      </p>
+    </div>
+    <div
+      style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-top: 4px solid #1c1a17;
+        padding: 24px 0 0 0;
+      "
+    >
+      <h3
+        style="
+          font-family: &quot;Bricolage Grotesque&quot;, Arial, sans-serif;
+          font-weight: 800;
+          font-size: 44px;
+          line-height: 1.1;
+        "
+      >
+        The shop owner keeps the rest
+      </h3>
+      <p style="font-size: 28px; line-height: 1.4; color: #4d4943">
+        Every offer shows the price alone, the costs, our fee and the final total.
+      </p>
+    </div>
+  </div>
+  <p
+    style="
+      position: absolute;
+      left: 128px;
+      bottom: 64px;
+      width: 1500px;
+      font-size: 24px;
+      color: #4d4943;
+    "
+  >
+    No warehouse and no stock of our own: trusted partners handle packing and delivery.
+  </p>
+  <p
+    style="
+      position: absolute;
+      right: 128px;
+      bottom: 64px;
+      width: 100px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #4d4943;
+      text-align: right;
+    "
+  >
+    7
+  </p>
+  <aside>
+    This replaces the 1.5% supplier commission from V1. Say it as: what you’d pay alone, minus the
+    pooled cost, is the saving. We take an agreed share of it, and nothing if there is no saving. We
+    only charge on measurable cash savings for the same product, pack size and quantity, not on
+    estimates of time saved. An offer that can’t show worthwhile value is rejected or revised.
+  </aside>
 </section>

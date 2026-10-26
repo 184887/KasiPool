@@ -1,7 +1,8 @@
 # Testing KasiPool end to end
 
-How to try every flow in the app on your own computer, with test shops and pools that are
-already at each stage. For how pools work, see the [admin guide](admin-guide.md).
+How anyone in the team can try every flow on the live app (kasipool.co.za, or your phone) with
+test shops and pools that are already at each stage. Nothing to install. For how pools work, see
+the [admin guide](admin-guide.md).
 
 ## Real deals
 
@@ -15,24 +16,29 @@ The list and bulk prices are **estimates** of Cape Town cash & carry prices, sho
 (stand-in)". Before verifying any real payment, get a quote from a real supplier, then cancel the
 deal and publish a new one with the quoted prices (prices are locked once a deal is published).
 
-## Load the test data (local only)
+## Test data on the live app
 
-```sh
-npx supabase start          # local stack in Docker
-npx supabase migration up --local
-npm run test-data           # clears old test data, then loads it fresh
-npm run test-data:clear     # removes it again
-```
+The test data lives on production next to the real data, kept apart from it:
 
-Point the app at the local stack: in `.env.local` set `NEXT_PUBLIC_SUPABASE_URL` and
-`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the `API_URL` and `PUBLISHABLE_KEY` from
-`npx supabase status -o env`, then `npm run dev`. Put the live values back afterwards.
+- Only test shops can see test pools. Real shops never see or join them.
+- Test shops see the real deals but can't join them or ask for them ("Test shops can only join
+  test pools").
+- The admin dashboard and reports leave test shops and test pools out. The pools list marks test
+  pools **Test**; test shop names end in "(test)".
 
-The script needs one admin account on the local stack (see "Admin accounts" in the README). It
-acts as that admin for the admin steps, so the audit log shows them as that admin. It only runs
-against the local stack; there is no command to load test data on the live project.
+**Reset it** in Admin → Settings → Test data → **Reset test data**. Every test shop and test pool
+is deleted and made again, back at its starting stage. Do this before a test session, or when
+someone has used the pools up: they also close by themselves after 7 days. **Remove test data**
+deletes it all. Neither button touches real shops or deals.
 
-Run `npm run test-data` again at any time to start over.
+Testing the admin side needs your own admin account (see "Admin accounts" in the README). Admin
+notifications, such as a delivery problem a test shop reports, go to every admin.
+
+### Developers: local stack
+
+The same data loads on the local Docker stack with `npm run test-data` (clear, then load) and
+`npm run test-data:clear`. Both call the database functions behind the Settings buttons
+(`private.load_test_data`, `private.clear_test_data`) and need one local admin account.
 
 ## Test shops
 
@@ -74,8 +80,9 @@ shop is close enough for some of them and too far for others.
 
 ### Shop (start with shop 1)
 
-1. **Deals:** real deals are listed nearest first with their distance; far ones say "Too far for
-   you". Log in as shop 7 to see every test pool as too far.
+1. **Deals:** test pools and real deals are listed nearest first with their distance; far ones
+   say "Too far for you". Log in as shop 7 to see every test pool as too far. Joining a real deal
+   says "Test shops can only join test pools".
 2. **Join a pool:** Star maize meal, 4 or more bags. The pool fills and an order to confirm
    appears in My Pools, with a notification.
 3. **Confirm and pay:** confirm the Huletts sugar order. You get a payment reference. Bank
@@ -83,7 +90,8 @@ shop is close enough for some of them and too far for others.
    pay yet.
 4. **Private group:** type CARWASH1 under "Got a private group code?" in My Pools, or open
    `/join/CARWASH1`.
-5. **Ask for a deal:** start a pool for a product. It waits for an admin as a draft.
+5. **Ask for a deal:** start a pool for a product. It waits for an admin as a draft, as a test
+   pool.
 6. **Delivery:** on the Sunlight order, confirm you got it, or report a problem. Log in as shop
    2 to confirm an order the courier already marked as delivered.
 7. **Refunds and reopen:** the bread flour order says the deal failed and money will be paid
@@ -106,12 +114,11 @@ shop is close enough for some of them and too far for others.
 
 ## Testing buttons
 
-The admin pool page has two testing buttons, backed by `admin_skip_ahead`:
+The admin pool page of a test pool has two testing buttons, backed by `admin_skip_ahead`:
 
 - **Testing: open now** on a scheduled pool.
 - **Testing: end payment time now** on a pool waiting for payment. Unpaid orders close and the
   pool is funded, reopens for the gap or fails, as at a real deadline.
 
-They work on any pool, including real ones, because they are only shortcuts for times the
-system would reach anyway. Take them out before launch, or only use them on test pools: ending the
-payment time early closes the orders of shops that still had time to pay.
+They only show, and only work, on test pools: ending a real deal's payment time early would close
+the orders of shops that still had time to pay.

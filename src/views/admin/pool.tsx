@@ -94,7 +94,7 @@ export function PoolAdmin() {
     toast.success(ok);
     qc.invalidateQueries();
   };
-  // Testing tool: jump to the next time-based step instead of waiting for it
+  // Test pools only: jump to the next time-based step instead of waiting for it
   const skipAhead = async (title: string, body: string) => {
     const ok = await ask({ title, body, confirmLabel: "Skip ahead", danger: true });
     if (ok === false) return;
@@ -369,18 +369,20 @@ export function PoolAdmin() {
                 <p>
                   Opens {dateTime(pool.opens_at)}. Businesses can see it then and start joining.
                 </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() =>
-                    skipAhead(
-                      "Open this pool now?",
-                      "For testing. Businesses can join straight away instead of at the opening time.",
-                    )
-                  }
-                >
-                  Testing: open now
-                </Button>
+                {pool.is_test && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() =>
+                      skipAhead(
+                        "Open this pool now?",
+                        "For testing. Businesses can join straight away instead of at the opening time.",
+                      )
+                    }
+                  >
+                    Testing: open now
+                  </Button>
+                )}
               </div>
             )}
             {pool.status === "open" && (
@@ -444,18 +446,20 @@ export function PoolAdmin() {
                     Available once paid quantity meets the minimum.
                   </p>
                 )}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() =>
-                    skipAhead(
-                      "End the payment time now?",
-                      "For testing. Unpaid orders close now. If enough is paid the pool is funded; if not, it reopens for the gap before its closing time, or fails and paid businesses are refunded.",
-                    )
-                  }
-                >
-                  Testing: end payment time now
-                </Button>
+                {pool.is_test && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() =>
+                      skipAhead(
+                        "End the payment time now?",
+                        "For testing. Unpaid orders close now. If enough is paid the pool is funded; if not, it reopens for the gap before its closing time, or fails and paid businesses are refunded.",
+                      )
+                    }
+                  >
+                    Testing: end payment time now
+                  </Button>
+                )}
               </div>
             )}
             {pool.status === "funded" && (

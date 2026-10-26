@@ -223,6 +223,10 @@ export function Settings() {
             </Button>
           </div>
         </Section>
+
+        <Section title="Test data">
+          <TestData />
+        </Section>
       </div>
     </>
   );
@@ -309,6 +313,57 @@ function AdminRequests() {
           ))}
         </ul>
       )}
+      {confirmDialog}
+    </>
+  );
+}
+
+/** Reset or remove the test shops and test pools (docs/testing.md). Real data is never touched. */
+function TestData() {
+  const qc = useQueryClient();
+  const [ask, confirmDialog] = useConfirm();
+  const [busy, setBusy] = useState(false);
+
+  async function run(load: boolean) {
+    const ok = await ask(
+      load
+        ? {
+            title: "Reset the test data?",
+            body: "All test shops and test pools are deleted and made again, each pool back at its starting stage. Anything the team did with them is lost. Real shops and deals are not touched.",
+            confirmLabel: "Reset test data",
+            danger: true,
+          }
+        : {
+            title: "Remove the test data?",
+            body: "All test shops and test pools are deleted. Real shops and deals are not touched.",
+            confirmLabel: "Remove test data",
+            danger: true,
+          },
+    );
+    if (ok === false) return;
+    setBusy(true);
+    const { data, error } = await supabase.rpc("admin_reset_test_data", { _load: load });
+    setBusy(false);
+    if (error) return toast.error(errMsg(error));
+    toast.success(data);
+    qc.invalidateQueries();
+  }
+
+  return (
+    <>
+      <p className="mb-3 text-sm text-muted-foreground">
+        7 test shops (060 000 0001 to 0007, PIN 123456) and 13 test pools, one at each stage, for
+        trying the app end to end. Only test shops can see test pools, test shops can only join test
+        pools, and the dashboard and reports leave them out. See docs/testing.md.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button disabled={busy} onClick={() => run(true)}>
+          {busy ? "Working…" : "Reset test data"}
+        </Button>
+        <Button variant="outline" disabled={busy} onClick={() => run(false)}>
+          Remove test data
+        </Button>
+      </div>
       {confirmDialog}
     </>
   );
