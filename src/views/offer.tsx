@@ -250,13 +250,13 @@ export function Offer() {
                 <span>
                   {pool.status === "open"
                     ? "The pool is full. It is closing now."
-                    : "The pool is full. Businesses are now confirming and paying."}
+                    : "The pool is full. Businesses are now confirming their orders."}
                 </span>
               </p>
             )}
             {open && pool.reopened_at && (
               <p className="mt-3 rounded-md bg-gold-soft p-3 text-sm text-ink">
-                <b>Open again.</b> Some businesses did not pay. This deal needs{" "}
+                <b>Open again.</b> Some businesses did not confirm their orders. This deal needs{" "}
                 {qtyOf(Math.max(pool.min_qty - pool.pledged_qty, 0), pool.unit)} more by{" "}
                 {dateTime(pool.closes_at)}.
               </p>
@@ -335,8 +335,8 @@ export function Offer() {
               <p className="mt-3 flex gap-2 text-sm text-muted-foreground">
                 <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>
-                  You do not pay now. When the pool is full, we ask you to confirm and pay. The deal
-                  also depends on the supplier having stock.
+                  You do not pay now. When the pool is full, we ask you to confirm your order. You
+                  pay when your stock arrives. The deal also depends on the supplier having stock.
                 </span>
               </p>
             </Section>
@@ -441,7 +441,8 @@ export function Offer() {
             </DialogTitle>
             <DialogDescription className="text-center">
               You are in for {qtyOf(success?.qty ?? 0, pool.unit)} of {pool.products?.name}. When
-              the pool is full, we will tell you. Then you confirm and pay.
+              the pool is full, we will tell you. Then you confirm your order. You pay when your
+              stock arrives.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:justify-center">

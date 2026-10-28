@@ -7,8 +7,8 @@ from the supplier and a courier delivers it to each shop.
 
 There are two sides to the app:
 
-- **Customers** browse deals, join pools, confirm and pay for orders, and track them through to
-  delivery.
+- **Customers** browse deals, join pools, confirm orders, track them through to delivery and pay
+  when their stock arrives.
 - **Admins** manage products, suppliers, pools, payments, purchase orders,
   deliveries and refunds.
 

@@ -521,8 +521,8 @@ export function PoolAdmin() {
             {pool.status === "procurement" && (
               <div className="space-y-2">
                 <p className="text-sm">
-                  Record what the supplier delivered. Stock is allocated to paid orders in payment
-                  order; shortfalls create refunds.
+                  Record what the supplier delivered. Stock is shared out to confirmed orders (early
+                  payers first). If some is missing, shops only pay for what they get.
                 </p>
                 <Field label={`Quantity received (ordered ${po?.quantity})`}>
                   <input

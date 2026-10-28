@@ -130,9 +130,9 @@ export function MyPools() {
                     {Number(o.delivery_fee) > 0 && ` + ${money(o.delivery_fee)} delivery`} ={" "}
                     <b>{money(o.total)}</b>
                   </p>
-                  {o.pools?.payment_deadline && o.fulfilment_status !== "ready" && (
+                  {o.status === "awaiting_confirmation" && o.pools?.payment_deadline && (
                     <p className="text-sm text-muted-foreground">
-                      Deadline {dateTime(o.pools.payment_deadline)}
+                      Confirm by {dateTime(o.pools.payment_deadline)}
                     </p>
                   )}
                 </div>

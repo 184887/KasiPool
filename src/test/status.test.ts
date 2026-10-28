@@ -23,17 +23,18 @@ describe("order progress", () => {
     payment_method: "eft",
   };
 
-  it("asks EFT shops for payment and proof once confirmed", () => {
-    expect(nextAction(order, true)).toBe("Pay and send proof");
-    expect(nextAction(order, false)).toBe("Wait for bank details");
-    expect(nextAction({ ...order, payment_status: "under_review" }, true)).toBeNull();
+  it("asks nobody to pay before the stock arrives", () => {
+    expect(nextAction(order, true)).toBeNull();
+    expect(nextAction({ ...order, payment_method: "cash" }, true)).toBeNull();
     expect(timelineStep(order)).toBe(2);
   });
 
-  it("asks cash shops for nothing until the stock arrives", () => {
-    const cash = { ...order, payment_method: "cash" };
-    expect(nextAction(cash, true)).toBeNull();
-    expect(nextAction({ ...cash, fulfilment_status: "received" }, true)).toBe("Pay what you owe");
+  it("asks for payment once the stock is received", () => {
+    const received = { ...order, fulfilment_status: "received" };
+    expect(nextAction(received, true)).toBe("Pay and send proof");
+    expect(nextAction(received, false)).toBe("Wait for bank details");
+    expect(nextAction({ ...received, payment_status: "under_review" }, true)).toBeNull();
+    expect(nextAction({ ...received, payment_method: "cash" }, true)).toBe("Pay what you owe");
   });
 
   it("asks the shop to confirm a delivery", () => {

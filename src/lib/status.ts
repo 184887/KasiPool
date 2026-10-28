@@ -7,7 +7,7 @@ export const POOL_STATUS: Record<string, { customer: string; admin: string; tone
   open: { customer: "Open to join", admin: "Open", tone: "info" },
   awaiting_confirmation: {
     customer: "Target reached",
-    admin: "Awaiting confirmation & payment",
+    admin: "Waiting for shops to confirm",
     tone: "info",
   },
   funded: {
@@ -83,9 +83,9 @@ export function nextAction(o: OrderLike, paymentConfigured: boolean): string | n
   if (o.payment_status === "issue") return "Fix payment problem";
   if (o.fulfilment_status === "out_for_delivery" || o.fulfilment_status === "delivered")
     return "Confirm delivery";
-  if (o.payment_status !== "awaiting_payment") return null;
-  if (o.payment_method === "cash")
-    return o.fulfilment_status === "received" ? "Pay what you owe" : null;
+  // Nobody is asked to pay before their stock arrives (an EFT shop may still pay early)
+  if (o.payment_status !== "awaiting_payment" || o.fulfilment_status !== "received") return null;
+  if (o.payment_method === "cash") return "Pay what you owe";
   return paymentConfigured ? "Pay and send proof" : "Wait for bank details";
 }
 
