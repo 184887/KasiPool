@@ -364,7 +364,7 @@ export function NewPool() {
                   />
                 </Field>
               </div>
-              <Field label="Confirmation & payment window (hours)">
+              <Field label="Confirm window (hours)">
                 <input
                   type="number"
                   min="1"

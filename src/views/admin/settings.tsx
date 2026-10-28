@@ -92,8 +92,8 @@ export function Settings() {
 
         <Section title="Payment instructions">
           <p className="mb-3 rounded-lg bg-warning-soft p-3 text-xs text-warning">
-            Only enter KasiPool's real, verified business account. Until this is enabled, customers
-            see “Payment instructions are not yet available”.
+            Only enter KasiPool's real, verified business account. Until this is enabled, shops who
+            choose EFT are told not to pay yet (cash on delivery still works).
           </p>
           <div className="space-y-2">
             <Field label="Approved payment method">
