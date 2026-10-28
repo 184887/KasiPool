@@ -331,6 +331,7 @@ export type Database = {
           out_for_delivery_at: string | null;
           paid_at: string | null;
           participation_id: string | null;
+          payment_method: string | null;
           payment_reference: string | null;
           payment_status: string;
           pool_id: string;
@@ -366,6 +367,7 @@ export type Database = {
           out_for_delivery_at?: string | null;
           paid_at?: string | null;
           participation_id?: string | null;
+          payment_method?: string | null;
           payment_reference?: string | null;
           payment_status?: string;
           pool_id: string;
@@ -400,6 +402,7 @@ export type Database = {
           out_for_delivery_at?: string | null;
           paid_at?: string | null;
           participation_id?: string | null;
+          payment_method?: string | null;
           payment_reference?: string | null;
           payment_status?: string;
           pool_id?: string;
@@ -494,6 +497,51 @@ export type Database = {
           },
         ];
       };
+      payment_proofs: {
+        Row: {
+          created_at: string;
+          file_path: string;
+          id: string;
+          note: string | null;
+          order_id: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: string;
+          uploaded_by: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          file_path: string;
+          id?: string;
+          note?: string | null;
+          order_id: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          uploaded_by: string;
+        };
+        Update: {
+          created_at?: string;
+          file_path?: string;
+          id?: string;
+          note?: string | null;
+          order_id?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payment_proofs_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       payments: {
         Row: {
           amount: number;
@@ -501,6 +549,7 @@ export type Database = {
           created_at: string;
           id: string;
           kind: string;
+          method: string;
           note: string | null;
           order_id: string;
           recorded_by: string | null;
@@ -512,6 +561,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           kind?: string;
+          method?: string;
           note?: string | null;
           order_id: string;
           recorded_by?: string | null;
@@ -522,6 +572,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           kind?: string;
+          method?: string;
           note?: string | null;
           order_id?: string;
           recorded_by?: string | null;
@@ -1055,6 +1106,7 @@ export type Database = {
           _amount: number;
           _channel_ref: string;
           _kind: string;
+          _method?: string;
           _note: string;
           _order: string;
         };
@@ -1067,6 +1119,10 @@ export type Database = {
       };
       admin_resolve_failed_pool: { Args: { _note: string; _pool: string }; Returns: undefined };
       admin_review_access: { Args: { _approve: boolean; _user: string }; Returns: undefined };
+      admin_review_payment_proof: {
+        Args: { _amount?: number; _approve: boolean; _note?: string; _proof: string };
+        Returns: undefined;
+      };
       admin_set_pool_location: {
         Args: { _label: string; _lat: number; _lon: number; _pool: string; _radius: number };
         Returns: undefined;
@@ -1077,12 +1133,16 @@ export type Database = {
         Args: { _action: string; _details?: Json; _entity: string; _id: string };
         Returns: undefined;
       };
+      choose_payment_method: { Args: { _method: string; _order: string }; Returns: undefined };
       claim_first_admin: { Args: Record<PropertyKey, never>; Returns: undefined };
       claim_pool_invite: { Args: { _code: string }; Returns: string };
       close_pool: { Args: { _pool: string }; Returns: undefined };
       complete_pool_if_delivered: { Args: { _pool: string }; Returns: undefined };
       confirm_delivery_received: { Args: { _order: string }; Returns: undefined };
-      confirm_order: { Args: { _accept: boolean; _order: string }; Returns: string };
+      confirm_order: {
+        Args: { _accept: boolean; _method?: string; _order: string };
+        Returns: string;
+      };
       decline_order: { Args: { _order: string }; Returns: undefined };
       discount_share_pct: { Args: Record<PropertyKey, never>; Returns: number };
       fail_pool: { Args: { _note: string; _pool: string }; Returns: string };
@@ -1129,6 +1189,7 @@ export type Database = {
       report_delivery_problem: { Args: { _note: string; _order: string }; Returns: undefined };
       request_admin_access: { Args: { _name: string }; Returns: undefined };
       set_order_delivery: { Args: { _order: string }; Returns: undefined };
+      submit_payment_proof: { Args: { _order: string; _path: string }; Returns: string };
       withdraw_from_pool: { Args: { _pool: string }; Returns: undefined };
     };
     Enums: {

@@ -150,24 +150,24 @@ export function PoolAdmin() {
           value={`${pool.pledged_qty} / ${pool.min_qty}`}
           hint={`${pool.participant_count} ${pool.participant_count === 1 ? "business" : "businesses"}`}
         />
-        <MetricCard label="Confirmed" value={pool.confirmed_qty} hint="units" />
         <MetricCard
-          label="Fully paid"
-          value={pool.paid_qty}
+          label="Confirmed"
+          value={pool.confirmed_qty}
           hint={
-            pool.paid_qty >= pool.min_qty
+            pool.confirmed_qty >= pool.min_qty
               ? "Meets minimum ✓"
-              : `Need ${pool.min_qty - pool.paid_qty} more`
+              : `Need ${pool.min_qty - pool.confirmed_qty} more`
           }
-          tone={pool.paid_qty >= pool.min_qty ? "success" : undefined}
+          tone={pool.confirmed_qty >= pool.min_qty ? "success" : undefined}
         />
+        <MetricCard label="Fully paid" value={pool.paid_qty} hint="units (shops pay on delivery)" />
         <MetricCard
           label={pool.status === "draft" ? "Price if published now" : "Price / bulk cost"}
           value={shownPrice == null ? "-" : money(shownPrice)}
           hint={`List ${money(pool.reference_price)} · bulk ${money(cost?.supplier_cost)} · KasiPool ${money(Number(shownPrice ?? 0) - Number(cost?.supplier_cost ?? 0))}/unit${pool.discount_share_pct != null ? ` (${pool.discount_share_pct}%)` : ""}`}
         />
         <MetricCard
-          label={pool.status === "open" ? "Closes" : "Payment deadline"}
+          label={pool.status === "open" ? "Closes" : "Confirm by"}
           value={
             <span className="text-base">
               {dateTime(
@@ -393,9 +393,10 @@ export function PoolAdmin() {
                 </p>
                 {pool.reopened_at && (
                   <p className="rounded-md bg-gold-soft p-2">
-                    Reopened {dateTime(pool.reopened_at)} after unpaid orders expired.{" "}
-                    {pool.paid_qty} already paid; {Math.max(pool.min_qty - pool.pledged_qty, 0)}{" "}
-                    more needed by the closing time, or paid businesses are refunded.
+                    Reopened {dateTime(pool.reopened_at)} after unconfirmed orders expired.{" "}
+                    {pool.confirmed_qty} already confirmed;{" "}
+                    {Math.max(pool.min_qty - pool.pledged_qty, 0)} more needed by the closing time,
+                    or the deal fails (anyone who paid early is refunded).
                   </p>
                 )}
                 <Button
@@ -418,17 +419,17 @@ export function PoolAdmin() {
             {pool.status === "awaiting_confirmation" && (
               <div className="space-y-2 text-sm">
                 <p>
-                  Businesses are confirming and paying. Deadline:{" "}
-                  <b>{dateTime(pool.payment_deadline)}</b>. At the deadline the system checks paid
-                  quantity against the minimum automatically.
+                  Businesses are confirming and choosing how to pay (cash or EFT on delivery).
+                  Deadline: <b>{dateTime(pool.payment_deadline)}</b>. At the deadline the system
+                  checks the confirmed quantity against the minimum automatically.
                 </p>
                 <Button
                   className="w-full"
-                  disabled={pool.paid_qty < pool.min_qty}
+                  disabled={pool.confirmed_qty < pool.min_qty}
                   onClick={async () => {
                     const ok = await ask({
                       title: "Finalise funding now?",
-                      body: "All unpaid orders will expire.",
+                      body: "All unconfirmed orders will expire.",
                       confirmLabel: "Finalise funding",
                       danger: true,
                     });
@@ -439,11 +440,11 @@ export function PoolAdmin() {
                       );
                   }}
                 >
-                  Finalise funding now ({pool.paid_qty}/{pool.min_qty} paid)
+                  Finalise funding now ({pool.confirmed_qty}/{pool.min_qty} confirmed)
                 </Button>
-                {pool.paid_qty < pool.min_qty && (
+                {pool.confirmed_qty < pool.min_qty && (
                   <p className="text-xs text-muted-foreground">
-                    Available once paid quantity meets the minimum.
+                    Available once the confirmed quantity meets the minimum.
                   </p>
                 )}
                 {pool.is_test && (
@@ -452,12 +453,12 @@ export function PoolAdmin() {
                     className="w-full"
                     onClick={() =>
                       skipAhead(
-                        "End the payment time now?",
-                        "For testing. Unpaid orders close now. If enough is paid the pool is funded; if not, it reopens for the gap before its closing time, or fails and paid businesses are refunded.",
+                        "End the confirm time now?",
+                        "For testing. Unconfirmed orders close now. If enough is confirmed the pool is funded; if not, it reopens for the gap before its closing time, or fails and anyone who paid early is refunded.",
                       )
                     }
                   >
-                    Testing: end payment time now
+                    Testing: end confirm time now
                   </Button>
                 )}
               </div>
@@ -467,10 +468,11 @@ export function PoolAdmin() {
                 <p className="text-sm">
                   Generate the consolidated supplier order for{" "}
                   <b>
-                    {pool.paid_qty} {pool.unit}s
+                    {pool.confirmed_qty} {pool.unit}s
                   </b>{" "}
                   at {money(cost?.supplier_cost)} ={" "}
-                  <b>{money(pool.paid_qty * Number(cost?.supplier_cost ?? 0))}</b>.
+                  <b>{money(pool.confirmed_qty * Number(cost?.supplier_cost ?? 0))}</b>. KasiPool
+                  pays the supplier; shops pay when their stock arrives.
                 </p>
                 <Field label="Supplier order reference">
                   <input

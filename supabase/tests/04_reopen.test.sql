@@ -42,33 +42,31 @@ select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
 select public.admin_publish_pool('00000000-0000-0000-0000-0000000000b1');
 select public.admin_publish_pool('00000000-0000-0000-0000-0000000000b2');
 
--- Pool 1: A (6) and B (4) reach the target; only A pays
+-- Pool 1: A (6) and B (4) reach the target; only A confirms (cash, so nothing is paid yet)
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select public.join_pool('00000000-0000-0000-0000-0000000000b1', 6);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
 select public.join_pool('00000000-0000-0000-0000-0000000000b1', 4);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select public.confirm_order((select id from public.orders where pool_id = '00000000-0000-0000-0000-0000000000b1'
-  and user_id = '00000000-0000-0000-0000-00000000c001'), true);
+  and user_id = '00000000-0000-0000-0000-00000000c001'), true, 'cash');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
-select public.admin_record_payment(id, total, 'EFT', null, 'verified') from public.orders
-  where pool_id = '00000000-0000-0000-0000-0000000000b1' and user_id = '00000000-0000-0000-0000-00000000c001';
 select throws_like($$select public.admin_finalise_funding('00000000-0000-0000-0000-0000000000b1')$$,
   '%below the minimum%', 'admin can''t finalise early while short');
 
 select pg_temp.deadline_passes('00000000-0000-0000-0000-0000000000b1');
 select results_eq(
-  $$select status, pledged_qty, paid_qty, payment_deadline is null, reopened_at is not null
+  $$select status, pledged_qty, confirmed_qty, payment_deadline is null, reopened_at is not null
     from public.pools where id = '00000000-0000-0000-0000-0000000000b1'$$,
   $$values ('open'::text, 6, 6, true, true)$$,
-  'after the deadline the pool reopens with the paid quantity counted'
+  'after the deadline the pool reopens with the confirmed quantity counted'
 );
 select is((select status from public.orders where user_id = '00000000-0000-0000-0000-00000000c002'
-  and pool_id = '00000000-0000-0000-0000-0000000000b1'), 'expired', 'the unpaid order expires');
-select is((select payment_status from public.orders where user_id = '00000000-0000-0000-0000-00000000c001'
-  and pool_id = '00000000-0000-0000-0000-0000000000b1'), 'paid', 'the paid order is kept');
+  and pool_id = '00000000-0000-0000-0000-0000000000b1'), 'expired', 'the unconfirmed order expires');
+select is((select status from public.orders where user_id = '00000000-0000-0000-0000-00000000c001'
+  and pool_id = '00000000-0000-0000-0000-0000000000b1'), 'confirmed', 'the confirmed (unpaid) order is kept');
 select ok(exists(select 1 from public.notifications where user_id = '00000000-0000-0000-0000-00000000c001'
-  and title = 'The deal is open again'), 'the paid shop is told about the reopen');
+  and title = 'The deal is open again'), 'the confirmed shop is told about the reopen');
 select ok(exists(select 1 from public.notifications where user_id = '00000000-0000-0000-0000-00000000c001'
   and body like '%It needs 4 cases more.%'), 'the reopen message says how many are needed, in plain words');
 select ok(exists(select 1 from public.notifications where user_id = '00000000-0000-0000-0000-00000000c001'
@@ -78,10 +76,10 @@ select ok(exists(select 1 from public.notifications where user_id = '00000000-00
 -- Who can join the reopened pool
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
 select throws_like($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 4)$$,
-  '%did not pay for your last order%', 'a shop whose order expired can''t rejoin');
+  '%did not confirm your last order%', 'a shop whose order expired can''t rejoin');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select throws_like($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 2)$$,
-  '%already have an order%', 'a shop that paid can''t join twice');
+  '%already have an order%', 'a confirmed shop can''t join twice');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c003');
 select lives_ok($$select public.join_pool('00000000-0000-0000-0000-0000000000b1', 4)$$, 'a new shop fills the gap');
 select is((select status from public.pools where id = '00000000-0000-0000-0000-0000000000b1'),
@@ -90,21 +88,19 @@ select is((select count(*)::int from public.orders where pool_id = '00000000-000
   and status = 'awaiting_confirmation'), 1, 'only the new shop gets a new order to confirm');
 
 select public.confirm_order((select id from public.orders where pool_id = '00000000-0000-0000-0000-0000000000b1'
-  and user_id = '00000000-0000-0000-0000-00000000c003'), true);
+  and user_id = '00000000-0000-0000-0000-00000000c003'), true, 'eft');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
-select public.admin_record_payment(id, total, 'EFT', null, 'verified') from public.orders
-  where pool_id = '00000000-0000-0000-0000-0000000000b1' and user_id = '00000000-0000-0000-0000-00000000c003';
 select is(public.admin_finalise_funding('00000000-0000-0000-0000-0000000000b1'), 'funded',
-  'paid quantity from both rounds funds the pool');
+  'confirmed quantity from both rounds funds the pool, before anyone pays');
 
--- Pool 2: reopened, but nobody fills the gap before the closing time
+-- Pool 2: A confirms and pays early by EFT; reopened, but nobody fills the gap before the closing time
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select public.join_pool('00000000-0000-0000-0000-0000000000b2', 6);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
 select public.join_pool('00000000-0000-0000-0000-0000000000b2', 4);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select public.confirm_order((select id from public.orders where pool_id = '00000000-0000-0000-0000-0000000000b2'
-  and user_id = '00000000-0000-0000-0000-00000000c001'), true);
+  and user_id = '00000000-0000-0000-0000-00000000c001'), true, 'eft');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
 select public.admin_record_payment(id, total, 'EFT', null, 'verified') from public.orders
   where pool_id = '00000000-0000-0000-0000-0000000000b2' and user_id = '00000000-0000-0000-0000-00000000c001';

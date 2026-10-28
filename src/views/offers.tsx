@@ -49,7 +49,7 @@ export function Offers() {
     <Container>
       <h1 className="font-headline text-4xl sm:text-5xl">Deals</h1>
       <p className="mt-1 text-muted-foreground">
-        You do not pay when you join. You pay when the pool is full.
+        You do not pay when you join. You pay when your stock arrives.
       </p>
       <div className="relative mt-5">
         <Search

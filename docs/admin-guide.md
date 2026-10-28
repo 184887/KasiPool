@@ -16,7 +16,8 @@ Do these once, in this order:
    confirms. Leave it at R0 while fees are undecided: shops then see "Delivery is free".
 2. **Pricing** (Admin → Settings → Pricing). Set KasiPool's share of the discount (default 20%).
 3. **Payment instructions** (Admin → Settings). Enter KasiPool's real bank details and tick "Show
-   these payment instructions to customers". Until then shops are told not to pay yet.
+   these payment instructions to customers". Until then shops who chose EFT are told not to pay
+   yet (cash on delivery still works).
 4. **Contact details** (Admin → Settings). Phone and WhatsApp numbers are shown on the Help page
    and to shops who forget their PIN.
 5. **Suppliers and products** (Admin → Suppliers, Admin → Products).
@@ -45,7 +46,7 @@ keeps R10 per unit.
 
 Admin → Pools → New pool. The wizard asks for campaign (optional), product, supplier, list and
 bulk prices, quantities (minimum target, optional maximum and per-shop limits), opening and
-closing dates, the **payment window** in hours (default 24), and **who can join**: the centre of
+closing dates, the **confirm window** in hours (default 24), and **who can join**: the centre of
 the deal (search a township or landmark in the middle of the businesses you want to reach) and
 the distance in km (default 10). It previews the shop price and KasiPool's cut. Publish when
 ready; a pool needs a supplier, list and bulk prices and a centre.
@@ -68,41 +69,38 @@ of the centre. Deals are listed nearest first with "4 km away"; ones that are to
 far for you" and can't be joined. Businesses never see where a pool is centred, only how far
 away it is.
 
-### 3. Target reached: confirm and pay
+### 3. Target reached: shops confirm
 
 The pool **closes as soon as the target is reached** (or at the closing time if it isn't). Each
-shop gets an order to confirm, with the goods, the delivery fee (from Settings, R0 for now) and the total. They must
-confirm and pay in full by EFT within the payment window, using their order reference.
+shop gets an order to confirm, with the goods, the delivery fee (from Settings, R0 for now) and
+the total. They confirm within the confirm window and choose how they will pay: **cash on
+delivery** or **EFT**. Nobody pays yet (pilot: see Payments below).
 
-Record payments in Admin → Payments (or **Record payment** on the pool page). A payment counts once
-it is recorded as verified against the bank statement. Overpayments create a refund automatically.
-
-If everything is paid before the deadline, you can **Finalise funding now** on the pool page.
-Otherwise the system settles it at the deadline. On test pools, **Testing: end payment time now**
+If enough is confirmed before the deadline, you can **Finalise funding now** on the pool page.
+Otherwise the system settles it at the deadline. On test pools, **Testing: end confirm time now**
 settles it straight away (see [testing](testing.md)). Real deals don't have this button.
 
-### 4. If some shops don't pay: the pool reopens
+### 4. If some shops don't confirm: the pool reopens
 
-At the payment deadline, unpaid orders expire. Then:
+At the deadline, unconfirmed orders expire. Then:
 
-- **Paid quantity reaches the target:** the pool is **funded**.
+- **Confirmed quantity reaches the target:** the pool is **funded**.
 - **Short, and the original closing time hasn't passed:** the pool **reopens** for the missing
-  quantity until the closing time. Shops that paid are told their order is safe. New shops can
-  join; shops whose order expired can't rejoin, and shops that paid can't join twice. When the gap
-  is filled the new shops get their own payment window.
-- **Short at the closing time:** the pool **fails**. Everyone who paid is owed a full refund
-  (see Refunds below), and the pool shows "Refund resolution required" until refunds are done.
-
-Shops can't cancel after paying.
+  quantity until the closing time. Confirmed shops are told their order is safe. New shops can
+  join; shops whose order expired can't rejoin, and confirmed shops can't join twice. When the
+  gap is filled the new shops get their own confirm window.
+- **Short at the closing time:** the pool **fails**. Confirmed shops owe nothing. Anyone who
+  paid early by EFT is owed a full refund (see Refunds below), and the pool shows "Refund
+  resolution required" until refunds are done.
 
 ### 5. Buy the stock
 
 On a funded pool: **Authorise purchase order** (supplier reference, order and expected dates).
-When stock arrives: **Record receipt & allocate** with the quantity the supplier actually
-delivered. Stock is shared out to paid orders in payment order. If the supplier is short:
-
-- a shop that gets part of its order is refunded for the missing units;
-- a shop that gets nothing is refunded in full, including its delivery fee.
+KasiPool pays the supplier for every confirmed order. When stock arrives: **Record receipt &
+allocate** with the quantity the supplier actually delivered. Stock is shared out to confirmed
+orders (shops that paid early first). If the supplier is short, a shop's order total drops to
+what it gets (a shop that gets nothing also pays no delivery fee). Anything it already paid above
+the new total is refunded.
 
 ### 6. Deliver
 
@@ -120,14 +118,34 @@ The pool is **completed** once nothing is still out for delivery.
 
 ### Cancelling
 
-**Cancel pool** works up to and including the confirm-and-pay stage (draft, scheduled, open or
-awaiting payment), not once a pool is funded. Shops that already paid are owed refunds
+**Cancel pool** works up to and including the confirm stage (draft, scheduled, open or
+awaiting confirmation), not once a pool is funded. Shops that already paid are owed refunds
 automatically.
+
+## Payments (pilot: pay on delivery)
+
+For the pilot, KasiPool buys the stock with its own money and shops pay when it arrives, so they
+don't have to trust a new business with money up front. KasiPool carries the risk of a shop not
+paying. Each shop chose a way to pay when it confirmed, and can change it until it is paid:
+
+- **Cash on delivery:** the shop pays at the door. When you have the cash, open Admin → Payments,
+  press **Record** on the order, choose **Cash** and record it as a verified payment. A part
+  payment leaves the rest owed.
+- **EFT:** the shop pays into KasiPool's account with its order number as the reference, then
+  uploads a proof of payment (photo, screenshot or PDF) in the app, whenever it is ready. The
+  order shows "Checking payment" and admins get a notification. In Admin → Payments → **Proofs
+  to check**, press **View proof**, then **find the money in the bank account**: a screenshot
+  alone is not proof. If it's there, enter the amount you found and press **Money is in:
+  approve**: the order shows "Paid". If not, press **Reject** with a reason; the shop is told
+  why and can send a new proof. You can also **Record** an EFT you found without a proof.
+
+Use the **Delivered, not paid** filter on Admin → Payments to chase shops that still owe money
+after their stock arrived. The dashboard shows how many there are and how much is owed.
 
 ## Refunds
 
-Refunds are created automatically for overpayments, partial payments on expired orders, failed
-or cancelled pools and supplier shortfalls. Pay them back by EFT, then record each one in Admin →
+Refunds are created automatically for overpayments, early payments on failed or cancelled pools,
+and money already paid for stock the supplier didn't send. Pay them back by EFT, then record each one in Admin →
 Payments → **Process refunds** with the bank reference. A failed pool can be marked resolved once
 all its refunds are done.
 

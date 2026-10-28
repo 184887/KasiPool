@@ -78,9 +78,9 @@ select results_eq(
 
 -- Both confirm and pay; funding goes through
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
-select public.confirm_order((select id from public.orders where user_id = '00000000-0000-0000-0000-00000000c001'), true);
+select public.confirm_order((select id from public.orders where user_id = '00000000-0000-0000-0000-00000000c001'), true, 'eft');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
-select public.confirm_order((select id from public.orders where user_id = '00000000-0000-0000-0000-00000000c002'), true);
+select public.confirm_order((select id from public.orders where user_id = '00000000-0000-0000-0000-00000000c002'), true, 'eft');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
 select public.admin_record_payment(id, total, 'EFT', null, 'verified') from public.orders
   where pool_id = '00000000-0000-0000-0000-0000000000b1';

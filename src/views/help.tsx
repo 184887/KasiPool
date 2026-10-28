@@ -29,8 +29,9 @@ export function Help() {
       )}
       <h2>Payments</h2>
       <p>
-        Always use your order number as the reference when you pay. KasiPool checks your payment,
-        then your order shows “Paid”.
+        Pay in cash when your stock arrives, or by bank transfer. For a bank transfer, use your
+        order number as the reference and send your proof of payment in the app. KasiPool checks it
+        in our bank account, then your order shows “Paid”.
       </p>
     </LegalPage>
   );

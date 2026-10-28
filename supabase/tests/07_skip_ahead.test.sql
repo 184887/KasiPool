@@ -51,30 +51,28 @@ select is(public.admin_skip_ahead('00000000-0000-0000-0000-0000000000b1'), 'open
 select is((select status from public.pools where id = '00000000-0000-0000-0000-0000000000b1'), 'open',
   'the pool is open now');
 select throws_like($$select public.admin_skip_ahead('00000000-0000-0000-0000-0000000000b1')$$,
-  '%Only scheduled pools and pools waiting for payment%', 'an open pool can''t skip ahead');
+  '%Only scheduled pools and pools waiting for shops to confirm%', 'an open pool can''t skip ahead');
 
--- b2: A (6) and B (4) fill it; only A pays
+-- b2: A (6) and B (4) fill it; only A confirms
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select public.join_pool('00000000-0000-0000-0000-0000000000b2', 6);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c002');
 select public.join_pool('00000000-0000-0000-0000-0000000000b2', 4);
 select pg_temp.act_as('00000000-0000-0000-0000-00000000c001');
 select public.confirm_order((select id from public.orders where pool_id = '00000000-0000-0000-0000-0000000000b2'
-  and user_id = '00000000-0000-0000-0000-00000000c001'), true);
+  and user_id = '00000000-0000-0000-0000-00000000c001'), true, 'eft');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000ad01');
-select public.admin_record_payment(id, total, 'EFT', null, 'verified') from public.orders
-  where pool_id = '00000000-0000-0000-0000-0000000000b2' and user_id = '00000000-0000-0000-0000-00000000c001';
 
 select is(public.admin_skip_ahead('00000000-0000-0000-0000-0000000000b2'), 'reopened',
-  'ending the payment time early reopens a short pool before its closing time');
+  'ending the confirm time early reopens a short pool before its closing time');
 select is((select status from public.orders where pool_id = '00000000-0000-0000-0000-0000000000b2'
-  and user_id = '00000000-0000-0000-0000-00000000c002'), 'expired', 'the unpaid order closes');
+  and user_id = '00000000-0000-0000-0000-00000000c002'), 'expired', 'the unconfirmed order closes');
 
 -- Nobody fills the gap before the closing time
 update public.pools set closes_at = now() - interval '1 second' where id = '00000000-0000-0000-0000-0000000000b2';
 select public.refresh_pool_states();
 select is((select status from public.pools where id = '00000000-0000-0000-0000-0000000000b2'),
-  'refund_resolution', 'past the closing time the short pool fails and owes refunds');
+  'unsuccessful', 'past the closing time the short pool fails; nobody paid, so no refunds');
 select ok(exists(select 1 from public.audit_events where action = 'skip_ahead'
   and entity_id = '00000000-0000-0000-0000-0000000000b2'), 'skipping ahead is audited');
 

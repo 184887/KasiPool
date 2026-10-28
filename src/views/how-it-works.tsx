@@ -8,7 +8,7 @@ import { STEPS } from "@/views/home";
 const FAQ = [
   [
     "Do I pay when I join a pool?",
-    "No. You pay only when the pool is full and you confirm your order.",
+    "No. You pay when your stock arrives, in cash or by bank transfer (EFT).",
   ],
   ["What if the pool does not fill up?", "The deal stops and you pay nothing."],
   [
@@ -16,12 +16,12 @@ const FAQ = [
     "Yes. While the pool is open, you can change how many you want, or leave the pool.",
   ],
   [
-    "How is payment checked?",
-    "KasiPool checks every payment in our bank account. A screenshot is not enough.",
+    "How do I pay?",
+    "When you confirm your order, choose cash or bank transfer. Cash: pay at the door when your stock arrives. Bank transfer: use your order number as the reference, then send us a photo of your payment slip in the app. Your order shows 'Paid' when we find the money in our bank account.",
   ],
   [
-    "What if some businesses don't pay?",
-    "The pool opens again for other businesses until the closing date. If it is still not full, we pay back everyone who paid.",
+    "What if some businesses don't confirm?",
+    "The pool opens again for other businesses until the closing date. If it is still not full, the deal stops. If you paid early, we pay you back.",
   ],
   [
     "How do I get my stock?",

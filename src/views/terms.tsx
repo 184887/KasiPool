@@ -5,7 +5,7 @@ import { LegalPage } from "@/components/kp/LegalPage";
 export function Terms() {
   return (
     <LegalPage title="Terms of use">
-      <p>Version v0.1-draft.</p>
+      <p>Version v0.2-draft.</p>
       <h2>1. What KasiPool does</h2>
       <p>
         KasiPool aggregates purchasing demand from registered businesses and buys stock from
@@ -20,18 +20,21 @@ export function Terms() {
       <h2>3. Confirmation and payment</h2>
       <p>
         If a pool reaches its target, you will be asked to confirm your order at the stated price
-        and pay within the payment window (24 hours by default). Confirmed prices will not be
+        within the confirmation window (24 hours by default) and choose how you will pay: cash on
+        delivery or bank transfer (EFT). You pay when your stock is delivered. A bank transfer
+        counts as paid only once KasiPool finds it in its bank account. Confirmed prices will not be
         changed.
       </p>
       <h2>4. Funding and procurement</h2>
       <p>
-        Stock is ordered only if fully paid orders meet the supplier minimum. If not, the deal fails
-        and payments received are refunded.
+        KasiPool buys the stock for confirmed orders with its own money. Stock is ordered only if
+        confirmed orders meet the supplier minimum. If not, the deal fails, you owe nothing and any
+        early payments are refunded. By confirming, you agree to pay for the stock delivered to you.
       </p>
       <h2>5. Supplier availability</h2>
       <p>
-        Deals are subject to supplier availability. If a supplier delivers less than ordered,
-        affected quantities are refunded.
+        Deals are subject to supplier availability. If a supplier delivers less than ordered, you
+        only pay for what you receive, and any amount you paid for missing stock is refunded.
       </p>
       <h2>6. Delivery</h2>
       <p>

@@ -19,10 +19,15 @@ day to day, see the [admin guide](docs/admin-guide.md).
 
 - **Pricing:** shops pay KasiPool, KasiPool pays the supplier. KasiPool keeps one global share of
   the discount (Admin → Settings): `price = list - (1 - share) × (list - bulk)`.
-- **Pools:** joining is free. A pool closes as soon as it reaches its target; shops then pay in
-  full within the pool's payment window. If unpaid orders leave a gap, the pool reopens for the
-  gap until its original closing time, then fails and refunds paid shops if still short. No
-  cancelling after paying.
+- **Pools:** joining is free. A pool closes as soon as it reaches its target; shops then confirm
+  within the pool's confirm window. If unconfirmed orders leave a gap, the pool reopens for the
+  gap until its original closing time, then fails if still short (anyone who paid early is
+  refunded).
+- **Payments (pilot, 2026-10-28):** KasiPool buys the stock with its own money and shops pay when
+  it arrives, so they don't have to trust a new business with money up front. When confirming,
+  a shop chooses **cash on delivery** or **EFT**. EFT shops upload a proof of payment whenever
+  they are ready; an order only counts as paid once an admin finds the money in the bank account
+  and approves it. KasiPool carries the risk of a shop not paying.
 - **Who can join (distance):** every public pool has a centre and a radius (default 10 km). A
   business can join if the place its stock goes to is inside it, so each pool's deliveries stay
   close together. A pool a business asks for is centred on that business (the "hub"); admins
@@ -35,8 +40,8 @@ day to day, see the [admin guide](docs/admin-guide.md).
   Admins record what the courier reports; businesses confirm receipt or report a problem.
 - **Who it's for:** every kind of local business (shops, salons, car washes, bakeries, butcheries
   and more), not only spaza shops.
-- **For now:** one login per shop, no business verification, in-app notifications only, EFT
-  payments verified by an admin, suppliers managed by admins.
+- **For now:** one login per shop, no business verification, in-app notifications only, cash
+  or EFT payments recorded by an admin, suppliers managed by admins.
 
 ## Tech stack
 
@@ -46,7 +51,7 @@ day to day, see the [admin guide](docs/admin-guide.md).
 | UI         | Tailwind CSS 4, [shadcn/ui](https://ui.shadcn.com) (Radix), lucide icons   |
 | Data       | [Supabase](https://supabase.com) (Postgres, Auth, Storage), TanStack Query |
 | Backend    | Postgres `SECURITY DEFINER` functions + Supabase Edge Functions (Deno)     |
-| Payments   | EFT (bank transfer), verified by an admin                                  |
+| Payments   | Cash on delivery or EFT with proof of payment, verified by an admin        |
 | Messaging  | In-app notifications; Clickatell SMS hook kept for future sign-in codes    |
 | Tests/lint | Vitest, Testing Library, ESLint, Prettier                                  |
 
