@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, BadgeCheck, Copy, PackageCheck } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Banknote, Copy, Landmark, PackageCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -13,10 +13,14 @@ import { Container } from "@/components/kp/AppShell";
 import { useConfirm } from "@/components/kp/ConfirmDialog";
 import { OrderTimeline, Countdown, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
+import { ProofUpload } from "@/components/kp/PaymentProof";
 import { supabase } from "@/integrations/supabase/client";
 import { settingsQuery, errMsg } from "@/lib/queries";
 import { money, dateTime, qty } from "@/lib/format";
-import { PAYMENT_STATUS, ORDER_STATUS, timelineStep } from "@/lib/status";
+import { PAYMENT_STATUS, PAYMENT_METHOD, ORDER_STATUS, timelineStep } from "@/lib/status";
+import { cn } from "@/lib/utils";
+
+type Method = "cash" | "eft";
 
 export function OrderPage() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -28,12 +32,16 @@ export function OrderPage() {
       (
         await supabase
           .from("orders")
-          .select("*, pools(*, products(name, image_url, pack_size)), refunds(*)")
+          .select(
+            "*, pools(*, products(name, image_url, pack_size)), refunds(*), payment_proofs(id, status, note, created_at)",
+          )
           .eq("id", orderId)
           .maybeSingle()
       ).data,
   });
   const [accept, setAccept] = useState(false);
+  const [method, setMethod] = useState<Method | null>(null);
+  const [changing, setChanging] = useState(false);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const [ask, confirmDialog] = useConfirm();
@@ -47,16 +55,32 @@ export function OrderPage() {
     );
   const pool = o.pools!;
   const pay = settings.data?.payment;
+  const latestProof = [...(o.payment_proofs ?? [])].sort((a, b) =>
+    b.created_at.localeCompare(a.created_at),
+  )[0];
+  const payMethod: Method = o.payment_method === "cash" ? "cash" : "eft";
   const failed = ["declined", "expired", "cancelled", "failed"].includes(o.status)
     ? (o.failure_reason ?? ORDER_STATUS[o.status].label)
     : null;
 
   async function confirm() {
     setBusy(true);
-    const { error } = await supabase.rpc("confirm_order", { _order: orderId, _accept: accept });
+    const { error } = await supabase.rpc("confirm_order", {
+      _order: orderId,
+      _accept: accept,
+      _method: method ?? undefined,
+    });
     setBusy(false);
     if (error) return toast.error(errMsg(error));
     toast.success("Order confirmed");
+    qc.invalidateQueries();
+  }
+  async function changeMethod(m: Method) {
+    setBusy(true);
+    const { error } = await supabase.rpc("choose_payment_method", { _order: orderId, _method: m });
+    setBusy(false);
+    if (error) return toast.error(errMsg(error));
+    setChanging(false);
     qc.invalidateQueries();
   }
   async function received() {
@@ -131,7 +155,7 @@ export function OrderPage() {
             <Row k="Order total" v={<b className="text-lg">{money(o.total)}</b>} />
             <Row k="Deliver to" v={o.delivery_address ?? "-"} />
             <Row
-              k="Confirm & pay by"
+              k="Confirm by"
               v={
                 <span>
                   {dateTime(pool.payment_deadline)} (<Countdown to={pool.payment_deadline!} />)
@@ -140,10 +164,11 @@ export function OrderPage() {
             />
           </dl>
           <p className="mt-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">
-            When you confirm, you agree to buy this amount at this price and to pay all of it before
-            the deadline. We only order the stock if enough businesses pay. If not, we pay your
-            money back. Your price will not change.
+            When you confirm, you agree to buy this amount at this price. KasiPool buys the stock
+            first. You pay when your stock arrives. Your price will not change.
           </p>
+          <p className="mt-4 text-sm font-bold">How will you pay?</p>
+          <MethodChoice value={method} onChange={setMethod} />
           <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
             <Checkbox checked={accept} onCheckedChange={(v) => setAccept(!!v)} className="mt-0.5" />
             <span>
@@ -151,14 +176,19 @@ export function OrderPage() {
               <a href="/terms" target="_blank" className="font-semibold underline">
                 purchase terms
               </a>{" "}
-              ({settings.data?.terms?.version ?? "v0.1-draft"}).
+              ({settings.data?.terms?.version ?? "v0.2-draft"}).
             </span>
           </label>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <Button variant="outline" size="lg" onClick={decline}>
               Decline
             </Button>
-            <Button size="lg" variant="gold" onClick={confirm} disabled={!accept || busy}>
+            <Button
+              size="lg"
+              variant="gold"
+              onClick={confirm}
+              disabled={!accept || !method || busy}
+            >
               {busy ? "Please wait…" : "Confirm my order"}
             </Button>
           </div>
@@ -180,9 +210,38 @@ export function OrderPage() {
               v={<b className="text-lg">{money(Number(o.total) - Number(o.amount_paid))}</b>}
             />
             {Number(o.amount_paid) > 0 && <Row k="Paid so far" v={money(o.amount_paid)} />}
-            <Row k="Payment deadline" v={dateTime(pool.payment_deadline)} />
           </dl>
-          {pay?.configured ? (
+          <div className="mt-3 flex items-center justify-between gap-2 text-sm">
+            <span className="text-muted-foreground">How you pay</span>
+            <span className="flex items-center gap-2 font-medium">
+              {PAYMENT_METHOD[payMethod]}
+              {o.payment_status !== "under_review" && !changing && (
+                <Button size="sm" variant="ghost" onClick={() => setChanging(true)}>
+                  Change
+                </Button>
+              )}
+            </span>
+          </div>
+          {changing && (
+            <div className="mt-2">
+              <MethodChoice value={payMethod} onChange={changeMethod} disabled={busy} />
+              <Button variant="ghost" className="mt-1 w-full" onClick={() => setChanging(false)}>
+                Keep {PAYMENT_METHOD[payMethod].toLowerCase()}
+              </Button>
+            </div>
+          )}
+          {payMethod === "cash" ? (
+            <div className="mt-4 rounded-md border-2 border-ink bg-muted p-4 text-sm">
+              <p className="font-bold">
+                Have {money(Number(o.total) - Number(o.amount_paid))} ready in cash when your stock
+                arrives.
+              </p>
+              <p className="mt-2 text-muted-foreground">
+                Count the stock first, then pay. KasiPool marks your order “Paid” when we get the
+                money.
+              </p>
+            </div>
+          ) : pay?.configured ? (
             <div className="mt-4 rounded-md border-2 border-ink bg-muted p-4 text-sm">
               <p className="font-bold">{pay.method}</p>
               <dl className="mt-2 space-y-1">
@@ -210,14 +269,15 @@ export function OrderPage() {
               </div>
               {pay.notes && <p className="mt-2 text-sm">{pay.notes}</p>}
               <p className="mt-2 text-sm text-muted-foreground">
-                KasiPool checks every payment in our bank account. When we find it, your order shows
-                “Paid”.
+                Pay before or when your stock arrives. Then send us your proof of payment. Your
+                order shows “Paid” when we find the money in our bank account.
               </p>
+              <ProofUpload orderId={o.id} latest={latestProof} />
             </div>
           ) : (
             <div className="mt-4 rounded-md border-2 border-warning/40 bg-warning-soft p-4 text-sm text-warning">
-              <b>We don't have bank details for you yet.</b> Please do not pay yet. We will tell you
-              when you can pay.
+              <b>We don't have bank details for you yet.</b> Please do not pay by EFT yet. We will
+              tell you when you can, or tap Change to pay in cash when your stock arrives.
             </div>
           )}
         </Section>
@@ -323,6 +383,59 @@ export function OrderPage() {
       )}
       {confirmDialog}
     </Container>
+  );
+}
+
+function MethodChoice({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: Method | null;
+  onChange: (m: Method) => void;
+  disabled?: boolean;
+}) {
+  const options = [
+    {
+      id: "cash" as const,
+      icon: Banknote,
+      title: "Cash when it arrives",
+      body: "Pay at the door.",
+    },
+    {
+      id: "eft" as const,
+      icon: Landmark,
+      title: "Bank transfer (EFT)",
+      body: "Pay into our bank account and send us proof.",
+    },
+  ];
+  return (
+    <div
+      role="radiogroup"
+      aria-label="How will you pay?"
+      className="mt-2 grid gap-2 sm:grid-cols-2"
+    >
+      {options.map(({ id, icon: Icon, title, body }) => (
+        <button
+          key={id}
+          type="button"
+          role="radio"
+          aria-checked={value === id}
+          disabled={disabled}
+          onClick={() => onChange(id)}
+          className={cn(
+            "flex min-h-16 items-start gap-3 rounded-md border-2 p-3 text-left transition-colors disabled:opacity-60",
+            value === id ? "border-ink bg-gold-soft" : "border-input bg-card hover:border-ink",
+          )}
+        >
+          <Icon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+          <span>
+            <span className="block font-bold">{title}</span>
+            <span className="block text-sm text-muted-foreground">{body}</span>
+          </span>
+        </button>
+      ))}
+    </div>
   );
 }
 

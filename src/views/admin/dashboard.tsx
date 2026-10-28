@@ -18,7 +18,7 @@ export function useAdminStats() {
       const [pools, biz, parts, orders, costs, pos] = await Promise.all([
         supabase
           .from("pools")
-          .select("id, status, min_qty, pledged_qty, paid_qty, price, created_at")
+          .select("id, status, min_qty, pledged_qty, confirmed_qty, paid_qty, price, created_at")
           .eq("is_test", false),
         supabase.from("businesses").select("id, user_id").eq("is_test", false),
         supabase
@@ -73,6 +73,8 @@ export function Dashboard() {
       ["awaiting_payment", "under_review", "issue"].includes(o.payment_status),
   );
   const review = orders.filter((o) => o.payment_status === "under_review");
+  // Pilot: shops pay when their stock arrives, so delivered and unpaid is money KasiPool is owed
+  const owed = awaitingPay.filter((o) => ["delivered", "received"].includes(o.fulfilment_status));
   const onTheWay = orders.filter((o) => o.fulfilment_status === "out_for_delivery");
   const problems = orders.filter((o) => o.problem_reported_at);
   const completed = orders.filter((o) => ["delivered", "received"].includes(o.fulfilment_status));
@@ -84,18 +86,18 @@ export function Dashboard() {
       to: "/admin/settings",
     },
     {
-      n: by("awaiting_confirmation").filter((p) => p.paid_qty >= p.min_qty).length,
-      text: "pool(s) have enough paid demand to finalise funding",
+      n: by("awaiting_confirmation").filter((p) => p.confirmed_qty >= p.min_qty).length,
+      text: "pool(s) have enough confirmed orders to finalise funding",
       to: "/admin/pools",
     },
     {
       n: review.length,
-      text: "order(s) have partial payments under review",
+      text: "proof(s) of payment to check against the bank account",
       to: "/admin/payments",
     },
     {
-      n: awaitingPay.length - review.length,
-      text: "order(s) are awaiting payment verification",
+      n: owed.length,
+      text: "delivered order(s) not paid yet",
       to: "/admin/payments",
     },
     {
@@ -167,14 +169,20 @@ export function Dashboard() {
         />
         <MetricCard
           label="Awaiting funding"
-          value={by("awaiting_confirmation").filter((p) => p.paid_qty < p.min_qty).length}
-          hint="Paid below minimum"
+          value={by("awaiting_confirmation").filter((p) => p.confirmed_qty < p.min_qty).length}
+          hint="Confirmed below minimum"
         />
         <MetricCard label="Funded, awaiting procurement" value={by("funded").length} />
         <MetricCard
           label="Outstanding payments"
           value={awaitingPay.length}
           hint={money(awaitingPay.reduce((s, o) => s + Number(o.total) - Number(o.amount_paid), 0))}
+        />
+        <MetricCard
+          label="Owed after delivery"
+          value={owed.length}
+          hint={money(owed.reduce((s, o) => s + Number(o.total) - Number(o.amount_paid), 0))}
+          tone={owed.length ? "gold" : undefined}
         />
         <MetricCard label="Out for delivery" value={onTheWay.length} />
         <MetricCard label="Completed orders" value={completed.length} />

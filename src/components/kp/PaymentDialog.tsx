@@ -19,6 +19,7 @@ export type PaymentDialogOrder = {
   ref: string | null;
   total: number;
   amount_paid: number;
+  payment_method: string | null;
 };
 
 export function PaymentDialog({
@@ -33,7 +34,9 @@ export function PaymentDialog({
   const [amount, setAmount] = useState("");
   const [chan, setChan] = useState("");
   const [note, setNote] = useState("");
+  const [method, setMethod] = useState("");
   const [busy, setBusy] = useState(false);
+  const how = method || (order?.payment_method === "cash" ? "cash" : "eft");
 
   async function run(kind: "verified" | "review" | "issue") {
     if (!order) return;
@@ -50,6 +53,7 @@ export function PaymentDialog({
             _channel_ref: chan,
             _note: note,
             _kind: kind,
+            _method: how,
           });
     setBusy(false);
     if (error) return toast.error(errMsg(error));
@@ -64,6 +68,7 @@ export function PaymentDialog({
     setAmount("");
     setChan("");
     setNote("");
+    setMethod("");
     onClose();
   }
 
@@ -73,10 +78,16 @@ export function PaymentDialog({
         <DialogHeader>
           <DialogTitle>Record payment: {order?.ref}</DialogTitle>
           <DialogDescription>
-            Only record money you have verified in the KasiPool business account. Customer
-            screenshots are not proof of settlement.
+            Only record money you have: cash you counted, or an EFT you found in the KasiPool bank
+            account. A shop&apos;s screenshot alone is not enough.
           </DialogDescription>
         </DialogHeader>
+        <Field label="Paid by">
+          <select className={inputCls} value={how} onChange={(e) => setMethod(e.target.value)}>
+            <option value="cash">Cash</option>
+            <option value="eft">EFT (bank transfer)</option>
+          </select>
+        </Field>
         <p className="text-sm">
           Outstanding: <b>{money(due)}</b> of {money(order?.total)}
         </p>

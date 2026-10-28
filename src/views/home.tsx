@@ -22,12 +22,12 @@ export const STEPS = [
     body: "Choose how many you want. You don't pay yet.",
   },
   {
-    title: "Confirm & pay",
-    body: "When the pool is full, check your total and pay.",
+    title: "Confirm your order",
+    body: "When the pool is full, check your total and confirm. Choose cash or bank transfer.",
   },
   {
-    title: "Get it delivered",
-    body: "A courier brings your stock to your business.",
+    title: "Get it, then pay",
+    body: "A courier brings your stock to your business. Then you pay.",
   },
 ];
 
@@ -62,7 +62,7 @@ export function Home() {
           </h1>
           <p className="mt-5 max-w-md animate-rise text-lg text-paper/85 [animation-delay:260ms]">
             For local businesses: shops, salons, car washes, bakeries and more. Order together and
-            pay the bulk price. You pay only when the pool is full.
+            pay the bulk price. You pay only when your stock arrives.
           </p>
           <div className="mt-7 flex animate-rise flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:340ms]">
             <Button asChild size="xl" variant="gold">

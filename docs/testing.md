@@ -65,16 +65,19 @@ shop is close enough for some of them and too far for others.
 | Star Super Maize Meal       | Open, 26 of 30                     | Shop 1 or 6 joins with 4 or more: the pool fills |
 | Tastic Rice                 | Open, 10 of 60                     | Join, change the amount, leave                   |
 | Shield Car Wash Shampoo     | Open, private group                | Join with code **CARWASH1**                      |
-| Anchor Instant Dry Yeast    | Reopened: 12 paid, 8 more needed   | Shop 4 or 6 fills the gap                        |
+| Anchor Instant Dry Yeast    | Reopened: 12 confirmed, 8 needed   | Shop 4 or 6 fills the gap                        |
 | Coca-Cola (opens tomorrow)  | Scheduled                          | Admin: **Testing: open now**                     |
 | Dark and Lovely Relaxer Kit | Asked for by shop 3 (draft)        | Admin: set prices and publish                    |
-| Huletts White Sugar         | Full: waiting for shops to pay     | Shop 1 confirms; admin records payments          |
-| Crown Blended Cooking Oil   | Paid by everyone                   | Admin: authorise the purchase order              |
+| Huletts White Sugar         | Full: waiting for shops to confirm | Shop 1 confirms; shop 3 uploads a proof          |
+| Crown Blended Cooking Oil   | Confirmed by everyone, none paid   | Admin: authorise the purchase order              |
 | Snowflake Cake Wheat Flour  | Ordered from the supplier          | Admin: record receipt (try fewer than 20)        |
 | Coca-Cola                   | Stock received                     | Admin: send out for delivery                     |
-| Sunlight Dishwashing Liquid | Out for delivery                   | Shop 1 confirms or reports a problem             |
-| Cerebos Iodated Table Salt  | Done                               | History only                                     |
-| Snowflake White Bread Flour | Failed: shops 1 and 4 owed refunds | Admin: complete refunds, then mark resolved      |
+| Sunlight Dishwashing Liquid | Out for delivery                   | Shop 1 confirms; admin records shop 1's cash     |
+| Cerebos Iodated Table Salt  | Done; shop 5 still owes (EFT)      | Shop 5 uploads a proof; admin approves it        |
+| Snowflake White Bread Flour | Failed: shop 1 owed a refund       | Admin: complete the refund, then mark resolved   |
+
+On the sugar pool, shop 2 chose cash, shop 3 chose EFT and shop 4 already paid by EFT. Shops pay
+when their stock arrives (pilot), so in the later pools nobody has paid until delivery.
 
 ## Things to check
 
@@ -85,40 +88,52 @@ shop is close enough for some of them and too far for others.
    says "Test shops can only join test pools".
 2. **Join a pool:** Star maize meal, 4 or more bags. The pool fills and an order to confirm
    appears in My Pools, with a notification.
-3. **Confirm and pay:** confirm the Huletts sugar order. You get a payment reference. Bank
-   details only show once they are set in Admin → Settings; until then shops are told not to
-   pay yet.
-4. **Private group:** type CARWASH1 under "Got a private group code?" in My Pools, or open
+3. **Confirm and choose how to pay:** confirm the Huletts sugar order. You must choose **Cash
+   when it arrives** or **Bank transfer (EFT)**. With EFT you get a payment reference and the
+   bank details, and an **Upload proof of payment** button: send any photo. The order shows
+   "Checking payment", not "Paid". Bank details only show once they are set in Admin → Settings;
+   until then EFT shops are told not to pay yet. Try **Change** to switch to cash.
+4. **Proof after delivery:** log in as shop 5. The salt order was received but not paid:
+   upload a proof of payment.
+5. **Private group:** type CARWASH1 under "Got a private group code?" in My Pools, or open
    `/join/CARWASH1`.
-5. **Ask for a deal:** start a pool for a product. It waits for an admin as a draft, as a test
+6. **Ask for a deal:** start a pool for a product. It waits for an admin as a draft, as a test
    pool.
-6. **Delivery:** on the Sunlight order, confirm you got it, or report a problem. Log in as shop
+7. **Delivery:** on the Sunlight order, confirm you got it, or report a problem. Log in as shop
    2 to confirm an order the courier already marked as delivered.
-7. **Refunds and reopen:** the bread flour order says the deal failed and money will be paid
-   back; the yeast order says the deal is open again and the order is safe.
+8. **Refunds and reopen:** the bread flour order says the deal failed and money will be paid
+   back (shop 1 paid early); the yeast order says the deal is open again and the order is safe.
 
 ### Admin
 
-1. **Payments:** record the payments for Huletts sugar (shops 2 to 4), then **Finalise funding
-   now** once enough is paid. Try **Testing: end payment time now** before that, to see unpaid
-   orders close and the pool reopen.
-2. **Supplier order and stock:** Crown oil, then flour (record fewer than 20 to see the refund for
-   missing stock), then Coca-Cola out for delivery.
-3. **Deliveries:** Admin → Deliveries, mark the Sunlight orders as delivered.
-4. **Refunds:** Admin → Payments, complete the bread flour refunds, then **Mark resolved** on the
+1. **Proofs:** Admin → Payments → **Proofs to check**. Open each proof with **View proof**.
+   Reject one with a reason (the shop sees it and can send another), approve one (the order
+   shows "Paid").
+2. **Cash:** Admin → Payments, filter **Delivered, not paid**, press **Record** on a cash order,
+   choose **Cash**. Try a part payment first: the rest stays owed.
+3. **Funding:** once shop 1 confirms the sugar order, **Finalise funding now** works, even though
+   nobody has paid. Try **Testing: end confirm time now** before shop 1 confirms, to see the
+   unconfirmed order close and the pool reopen.
+4. **Supplier order and stock:** Crown oil, then flour (record fewer than 20 to see order totals
+   drop to what shops get), then Coca-Cola out for delivery.
+5. **Deliveries:** Admin → Deliveries, mark the Sunlight orders as delivered.
+6. **Refunds:** Admin → Payments, complete the bread flour refund, then **Mark resolved** on the
    pool.
-5. **Requests:** publish the Dark and Lovely draft after adding a supplier, list price and bulk
+7. **Requests:** publish the Dark and Lovely draft after adding a supplier, list price and bulk
    price.
-6. **Scheduled pool:** open the Coca-Cola pool that opens tomorrow with **Testing: open now**.
-7. **Close a pool early:** **Close pool now** on an open pool below its target: it fails.
+8. **Scheduled pool:** open the Coca-Cola pool that opens tomorrow with **Testing: open now**.
+9. **Close a pool early:** **Close pool now** on an open pool below its target: it fails.
 
 ## Testing buttons
 
 The admin pool page of a test pool has two testing buttons, backed by `admin_skip_ahead`:
 
 - **Testing: open now** on a scheduled pool.
-- **Testing: end payment time now** on a pool waiting for payment. Unpaid orders close and the
-  pool is funded, reopens for the gap or fails, as at a real deadline.
+- **Testing: end confirm time now** on a pool waiting for shops to confirm. Unconfirmed orders
+  close and the pool is funded, reopens for the gap or fails, as at a real deadline.
 
-They only show, and only work, on test pools: ending a real deal's payment time early would close
-the orders of shops that still had time to pay.
+They only show, and only work, on test pools: ending a real deal's confirm time early would close
+the orders of shops that still had time to confirm.
+
+Proof files that test shops upload stay in storage when the test data is reset (Supabase doesn't
+let SQL delete storage files). They are small and only admins can open them.

@@ -20,21 +20,30 @@ describe("order progress", () => {
     status: "confirmed",
     payment_status: "awaiting_payment",
     fulfilment_status: "none",
+    payment_method: "eft",
   };
 
-  it("asks for payment once confirmed", () => {
-    expect(nextAction(order, true)).toBe("Pay now");
+  it("asks EFT shops for payment and proof once confirmed", () => {
+    expect(nextAction(order, true)).toBe("Pay and send proof");
     expect(nextAction(order, false)).toBe("Wait for bank details");
+    expect(nextAction({ ...order, payment_status: "under_review" }, true)).toBeNull();
     expect(timelineStep(order)).toBe(2);
   });
 
-  it("asks the shop to confirm a delivery", () => {
-    const delivered = { ...order, payment_status: "paid", fulfilment_status: "delivered" };
-    expect(nextAction(delivered, true)).toBe("Confirm delivery");
-    expect(timelineStep(delivered)).toBe(5);
+  it("asks cash shops for nothing until the stock arrives", () => {
+    const cash = { ...order, payment_method: "cash" };
+    expect(nextAction(cash, true)).toBeNull();
+    expect(nextAction({ ...cash, fulfilment_status: "received" }, true)).toBe("Pay what you owe");
   });
 
-  it("reaches the final step when received", () => {
+  it("asks the shop to confirm a delivery", () => {
+    const delivered = { ...order, fulfilment_status: "delivered" };
+    expect(nextAction(delivered, true)).toBe("Confirm delivery");
+    expect(timelineStep(delivered)).toBe(4);
+  });
+
+  it("is only done when the stock is received and paid for", () => {
+    expect(timelineStep({ ...order, fulfilment_status: "received" })).toBe(5);
     expect(timelineStep({ ...order, payment_status: "paid", fulfilment_status: "received" })).toBe(
       6,
     );
