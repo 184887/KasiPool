@@ -60,21 +60,21 @@ shop is close enough for some of them and too far for others.
 
 ## Test pools
 
-| Product                     | Stage when loaded                  | What to test                                     |
-| --------------------------- | ---------------------------------- | ------------------------------------------------ |
-| Star Super Maize Meal       | Open, 26 of 30                     | Shop 1 or 6 joins with 4 or more: the pool fills |
-| Tastic Rice                 | Open, 10 of 60                     | Join, change the amount, leave                   |
-| Shield Car Wash Shampoo     | Open, private group                | Join with code **CARWASH1**                      |
-| Anchor Instant Dry Yeast    | Reopened: 12 confirmed, 8 needed   | Shop 4 or 6 fills the gap                        |
-| Coca-Cola (opens tomorrow)  | Scheduled                          | Admin: **Testing: open now**                     |
-| Dark and Lovely Relaxer Kit | Asked for by shop 3 (draft)        | Admin: set prices and publish                    |
-| Huletts White Sugar         | Full: waiting for shops to confirm | Shop 1 confirms; shop 3 uploads a proof          |
-| Crown Blended Cooking Oil   | Confirmed by everyone, none paid   | Admin: authorise the purchase order              |
-| Snowflake Cake Wheat Flour  | Ordered from the supplier          | Admin: record receipt (try fewer than 20)        |
-| Coca-Cola                   | Stock received                     | Admin: send out for delivery                     |
-| Sunlight Dishwashing Liquid | Out for delivery                   | Shop 1 confirms; admin records shop 1's cash     |
-| Cerebos Iodated Table Salt  | Done; shop 5 still owes (EFT)      | Shop 5 uploads a proof; admin approves it        |
-| Snowflake White Bread Flour | Failed: shop 1 owed a refund       | Admin: complete the refund, then mark resolved   |
+| Product                      | Stage when loaded                  | What to test                                     |
+| ---------------------------- | ---------------------------------- | ------------------------------------------------ |
+| Star Super Maize Meal        | Open, 26 of 30                     | Shop 1 or 6 joins with 4 or more: the pool fills |
+| Tastic Rice                  | Open, 10 of 60                     | Join, change the amount, leave                   |
+| Shield High Foam Car Shampoo | Open, private group                | Join with code **CARWASH1**                      |
+| Anchor Instant Yeast         | Reopened: 12 confirmed, 8 needed   | Shop 4 or 6 fills the gap                        |
+| Coca-Cola (opens tomorrow)   | Scheduled                          | Admin: **Testing: open now**                     |
+| Dark and Lovely Relaxer Kit  | Asked for by shop 3 (draft)        | Admin: set prices and publish                    |
+| Huletts White Sugar          | Full: waiting for shops to confirm | Shop 1 confirms; shop 3 uploads a proof          |
+| Crown Blended Cooking Oil    | Confirmed by everyone, none paid   | Admin: authorise the purchase order              |
+| Snowflake Cake Wheat Flour   | Ordered from the supplier          | Admin: record receipt (try fewer than 20)        |
+| Coca-Cola                    | Stock received                     | Admin: send out for delivery                     |
+| Sunlight Dishwashing Liquid  | Out for delivery                   | Shop 1 confirms; admin records shop 1's cash     |
+| Cerebos Iodated Table Salt   | Done; shop 5 still owes (EFT)      | Shop 5 uploads a proof; admin approves it        |
+| Snowflake White Bread Flour  | Failed: shop 1 owed a refund       | Admin: complete the refund, then mark resolved   |
 
 On the sugar pool, shop 2 chose cash, shop 3 chose EFT and shop 4 already paid by EFT. Shops pay
 when their stock arrives (pilot), so in the later pools nobody has paid until delivery.

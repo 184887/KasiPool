@@ -18,3 +18,14 @@ identify or guarantee a particular stocked brand.
 product's SKU and compressed for mobile data. They show branded South African products; the brands
 and packaging belong to their owners, and the original photo sources were not recorded. The real
 deals use them for now: replace them with licensed or supplier-provided photos before launch.
+
+Four packshots were added on 2026-10-28 for the products that had none. They are product photos
+published by South African retailers and the manufacturer, saved at 600 x 600 on white:
+
+- `products/kp-brd-125.jpg`: Snowflake White Bread Wheat Flour 2.5kg, from [Premier FMCG Foodservices](https://foodservices.premierfmcg.com/OurProducts/SnowflakeWhiteBreadWheatFlour) (Snowflake's maker).
+- `products/kp-yst-500.jpg`: Anchor Instant Yeast 500g, from [Bread Emporium](https://breademporium.co.za/product/instant-dry-yeast-500g/).
+- `products/kp-rlx-6.jpg`: Dark and Lovely Superior Moisture Plus No Lye Relaxer Kit, from [Dis-Chem](https://www.dischem.co.za/dark-lovely-relaxer-kit-regular-452).
+- `products/kp-car-5l4.jpg`: Shield High Foam Car Shampoo 5L, from [Vaalpac](https://vaalpac.co.za/products/shield-car-shampoo-high-foam).
+
+Like the other packshots, they are not licensed to KasiPool: replace them with licensed or
+supplier-provided photos before launch.
