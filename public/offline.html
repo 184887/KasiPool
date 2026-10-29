@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en-ZA">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1C1A17" />
+    <title>No connection | KasiPool</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #f3f0ea;
+        color: #1c1a17;
+        font-family: system-ui, sans-serif;
+      }
+      header {
+        background: #1c1a17;
+        color: #f3f0ea;
+        padding: 14px 16px;
+        font-weight: 800;
+        font-size: 22px;
+      }
+      header span {
+        color: #f2892b;
+      }
+      main {
+        padding: 32px 16px;
+        max-width: 480px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0 0 12px;
+      }
+      p {
+        font-size: 17px;
+        line-height: 1.5;
+        margin: 0 0 24px;
+      }
+      button {
+        height: 48px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 6px;
+        background: #f2892b;
+        color: #1c1a17;
+        font-size: 17px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <header>Kasi<span>Pool</span></header>
+    <main>
+      <h1>No internet connection</h1>
+      <p>
+        KasiPool needs the internet to show your pools and orders. Check your data or Wi-Fi, then
+        try again.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

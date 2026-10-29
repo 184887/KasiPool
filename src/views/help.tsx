@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { InstallSteps } from "@/components/kp/InstallPrompt";
 import { LegalPage } from "@/components/kp/LegalPage";
 import { settingsQuery } from "@/lib/queries";
 
@@ -17,6 +18,8 @@ export function Help() {
         </Link>
         .
       </p>
+      <h2>Get the app</h2>
+      <InstallSteps />
       <h2>Contact KasiPool</h2>
       {c?.phone || c?.email || c?.whatsapp ? (
         <ul className="list-disc pl-5">

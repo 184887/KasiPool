@@ -107,6 +107,11 @@ when their stock arrives (pilot), so in the later pools nobody has paid until de
    2 to confirm an order the courier already marked as delivered.
 9. **Refunds and reopen:** the bread flour order says the deal failed and money will be paid
    back (shop 1 paid early); the yeast order says the deal is open again and the order is safe.
+10. **Install the app:** on an Android phone in Chrome, the "Get the KasiPool app" card has an
+    **Install** button (or use the menu, **Install app**). On an iPhone in Safari, the card shows
+    the Share steps. The app opens full-screen from the home screen icon. Turn on airplane mode
+    and open it: it shows "No internet connection" with **Try again**. The steps are also under
+    Help → Get the app.
 
 ### Admin
 
