@@ -24,6 +24,8 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: { card: "summary_large_image" },
+  // Home screen name and status bar on iPhone (Android reads the manifest)
+  appleWebApp: { capable: true, title: "KasiPool", statusBarStyle: "black" },
 };
 
 export const viewport: Viewport = {

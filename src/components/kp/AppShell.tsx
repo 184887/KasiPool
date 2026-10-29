@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { InstallBanner } from "./InstallPrompt";
 import { Logo } from "./pool-bits";
 
 // "Deals" is the /offers list (the old Catalogue page redirects there).
@@ -97,6 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      <InstallBanner />
       <main key={pathname} className="flex-1 animate-enter">
         {children}
       </main>
