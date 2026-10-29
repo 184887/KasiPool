@@ -63,9 +63,12 @@ distance limit, so check the deliveries make sense before publishing.
 
 ### 2. Shops join
 
-Joining only records interest. A business can join if the map pin of where its stock goes
-(business address, or its second delivery address if it chose one) is within the pool's distance
-of the centre. Deals are listed nearest first with "4 km away"; ones that are too far show "Too
+Joining only records interest. A business can join if where its stock goes (business address, or
+its second delivery address if it chose one) is within the pool's distance of the centre. Shops
+often sign up away from the shop, so the map pin can wait: until it's set, the centre of their
+township or area is used for the distance. They must set the exact pin before they can confirm an
+order (the app reminds them, and shows a one-tap "I am at my business now" button). Admin →
+Customers marks shops with "No map pin yet"; a call can help them set it. Deals are listed nearest first with "4 km away"; ones that are too far show "Too
 far for you" and can't be joined. Businesses never see where a pool is centred, only how far
 away it is.
 
@@ -186,7 +189,6 @@ deadlines (fund, reopen or fail). Nobody needs to have the site open.
 - **Courier integration:** couriers report to KasiPool and an admin records the delivery by hand.
 - **Old pools have no centre:** pools from before the distance rule can be joined from
   anywhere. The admin pool page shows "No centre set".
-- **Old businesses without a map pin** must add one in their profile before they can join a pool.
 - **Delivery areas** (`delivery_zones`, `pool_zones`) are no longer used but are kept in the
   database in case they come back.
 - **Real supplier prices:** the first real deals (2026-10-26) use estimated prices and a stand-in

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loading, PageHeader } from "@/components/kp/ui";
 import { DataTable, Td, inputCls } from "@/components/kp/admin";
+import { missingPin } from "@/lib/delivery";
 import { money, date } from "@/lib/format";
 
 export function Customers() {
@@ -85,6 +86,9 @@ export function Customers() {
               <Td>
                 {b.township}, {b.city}
                 <p className="text-xs text-muted-foreground">{b.province}</p>
+                {missingPin(b) && (
+                  <p className="text-xs font-semibold text-warning">No map pin yet</p>
+                )}
               </Td>
               <Td className="tabular">{data.parts.filter((p) => p.business_id === b.id).length}</Td>
               <Td className="tabular">{os.filter((o) => o.status === "confirmed").length}</Td>
