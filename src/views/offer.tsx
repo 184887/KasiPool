@@ -95,12 +95,13 @@ export function Offer() {
   const maxQty = pool.max_per_customer ?? 999;
   const dist = distances.data?.get(pool.id);
   const tooFar = !!dist && !dist.in_range;
-  // Where the stock goes needs a map pin before the business can join
+  // Joining needs to know roughly where the stock goes: the exact pin, or else the area's centre.
+  // The exact pin is only needed to confirm an order.
   const noPin =
     !!business &&
     (business.deliver_to === "other"
-      ? business.delivery_latitude == null
-      : business.latitude == null);
+      ? business.delivery_latitude == null && business.delivery_approx_latitude == null
+      : business.latitude == null && business.approx_latitude == null);
   const fee = Number(settings.data?.delivery?.fee_per_order ?? 0);
 
   async function join() {
@@ -320,7 +321,7 @@ export function Offer() {
                 {tooFar
                   ? "Too far for you"
                   : noPin
-                    ? "Add your map pin first"
+                    ? "Add your area first"
                     : busy
                       ? "Saving…"
                       : active
@@ -391,7 +392,7 @@ export function Offer() {
             )}
             {noPin && (
               <p className="mt-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
-                Please add a map pin for your business first.{" "}
+                Please add your township or area in your profile first.{" "}
                 <Link href="/profile" className="font-semibold underline">
                   Go to your profile
                 </Link>
