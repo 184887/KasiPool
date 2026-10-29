@@ -35,7 +35,10 @@ day to day, see the [admin guide](docs/admin-guide.md).
   groups (invite code) have no distance limit. Businesses only see how far away a pool is, never
   where it is centred.
 - **Delivery:** couriers deliver to the business address or an optional second address. Every
-  address needs a map pin (many places have no street number). Delivery fees aren't decided yet:
+  address needs a map pin (many places have no street number), best set with the phone's GPS
+  while standing there. Since 2026-10-29 the pin doesn't block sign-up: a shop gives its township
+  or area (and directions), whose centre is used for distances to deals until the pin is set. The
+  exact pin is required to **confirm an order**, and the app reminds shops until it's set. Delivery fees aren't decided yet:
   one flat fee per order in Admin → Settings, R0 (free) for now.
   Admins record what the courier reports; businesses confirm receipt or report a problem.
 - **Who it's for:** every kind of local business (shops, salons, car washes, bakeries, butcheries

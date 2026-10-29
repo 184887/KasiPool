@@ -9,6 +9,7 @@ import { PoolCard } from "@/components/kp/PoolCard";
 import { LogoMark } from "@/components/kp/pool-bits";
 import { Loading, EmptyState } from "@/components/kp/ui";
 import { useAuth } from "@/lib/auth";
+import { PinPrompt } from "@/components/kp/PinPrompt";
 import { activePoolsQuery, myOrdersQuery, poolDistancesQuery, settingsQuery } from "@/lib/queries";
 import { nextAction } from "@/lib/status";
 
@@ -32,7 +33,7 @@ export const STEPS = [
 ];
 
 export function Home() {
-  const { user } = useAuth();
+  const { user, business } = useAuth();
   const pools = useQuery(activePoolsQuery);
   const dist = useQuery(poolDistancesQuery(user?.id)).data ?? new Map();
   // Only deals this business can join (too-far ones are on the Deals page)
@@ -83,6 +84,7 @@ export function Home() {
       {user && <NextStep userId={user.id} />}
 
       <Container className="pt-8">
+        <PinPrompt business={business} className="mb-6" />
         <div className="mb-4 flex items-end justify-between gap-4 border-b-4 border-ink pb-2">
           <h2 className="font-headline text-3xl">Closing soon</h2>
           <Link

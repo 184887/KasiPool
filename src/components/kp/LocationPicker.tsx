@@ -3,21 +3,19 @@ import { MapPin, Search, LocateFixed } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mapsUrl } from "@/lib/delivery";
+import { mapsUrl, NOMINATIM } from "@/lib/delivery";
 
 export type PickedLocation = { latitude: number; longitude: number; address: string };
 
 type Hit = { lat: string; lon: string; display_name: string };
-
-const NOMINATIM = "https://nominatim.openstreetmap.org";
 
 export function LocationPicker({
   latitude,
   longitude,
   address,
   onPick,
-  title = "Map pin *",
-  hint = "Many places have no street number, so the pin is how the driver finds you. Best: stand at your business and tap “Use my current location”.",
+  title = "Map pin",
+  hint = "Many places have no street number, so the pin is how the driver finds you. Best: stand at your business and tap “Use my current location”. Not there now? You can do it later, but you need it to confirm an order.",
 }: {
   latitude: number | null;
   longitude: number | null;

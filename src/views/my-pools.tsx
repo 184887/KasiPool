@@ -13,6 +13,7 @@ import { PoolProgress, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, PageHeader, SectionTitle } from "@/components/kp/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { PinPrompt } from "@/components/kp/PinPrompt";
 import { settingsQuery, errMsg, myOrdersQuery, type MyOrder } from "@/lib/queries";
 import { money, date, dateTime, qty } from "@/lib/format";
 import { POOL_STATUS, ORDER_STATUS, nextAction, FULFIL_STATUS, PAYMENT_STATUS } from "@/lib/status";
@@ -98,6 +99,7 @@ export function MyPools() {
           to join a pool.
         </div>
       )}
+      <PinPrompt business={business} className="mb-4" />
 
       {action.length > 0 && (
         <section className="mb-8">

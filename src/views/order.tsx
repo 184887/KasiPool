@@ -14,6 +14,9 @@ import { useConfirm } from "@/components/kp/ConfirmDialog";
 import { OrderTimeline, Countdown, ProductImage } from "@/components/kp/pool-bits";
 import { Loading, EmptyState, StatusBadge, Section } from "@/components/kp/ui";
 import { ProofUpload } from "@/components/kp/PaymentProof";
+import { PinPrompt } from "@/components/kp/PinPrompt";
+import { useAuth } from "@/lib/auth";
+import { missingPin } from "@/lib/delivery";
 import { supabase } from "@/integrations/supabase/client";
 import { settingsQuery, errMsg } from "@/lib/queries";
 import { money, dateTime, qty } from "@/lib/format";
@@ -25,6 +28,7 @@ type Method = "cash" | "eft";
 export function OrderPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const qc = useQueryClient();
+  const { business } = useAuth();
   const settings = useQuery(settingsQuery);
   const { data: o, isLoading } = useQuery({
     queryKey: ["order", orderId],
@@ -167,6 +171,7 @@ export function OrderPage() {
             When you confirm, you agree to buy this amount at this price. KasiPool buys the stock
             first. You pay when your stock arrives. Your price will not change.
           </p>
+          <PinPrompt business={business} className="mt-4" />
           <p className="mt-4 text-sm font-bold">How will you pay?</p>
           <MethodChoice value={method} onChange={setMethod} />
           <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
@@ -187,7 +192,7 @@ export function OrderPage() {
               size="lg"
               variant="gold"
               onClick={confirm}
-              disabled={!accept || !method || busy}
+              disabled={!accept || !method || busy || !!missingPin(business)}
             >
               {busy ? "Please wait…" : "Confirm my order"}
             </Button>

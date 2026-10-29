@@ -46,7 +46,7 @@ All test shops use the PIN **123456**. Log in at `/auth` with the number.
 
 | #   | Number       | Shop                         | Area            | Notes                         |
 | --- | ------------ | ---------------------------- | --------------- | ----------------------------- |
-| 1   | 060 000 0001 | Thandeka's Spaza (test)      | Khayelitsha     | Main test shop: in most pools |
+| 1   | 060 000 0001 | Thandeka's Spaza (test)      | Khayelitsha     | In most pools; no map pin yet |
 | 2   | 060 000 0002 | Lwazi Car Wash (test)        | Khayelitsha     | Started the private group     |
 | 3   | 060 000 0003 | Nomsa's Hair Salon (test)    | Gugulethu       | Asked for the relaxer deal    |
 | 4   | 060 000 0004 | Langa Fresh Bakery (test)    | Langa           |                               |
@@ -88,20 +88,24 @@ when their stock arrives (pilot), so in the later pools nobody has paid until de
    says "Test shops can only join test pools".
 2. **Join a pool:** Star maize meal, 4 or more bags. The pool fills and an order to confirm
    appears in My Pools, with a notification.
-3. **Confirm and choose how to pay:** confirm the Huletts sugar order. You must choose **Cash
+3. **Map pin:** shop 1 has only its area, so Home and My Pools ask it to set its map pin, and the
+   Huletts sugar order can't be confirmed yet. You are not in Khayelitsha, so don't use "I am at my
+   business now" (it would pin where you are, too far for the deal): go to Profile, search
+   "Site C, Khayelitsha" under Map pin and save.
+4. **Confirm and choose how to pay:** confirm the Huletts sugar order. You must choose **Cash
    when it arrives** or **Bank transfer (EFT)**. With EFT you get a payment reference and the
    bank details, and an **Upload proof of payment** button: send any photo. The order shows
    "Checking payment", not "Paid". Bank details only show once they are set in Admin → Settings;
    until then EFT shops are told not to pay yet. Try **Change** to switch to cash.
-4. **Proof after delivery:** log in as shop 5. The salt order was received but not paid:
+5. **Proof after delivery:** log in as shop 5. The salt order was received but not paid:
    upload a proof of payment.
-5. **Private group:** type CARWASH1 under "Got a private group code?" in My Pools, or open
+6. **Private group:** type CARWASH1 under "Got a private group code?" in My Pools, or open
    `/join/CARWASH1`.
-6. **Ask for a deal:** start a pool for a product. It waits for an admin as a draft, as a test
+7. **Ask for a deal:** start a pool for a product. It waits for an admin as a draft, as a test
    pool.
-7. **Delivery:** on the Sunlight order, confirm you got it, or report a problem. Log in as shop
+8. **Delivery:** on the Sunlight order, confirm you got it, or report a problem. Log in as shop
    2 to confirm an order the courier already marked as delivered.
-8. **Refunds and reopen:** the bread flour order says the deal failed and money will be paid
+9. **Refunds and reopen:** the bread flour order says the deal failed and money will be paid
    back (shop 1 paid early); the yeast order says the deal is open again and the order is safe.
 
 ### Admin

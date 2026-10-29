@@ -107,11 +107,16 @@ export type Database = {
       businesses: {
         Row: {
           address: string | null;
+          approx_latitude: number | null;
+          approx_longitude: number | null;
           category: string | null;
           city: string;
           created_at: string;
           deliver_to: string;
           delivery_address: string | null;
+          delivery_approx_latitude: number | null;
+          delivery_approx_longitude: number | null;
+          delivery_area: string | null;
           delivery_latitude: number | null;
           delivery_longitude: number | null;
           delivery_zone_id: string | null;
@@ -123,6 +128,7 @@ export type Database = {
           marketing_opt_in: boolean;
           mobile: string;
           notify_in_app: boolean;
+          postal_code: string | null;
           province: string;
           rep_name: string;
           terms_accepted_at: string;
@@ -135,11 +141,16 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           address?: string | null;
+          approx_latitude?: number | null;
+          approx_longitude?: number | null;
           category?: string | null;
           city: string;
           created_at?: string;
           deliver_to?: string;
           delivery_address?: string | null;
+          delivery_approx_latitude?: number | null;
+          delivery_approx_longitude?: number | null;
+          delivery_area?: string | null;
           delivery_latitude?: number | null;
           delivery_longitude?: number | null;
           delivery_zone_id?: string | null;
@@ -151,6 +162,7 @@ export type Database = {
           marketing_opt_in?: boolean;
           mobile: string;
           notify_in_app?: boolean;
+          postal_code?: string | null;
           province: string;
           rep_name: string;
           terms_accepted_at?: string;
@@ -162,11 +174,16 @@ export type Database = {
         };
         Update: {
           address?: string | null;
+          approx_latitude?: number | null;
+          approx_longitude?: number | null;
           category?: string | null;
           city?: string;
           created_at?: string;
           deliver_to?: string;
           delivery_address?: string | null;
+          delivery_approx_latitude?: number | null;
+          delivery_approx_longitude?: number | null;
+          delivery_area?: string | null;
           delivery_latitude?: number | null;
           delivery_longitude?: number | null;
           delivery_zone_id?: string | null;
@@ -178,6 +195,7 @@ export type Database = {
           marketing_opt_in?: boolean;
           mobile?: string;
           notify_in_app?: boolean;
+          postal_code?: string | null;
           province?: string;
           rep_name?: string;
           terms_accepted_at?: string;

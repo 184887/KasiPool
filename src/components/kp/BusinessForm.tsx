@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { PROVINCES, normaliseSaMobile } from "@/lib/format";
 import { errMsg } from "@/lib/queries";
+import { findArea } from "@/lib/delivery";
 import { LocationPicker } from "./LocationPicker";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -61,8 +62,10 @@ export function BusinessForm({
     city: existing?.city ?? "Cape Town",
     province: existing?.province ?? "Western Cape",
     address: existing?.address ?? "",
+    postal_code: existing?.postal_code ?? "",
     deliver_to: existing?.deliver_to ?? "business",
     delivery_address: existing?.delivery_address ?? "",
+    delivery_area: existing?.delivery_area ?? "",
     latitude: existing?.latitude ?? (null as number | null),
     longitude: existing?.longitude ?? (null as number | null),
     delivery_latitude: existing?.delivery_latitude ?? (null as number | null),
@@ -80,15 +83,40 @@ export function BusinessForm({
     if (!mobile) return toast.error("Enter a South African cellphone number, like 072 123 4567");
     if (f.category === OTHER && !f.category_other.trim())
       return toast.error("Tell us what type of business you have");
-    if (!f.address.trim()) return toast.error("Enter your business address");
-    if (f.latitude == null || f.longitude == null)
-      return toast.error("Add a map pin so the driver can find your business");
-    if (f.deliver_to === "other" && !f.delivery_address.trim())
-      return toast.error("Enter the other address");
-    if (f.deliver_to === "other" && (f.delivery_latitude == null || f.delivery_longitude == null))
-      return toast.error("Add a map pin for the other address");
+    if (!f.address.trim()) return toast.error("Tell us your address, or how to find your business");
+    const other = f.deliver_to === "other";
+    if (other && !f.delivery_address.trim()) return toast.error("Enter the other address");
+    if (other && !f.delivery_area.trim()) return toast.error("Enter the area of the other address");
     if (!terms) return toast.error("Please accept the terms and privacy notice");
     setBusy(true);
+    // Until the exact map pin is set, the centre of the area is used to work out distances to deals
+    const area =
+      existing?.approx_latitude != null &&
+      existing.township === f.township &&
+      existing.city === f.city &&
+      existing.province === f.province
+        ? { latitude: existing.approx_latitude, longitude: existing.approx_longitude! }
+        : await findArea(f.township, f.city, f.province);
+    if (!area && f.latitude == null) {
+      setBusy(false);
+      return toast.error(
+        `We could not find "${f.township}" on the map. Check the spelling, or set the map pin.`,
+      );
+    }
+    const otherArea = !other
+      ? null
+      : existing?.delivery_approx_latitude != null && existing.delivery_area === f.delivery_area
+        ? {
+            latitude: existing.delivery_approx_latitude,
+            longitude: existing.delivery_approx_longitude!,
+          }
+        : await findArea(f.delivery_area, f.province);
+    if (other && !otherArea && f.delivery_latitude == null) {
+      setBusy(false);
+      return toast.error(
+        `We could not find "${f.delivery_area}" on the map. Check the spelling, or set the map pin for the other address.`,
+      );
+    }
     const { category_other, ...rest } = f;
     const row = {
       ...rest,
@@ -96,9 +124,15 @@ export function BusinessForm({
       mobile,
       email: f.email || null,
       address: f.address.trim(),
-      delivery_address: f.deliver_to === "other" ? f.delivery_address.trim() : null,
-      delivery_latitude: f.deliver_to === "other" ? f.delivery_latitude : null,
-      delivery_longitude: f.deliver_to === "other" ? f.delivery_longitude : null,
+      postal_code: f.postal_code.trim() || null,
+      approx_latitude: area?.latitude ?? null,
+      approx_longitude: area?.longitude ?? null,
+      delivery_address: other ? f.delivery_address.trim() : null,
+      delivery_area: other ? f.delivery_area.trim() : null,
+      delivery_latitude: other ? f.delivery_latitude : null,
+      delivery_longitude: other ? f.delivery_longitude : null,
+      delivery_approx_latitude: otherArea?.latitude ?? null,
+      delivery_approx_longitude: otherArea?.longitude ?? null,
     };
     const { error } = existing
       ? await supabase.from("businesses").update(row).eq("id", existing.id)
@@ -183,7 +217,7 @@ export function BusinessForm({
       )}
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
-          <Label htmlFor="tw">Township *</Label>
+          <Label htmlFor="tw">Township or area *</Label>
           <Input
             id="tw"
             required
@@ -214,15 +248,26 @@ export function BusinessForm({
       <fieldset className="space-y-3 rounded-md border-2 border-ink p-3">
         <legend className="px-1 font-display font-bold">Delivery</legend>
         <div>
-          <Label htmlFor="ad">Business address *</Label>
+          <Label htmlFor="ad">Address or directions *</Label>
           <textarea
             id="ad"
             required
             rows={2}
             className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
-            placeholder="Street, number, and a place nearby the driver can find"
+            placeholder="Street and number if you have one, and a place nearby, e.g. opposite the Site C taxi rank"
             value={f.address}
             onChange={(e) => setF({ ...f, address: e.target.value })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="pc">Postal code (optional)</Label>
+          <Input
+            id="pc"
+            inputMode="numeric"
+            maxLength={4}
+            className={field + " max-w-32"}
+            value={f.postal_code}
+            onChange={set("postal_code")}
           />
         </div>
         <LocationPicker
@@ -248,7 +293,18 @@ export function BusinessForm({
         {f.deliver_to === "other" && (
           <>
             <div>
-              <Label htmlFor="dad">Other address *</Label>
+              <Label htmlFor="dar">Area of the other address *</Label>
+              <Input
+                id="dar"
+                required
+                className={field}
+                placeholder="e.g. Harare, Khayelitsha"
+                value={f.delivery_area}
+                onChange={set("delivery_area")}
+              />
+            </div>
+            <div>
+              <Label htmlFor="dad">Other address or directions *</Label>
               <textarea
                 id="dad"
                 required
@@ -260,8 +316,8 @@ export function BusinessForm({
               />
             </div>
             <LocationPicker
-              title="Map pin for the other address *"
-              hint="The driver uses this pin to find the other address."
+              title="Map pin for the other address"
+              hint="The driver uses this pin to find the other address. Best set when you are there. You can do it later, but you need it to confirm an order."
               latitude={f.delivery_latitude}
               longitude={f.delivery_longitude}
               address={f.delivery_address}
