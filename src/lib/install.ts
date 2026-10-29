@@ -15,9 +15,11 @@ type InstallState = {
   canPrompt: boolean;
   /** iPhone and iPad install by hand: Share, then "Add to Home Screen" */
   ios: boolean;
+  /** ...and only from Safari (Chrome, WhatsApp and Facebook on iPhone can't) */
+  iosSafari: boolean;
 };
 
-const SERVER: InstallState = { installed: false, canPrompt: false, ios: false };
+const SERVER: InstallState = { installed: false, canPrompt: false, ios: false, iosSafari: false };
 let state = SERVER;
 let deferred: InstallPromptEvent | null = null;
 const listeners = new Set<() => void>();
@@ -32,13 +34,15 @@ function start() {
   if (started || typeof window === "undefined") return;
   started = true;
   const ua = navigator.userAgent;
+  // iPadOS reports itself as a Mac, so check for touch too
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   state = {
     installed:
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true,
     canPrompt: false,
-    // iPadOS reports itself as a Mac, so check for touch too
-    ios: /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1),
+    ios,
+    iosSafari: ios && !/CriOS|FxiOS|EdgiOS|OPiOS|FBAN|FBAV|Instagram|Line\//.test(ua),
   };
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
@@ -50,6 +54,10 @@ function start() {
     set({ installed: true, canPrompt: false });
   });
 }
+
+// Chrome sends its install event only once per page load, sometimes before React has started,
+// so listen from the moment this file loads
+start();
 
 function subscribe(listener: () => void) {
   start();
@@ -71,8 +79,12 @@ export async function installApp() {
   const e = deferred;
   deferred = null;
   set({ canPrompt: false });
-  await e.prompt();
-  return (await e.userChoice).outcome === "accepted";
+  try {
+    await e.prompt();
+    return (await e.userChoice).outcome === "accepted";
+  } catch {
+    return false;
+  }
 }
 
 /** Registers the service worker (production only: in development it would cache stale files) */

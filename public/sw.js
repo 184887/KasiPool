@@ -5,12 +5,20 @@ const STATIC = "kp-static-v1";
 const OFFLINE = "kp-offline-v1";
 const OFFLINE_URL = "/offline.html";
 const MAX_STATIC = 150;
+const LOCAL = ["localhost", "127.0.0.1"].includes(self.location.hostname);
+
+// Last resort if the phone has cleared the saved offline page
+const offlineFallback = () =>
+  new Response("<h1>No internet connection</h1><p>Check your data or Wi-Fi, then try again.</p>", {
+    status: 503,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(OFFLINE)
-      .then((cache) => cache.addAll([OFFLINE_URL, "/icons/icon-192.png"]))
+      .then((cache) => cache.add(OFFLINE_URL))
       .then(() => self.skipWaiting()),
   );
 });
@@ -34,6 +42,24 @@ async function trim(cache) {
   );
 }
 
+/** Saves a copy without ever failing the request (a full phone or a partial response just skips it) */
+function save(cache, req, res) {
+  if (res.status !== 200) return;
+  cache
+    .put(req, res.clone())
+    .then(() => trim(cache))
+    .catch(() => {});
+}
+
+async function fromCache(req) {
+  try {
+    const cache = await caches.open(STATIC);
+    return { cache, hit: await cache.match(req) };
+  } catch {
+    return { cache: null, hit: undefined };
+  }
+}
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
@@ -42,27 +68,38 @@ self.addEventListener("fetch", (event) => {
 
   // Pages: always fresh from the network, the offline page when there is no connection
   if (req.mode === "navigate") {
-    event.respondWith(fetch(req).catch(() => caches.match(OFFLINE_URL)));
+    event.respondWith(
+      fetch(req).catch(async () => (await caches.match(OFFLINE_URL)) ?? offlineFallback()),
+    );
     return;
   }
 
-  // Built files have a new name for every version, and product pictures and icons rarely
-  // change: serve them from the phone once downloaded, which saves data
-  if (
-    url.pathname.startsWith("/_next/static/") ||
-    url.pathname.startsWith("/images/") ||
-    url.pathname.startsWith("/icons/")
-  ) {
+  // Built files get a new name for every version: once downloaded, serve them from the phone.
+  // Not on a developer's machine: `next dev` reuses file names
+  if (url.pathname.startsWith("/_next/static/") && !LOCAL) {
     event.respondWith(
-      caches.open(STATIC).then(async (cache) => {
-        const hit = await cache.match(req);
+      fromCache(req).then(async ({ cache, hit }) => {
         if (hit) return hit;
         const res = await fetch(req);
-        if (res.ok) {
-          await cache.put(req, res.clone());
-          trim(cache);
-        }
+        if (cache) save(cache, req, res);
         return res;
+      }),
+    );
+    return;
+  }
+
+  // Pictures and icons can be replaced under the same name: show the saved copy straight away
+  // and fetch the new one in the background for next time
+  if (url.pathname.startsWith("/images/") || url.pathname.startsWith("/icons/")) {
+    event.respondWith(
+      fromCache(req).then(({ cache, hit }) => {
+        const fresh = fetch(req).then((res) => {
+          if (cache) save(cache, req, res);
+          return res;
+        });
+        if (!hit) return fresh;
+        event.waitUntil(fresh.catch(() => {}));
+        return hit;
       }),
     );
   }

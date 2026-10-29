@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Download, Share, SquarePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { installApp, registerServiceWorker, useInstall } from "@/lib/install";
@@ -9,8 +10,9 @@ const DISMISSED = "kp-install-dismissed";
 
 /** A small card that offers to put KasiPool on the home screen, until it is installed or closed */
 export function InstallBanner() {
-  const { installed, canPrompt, ios } = useInstall();
+  const { installed, canPrompt, ios, iosSafari } = useInstall();
   const [dismissed, setDismissed] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     registerServiceWorker();
@@ -21,7 +23,8 @@ export function InstallBanner() {
     }
   }, []);
 
-  if (installed || dismissed || !(canPrompt || ios)) return null;
+  // Keep sign-up and log-in free of extras
+  if (installed || dismissed || pathname === "/auth" || !(canPrompt || ios)) return null;
 
   const close = () => {
     setDismissed(true);
@@ -43,20 +46,25 @@ export function InstallBanner() {
               <p className="text-sm text-muted-foreground">
                 Open KasiPool from your home screen, like any app.
               </p>
-              <Button size="sm" variant="gold" className="mt-2" onClick={() => installApp()}>
+              <Button variant="gold" className="mt-2" onClick={() => installApp()}>
                 <Download aria-hidden="true" />
                 Install
               </Button>
             </>
-          ) : (
+          ) : iosSafari ? (
             <IosSteps />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Open this page in <b className="text-ink">Safari</b> to add KasiPool to your home
+              screen.
+            </p>
           )}
         </div>
         <button
           type="button"
           onClick={close}
           aria-label="Close"
-          className="-m-1 grid size-11 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-ink/5 hover:text-ink"
+          className="-m-2 grid size-12 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-ink/5 hover:text-ink"
         >
           <X className="size-5" aria-hidden="true" />
         </button>
@@ -68,8 +76,9 @@ export function InstallBanner() {
 function IosSteps() {
   return (
     <p className="text-sm text-muted-foreground">
-      Tap <Share className="inline size-4 align-text-bottom text-ink" aria-label="Share" /> at the
-      bottom of Safari, then <b className="text-ink">Add to Home Screen</b>{" "}
+      Tap{" "}
+      <Share className="inline size-4 align-text-bottom text-ink" role="img" aria-label="Share" />{" "}
+      in Safari, then <b className="text-ink">Add to Home Screen</b>{" "}
       <SquarePlus className="inline size-4 align-text-bottom text-ink" aria-hidden="true" />.
     </p>
   );
@@ -104,7 +113,8 @@ export function InstallSteps() {
         <li>Open KasiPool in Safari.</li>
         <li>
           Tap the Share button{" "}
-          <Share className="inline size-4 align-text-bottom" aria-label="Share" /> at the bottom.
+          <Share className="inline size-4 align-text-bottom" role="img" aria-label="Share" /> at the
+          bottom.
         </li>
         <li>
           Tap <b>Add to Home Screen</b>, then <b>Add</b>.
