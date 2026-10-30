@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Archivo, Bricolage_Grotesque } from "next/font/google";
 import type { ReactNode } from "react";
+import { getDictionary, getLang } from "@/i18n/server";
 import { Providers } from "./providers";
 import "@/styles.css";
 
@@ -32,11 +33,20 @@ export const viewport: Viewport = {
   themeColor: "#1c1a17",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // The language saved on this phone. Reading it makes pages render per request, so a shop
+  // that chose isiXhosa never sees the English version first.
+  const lang = await getLang();
+  const dict = await getDictionary(lang);
   return (
-    <html lang="en-ZA" className={`${anton.variable} ${bricolage.variable} ${archivo.variable}`}>
+    <html
+      lang={lang === "xh" ? "xh-ZA" : "en-ZA"}
+      className={`${anton.variable} ${bricolage.variable} ${archivo.variable}`}
+    >
       <body>
-        <Providers>{children}</Providers>
+        <Providers lang={lang} dict={dict}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

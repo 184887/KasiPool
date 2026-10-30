@@ -12,6 +12,7 @@ import { errMsg } from "@/lib/queries";
 import { findArea } from "@/lib/delivery";
 import { LocationPicker } from "./LocationPicker";
 import { useQueryClient } from "@tanstack/react-query";
+import { useT } from "@/i18n";
 
 // KasiPool is for every kind of local business, not only spaza shops
 export const BUSINESS_TYPES = [
@@ -46,6 +47,7 @@ export function BusinessForm({
   onDone: () => void;
 }) {
   const qc = useQueryClient();
+  const { t, rich, server } = useT();
   const [f, setF] = useState({
     trading_name: existing?.trading_name ?? "",
     rep_name: existing?.rep_name ?? "",
@@ -80,14 +82,16 @@ export function BusinessForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const mobile = normaliseSaMobile(f.mobile);
-    if (!mobile) return toast.error("Enter a South African cellphone number, like 072 123 4567");
+    if (!mobile) return toast.error(t("Enter a South African cellphone number, like 072 123 4567"));
     if (f.category === OTHER && !f.category_other.trim())
-      return toast.error("Tell us what type of business you have");
-    if (!f.address.trim()) return toast.error("Tell us your address, or how to find your business");
+      return toast.error(t("Tell us what type of business you have"));
+    if (!f.address.trim())
+      return toast.error(t("Tell us your address, or how to find your business"));
     const other = f.deliver_to === "other";
-    if (other && !f.delivery_address.trim()) return toast.error("Enter the other address");
-    if (other && !f.delivery_area.trim()) return toast.error("Enter the area of the other address");
-    if (!terms) return toast.error("Please accept the terms and privacy notice");
+    if (other && !f.delivery_address.trim()) return toast.error(t("Enter the other address"));
+    if (other && !f.delivery_area.trim())
+      return toast.error(t("Enter the area of the other address"));
+    if (!terms) return toast.error(t("Please accept the terms and privacy notice"));
     setBusy(true);
     // Until the exact map pin is set, the centre of the area is used to work out distances to deals
     const area =
@@ -100,7 +104,9 @@ export function BusinessForm({
     if (!area && f.latitude == null) {
       setBusy(false);
       return toast.error(
-        `We could not find "${f.township}" on the map. Check the spelling, or set the map pin.`,
+        t('We could not find "{area}" on the map. Check the spelling, or set the map pin.', {
+          area: f.township,
+        }),
       );
     }
     const otherArea = !other
@@ -114,7 +120,10 @@ export function BusinessForm({
     if (other && !otherArea && f.delivery_latitude == null) {
       setBusy(false);
       return toast.error(
-        `We could not find "${f.delivery_area}" on the map. Check the spelling, or set the map pin for the other address.`,
+        t(
+          'We could not find "{area}" on the map. Check the spelling, or set the map pin for the other address.',
+          { area: f.delivery_area },
+        ),
       );
     }
     const { category_other, ...rest } = f;
@@ -138,10 +147,10 @@ export function BusinessForm({
       ? await supabase.from("businesses").update(row).eq("id", existing.id)
       : await supabase.from("businesses").insert({ ...row, user_id: userId });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) return toast.error(server(errMsg(error)));
     await qc.invalidateQueries({ queryKey: ["my-business"] });
     await qc.invalidateQueries({ queryKey: ["pool-distances"] });
-    toast.success("Saved");
+    toast.success(t("Saved"));
     onDone();
   }
 
@@ -149,7 +158,7 @@ export function BusinessForm({
   return (
     <form onSubmit={submit} className="space-y-3">
       <div>
-        <Label htmlFor="tn">Business name *</Label>
+        <Label htmlFor="tn">{t("Business name *")}</Label>
         <Input
           id="tn"
           required
@@ -160,7 +169,7 @@ export function BusinessForm({
         />
       </div>
       <div>
-        <Label htmlFor="rn">Your name *</Label>
+        <Label htmlFor="rn">{t("Your name *")}</Label>
         <Input
           id="rn"
           required
@@ -172,7 +181,7 @@ export function BusinessForm({
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <Label htmlFor="mob">Cellphone number *</Label>
+          <Label htmlFor="mob">{t("Cellphone number *")}</Label>
           <Input
             id="mob"
             required
@@ -184,12 +193,12 @@ export function BusinessForm({
           />
         </div>
         <div>
-          <Label htmlFor="em">Email (optional)</Label>
+          <Label htmlFor="em">{t("Email (optional)")}</Label>
           <Input id="em" type="email" className={field} value={f.email} onChange={set("email")} />
         </div>
       </div>
       <div>
-        <Label htmlFor="cat">Type of business</Label>
+        <Label htmlFor="cat">{t("Type of business")}</Label>
         <select
           id="cat"
           className="mt-1 h-12 w-full rounded-md border border-input bg-card px-3"
@@ -197,19 +206,21 @@ export function BusinessForm({
           onChange={set("category")}
         >
           {[...BUSINESS_TYPES, OTHER].map((c) => (
-            <option key={c}>{c}</option>
+            <option key={c} value={c}>
+              {t(c)}
+            </option>
           ))}
         </select>
       </div>
       {f.category === OTHER && (
         <div>
-          <Label htmlFor="cat-other">What type of business? *</Label>
+          <Label htmlFor="cat-other">{t("What type of business? *")}</Label>
           <Input
             id="cat-other"
             required
             maxLength={60}
             className={field}
-            placeholder="e.g. Phone repairs"
+            placeholder={t("e.g. Phone repairs")}
             value={f.category_other}
             onChange={set("category_other")}
           />
@@ -217,22 +228,22 @@ export function BusinessForm({
       )}
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
-          <Label htmlFor="tw">Township or area *</Label>
+          <Label htmlFor="tw">{t("Township or area *")}</Label>
           <Input
             id="tw"
             required
             className={field}
-            placeholder="e.g. Khayelitsha"
+            placeholder={t("e.g. Khayelitsha")}
             value={f.township}
             onChange={set("township")}
           />
         </div>
         <div>
-          <Label htmlFor="ci">City *</Label>
+          <Label htmlFor="ci">{t("City *")}</Label>
           <Input id="ci" required className={field} value={f.city} onChange={set("city")} />
         </div>
         <div>
-          <Label htmlFor="pr">Province *</Label>
+          <Label htmlFor="pr">{t("Province *")}</Label>
           <select
             id="pr"
             className="mt-1 h-12 w-full rounded-md border border-input bg-card px-3"
@@ -246,21 +257,23 @@ export function BusinessForm({
         </div>
       </div>
       <fieldset className="space-y-3 rounded-md border-2 border-ink p-3">
-        <legend className="px-1 font-display font-bold">Delivery</legend>
+        <legend className="px-1 font-display font-bold">{t("Delivery")}</legend>
         <div>
-          <Label htmlFor="ad">Address or directions *</Label>
+          <Label htmlFor="ad">{t("Address or directions *")}</Label>
           <textarea
             id="ad"
             required
             rows={2}
             className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
-            placeholder="Street and number if you have one, and a place nearby, e.g. opposite the Site C taxi rank"
+            placeholder={t(
+              "Street and number if you have one, and a place nearby, e.g. opposite the Site C taxi rank",
+            )}
             value={f.address}
             onChange={(e) => setF({ ...f, address: e.target.value })}
           />
         </div>
         <div>
-          <Label htmlFor="pc">Postal code (optional)</Label>
+          <Label htmlFor="pc">{t("Postal code (optional)")}</Label>
           <Input
             id="pc"
             inputMode="numeric"
@@ -288,36 +301,38 @@ export function BusinessForm({
             checked={f.deliver_to === "other"}
             onCheckedChange={(v) => setF({ ...f, deliver_to: v ? "other" : "business" })}
           />
-          <span>Deliver my stock to another address</span>
+          <span>{t("Deliver my stock to another address")}</span>
         </label>
         {f.deliver_to === "other" && (
           <>
             <div>
-              <Label htmlFor="dar">Area of the other address *</Label>
+              <Label htmlFor="dar">{t("Area of the other address *")}</Label>
               <Input
                 id="dar"
                 required
                 className={field}
-                placeholder="e.g. Harare, Khayelitsha"
+                placeholder={t("e.g. Harare, Khayelitsha")}
                 value={f.delivery_area}
                 onChange={set("delivery_area")}
               />
             </div>
             <div>
-              <Label htmlFor="dad">Other address or directions *</Label>
+              <Label htmlFor="dad">{t("Other address or directions *")}</Label>
               <textarea
                 id="dad"
                 required
                 rows={2}
                 className="mt-1 w-full rounded-md border border-input bg-card px-3 py-2"
-                placeholder="Where must the driver bring your stock?"
+                placeholder={t("Where must the driver bring your stock?")}
                 value={f.delivery_address}
                 onChange={(e) => setF({ ...f, delivery_address: e.target.value })}
               />
             </div>
             <LocationPicker
-              title="Map pin for the other address"
-              hint="The driver uses this pin to find the other address. Best set when you are there. You can do it later, but you need it to confirm an order."
+              title={t("Map pin for the other address")}
+              hint={t(
+                "The driver uses this pin to find the other address. Best set when you are there. You can do it later, but you need it to confirm an order.",
+              )}
               latitude={f.delivery_latitude}
               longitude={f.delivery_longitude}
               address={f.delivery_address}
@@ -336,7 +351,7 @@ export function BusinessForm({
         )}
       </fieldset>
       <label className="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm">
-        <span>Send me new deals on WhatsApp</span>
+        <span>{t("Send me new deals on WhatsApp")}</span>
         <Switch
           checked={f.marketing_opt_in}
           onCheckedChange={(v) => setF({ ...f, marketing_opt_in: v })}
@@ -346,20 +361,26 @@ export function BusinessForm({
         <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
           <Checkbox checked={terms} onCheckedChange={(v) => setTerms(!!v)} className="mt-0.5" />
           <span>
-            I accept the{" "}
-            <a href="/terms" target="_blank" className="font-semibold underline">
-              terms
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" target="_blank" className="font-semibold underline">
-              privacy notice
-            </a>
-            .
+            {rich(
+              "I accept the <terms>terms</terms> and <privacy>privacy notice</privacy> (in English).",
+              {
+                terms: (c) => (
+                  <a href="/terms" target="_blank" className="font-semibold underline">
+                    {c}
+                  </a>
+                ),
+                privacy: (c) => (
+                  <a href="/privacy" target="_blank" className="font-semibold underline">
+                    {c}
+                  </a>
+                ),
+              },
+            )}
           </span>
         </label>
       )}
       <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
-        {busy ? "Saving…" : existing ? "Save changes" : "Finish registration"}
+        {busy ? t("Saving…") : existing ? t("Save changes") : t("Finish registration")}
       </Button>
     </form>
   );

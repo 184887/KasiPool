@@ -63,6 +63,19 @@ Run lint, typecheck, test and build before committing. Format with `npx prettier
 - UI copy is South African English (en-ZA): "colour", "organise", "R219.00".
 - Money and dates go through `src/lib/format.ts` (ZAR, Africa/Johannesburg).
 
+## Languages (English and isiXhosa)
+
+- Shop screens are in English and isiXhosa. Shops pick a language in the header or Profile; it
+  is saved on the phone (`kp-lang` cookie) and the root layout sends only that dictionary.
+- Write UI text in English inside `t("...")` (or `rich("...", { b: ... })` for bold and links)
+  from `useT()` in `@/i18n`, and add the isiXhosa to `src/i18n/xh.ts`. Use `{placeholders}` for
+  numbers, money and names, and `qty(n, unit)` for "5 bales". `npm test` fails if a text has no
+  isiXhosa or the placeholders differ.
+- Messages written by the database (notifications, errors) stay English in the database; show
+  them with `server(text)`, and add them to the `server` part of `xh.ts`.
+- Not translated: admin pages, product names and descriptions, the Terms and Privacy pages, and
+  the brand lines. isiXhosa is a draft until a first-language speaker has checked it.
+
 ## Database
 
 - Supabase project `spjmlcodmjdihbxwueot` (eu-west-1). Migrations live in

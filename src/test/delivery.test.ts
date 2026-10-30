@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { byDistance, distanceLabel, distanceText, mapsUrl } from "@/lib/delivery";
+import { byDistance, mapsUrl } from "@/lib/delivery";
+import { awayLabel } from "@/components/kp/PoolCard";
+import { english } from "@/i18n";
 
 describe("mapsUrl", () => {
   it("links to the pin", () => {
@@ -13,11 +15,11 @@ describe("mapsUrl", () => {
   });
 });
 
-describe("distanceLabel", () => {
+describe("awayLabel", () => {
   it("says how far, in plain words", () => {
-    expect(distanceLabel({ distance_km: 0 })).toBe("Under 1 km away");
-    expect(distanceLabel({ distance_km: 4 })).toBe("4 km away");
-    expect(distanceText({ distance_km: 0 })).toBe("under 1 km");
+    const d = { radius_km: 10, in_range: true };
+    expect(awayLabel(english, { ...d, distance_km: 0 })).toBe("Under 1 km away");
+    expect(awayLabel(english, { ...d, distance_km: 4 })).toBe("4 km away");
   });
 });
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/kp/AppShell";
 import { STEPS } from "@/views/home";
+import { useT } from "@/i18n";
 
 const FAQ = [
   [
@@ -30,34 +31,37 @@ const FAQ = [
 ];
 
 export function HowItWorks() {
+  const { t } = useT();
   return (
     <Container className="max-w-3xl">
-      <h1 className="font-headline text-4xl sm:text-5xl">How KasiPool works</h1>
+      <h1 className="font-headline text-4xl sm:text-5xl">{t("How KasiPool works")}</h1>
       <p className="mt-2 text-muted-foreground">
-        Many businesses. One big order. Better prices for everyone.
+        {t("Many businesses. One big order. Better prices for everyone.")}
       </p>
       <ol className="mt-8 space-y-6">
         {STEPS.map((s, i) => (
           <li key={s.title} className="flex gap-5 border-t-2 border-ink pt-4">
             <span className="w-10 shrink-0 font-headline text-5xl text-ember">{i + 1}</span>
             <div>
-              <p className="font-display text-xl font-bold">{s.title}</p>
-              <p className="text-muted-foreground">{s.body}</p>
+              <p className="font-display text-xl font-bold">{t(s.title)}</p>
+              <p className="text-muted-foreground">{t(s.body)}</p>
             </div>
           </li>
         ))}
       </ol>
-      <h2 className="mt-12 border-b-4 border-ink pb-2 font-headline text-3xl">Common questions</h2>
+      <h2 className="mt-12 border-b-4 border-ink pb-2 font-headline text-3xl">
+        {t("Common questions")}
+      </h2>
       <div className="mt-4 space-y-3">
         {FAQ.map(([q, a]) => (
           <details key={q} className="rounded-xl border bg-card p-4">
-            <summary className="cursor-pointer font-semibold">{q}</summary>
-            <p className="mt-2 text-sm text-muted-foreground">{a}</p>
+            <summary className="cursor-pointer font-semibold">{t(q)}</summary>
+            <p className="mt-2 text-sm text-muted-foreground">{t(a)}</p>
           </details>
         ))}
       </div>
       <Button asChild size="lg" variant="gold" className="mt-8">
-        <Link href="/offers">See deals</Link>
+        <Link href="/offers">{t("See deals")}</Link>
       </Button>
     </Container>
   );

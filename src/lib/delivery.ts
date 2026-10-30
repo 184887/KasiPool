@@ -3,17 +3,6 @@ import type { PoolDistance } from "@/lib/queries";
 /** Pools are joinable within this many km of their centre unless an admin changes it */
 export const DEFAULT_RADIUS_KM = 10;
 
-/** "under 1 km", "4 km": for use inside a sentence */
-export function distanceText(d: Pick<PoolDistance, "distance_km">) {
-  return d.distance_km < 1 ? "under 1 km" : `${d.distance_km} km`;
-}
-
-/** "Under 1 km away", "4 km away": a label on its own */
-export function distanceLabel(d: Pick<PoolDistance, "distance_km">) {
-  const t = `${distanceText(d)} away`;
-  return t[0].toUpperCase() + t.slice(1);
-}
-
 /** Nearest first; pools you can't join go last */
 export function byDistance<T extends { id: string }>(list: T[], dist: Map<string, PoolDistance>) {
   const key = (p: T) => {

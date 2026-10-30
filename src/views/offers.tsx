@@ -14,9 +14,11 @@ import { activePoolsQuery, catalogueQuery, poolDistancesQuery } from "@/lib/quer
 import { byDistance } from "@/lib/delivery";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 /** Deals: open and upcoming pools, plus products that have no pool yet. */
 export function Offers() {
+  const { t } = useT();
   const { user } = useAuth();
   const pools = useQuery(activePoolsQuery);
   const cat = useQuery(catalogueQuery);
@@ -47,9 +49,9 @@ export function Offers() {
 
   return (
     <Container>
-      <h1 className="font-headline text-4xl sm:text-5xl">Deals</h1>
+      <h1 className="font-headline text-4xl sm:text-5xl">{t("Deals")}</h1>
       <p className="mt-1 text-muted-foreground">
-        You do not pay when you join. You pay when your stock arrives.
+        {t("You do not pay when you join. You pay when your stock arrives.")}
       </p>
       <div className="relative mt-5">
         <Search
@@ -59,15 +61,15 @@ export function Offers() {
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search products"
+          placeholder={t("Search products")}
           className="h-12 border-2 border-ink pl-10 text-base"
-          aria-label="Search products"
+          aria-label={t("Search products")}
         />
       </div>
       <div
         className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-2"
         role="group"
-        aria-label="Category"
+        aria-label={t("Category")}
       >
         {[{ id: null, name: "All" }, ...(cat.data?.categories ?? [])].map((c) => (
           <button
@@ -80,7 +82,7 @@ export function Offers() {
               category === c.id ? "bg-ink text-paper" : "bg-card text-ink",
             )}
           >
-            {c.name}
+            {t(c.name)}
           </button>
         ))}
       </div>
@@ -90,18 +92,21 @@ export function Offers() {
       ) : nothing ? (
         <div className="mt-6">
           {term || category ? (
-            <EmptyState title="Nothing matches" body="Try another search or category." />
+            <EmptyState title={t("Nothing matches")} body={t("Try another search or category.")} />
           ) : (
-            <EmptyState title="No deals yet" body="We add new deals often. Come back soon." />
+            <EmptyState
+              title={t("No deals yet")}
+              body={t("We add new deals often. Come back soon.")}
+            />
           )}
         </div>
       ) : (
         <>
-          <DealSection title="Open now" count={openNow.length}>
+          <DealSection title={t("Open now")} count={openNow.length}>
             {openNow.length === 0 ? (
               <EmptyState
-                title="No open deals right now"
-                body="We add new deals often. Come back soon."
+                title={t("No open deals right now")}
+                body={t("We add new deals often. Come back soon.")}
               />
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,7 +118,7 @@ export function Offers() {
           </DealSection>
 
           {soon.length > 0 && (
-            <DealSection title="Opening soon" count={soon.length}>
+            <DealSection title={t("Opening soon")} count={soon.length}>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {soon.map((p) => (
                   <PoolCard key={p.id} pool={p} distance={dist.get(p.id)} />
@@ -123,9 +128,9 @@ export function Offers() {
           )}
 
           {noDeal.length > 0 && (
-            <DealSection title="No deal yet" count={noDeal.length}>
+            <DealSection title={t("No deal yet")} count={noDeal.length}>
               <p className="-mt-2 mb-3 text-muted-foreground">
-                Want one of these? Ask for a deal, and other businesses near you can join it.
+                {t("Want one of these? Ask for a deal, and other businesses near you can join it.")}
               </p>
               <ul className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink bg-card">
                 {noDeal.map((p) => (
@@ -142,11 +147,11 @@ export function Offers() {
                     <div className="min-w-0 flex-1">
                       <p className="font-display font-bold leading-tight">{p.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {p.pack_size} · per {p.unit}
+                        {p.pack_size} · {t("per {unit}", { unit: t(p.unit) })}
                       </p>
                     </div>
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/start-pool?product=${p.id}`}>Ask for a deal</Link>
+                      <Link href={`/start-pool?product=${p.id}`}>{t("Ask for a deal")}</Link>
                     </Button>
                   </li>
                 ))}

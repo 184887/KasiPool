@@ -4,9 +4,10 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Home, Tag, Layers, User, Shield } from "lucide-react";
+import { Bell, Home, Tag, Layers, User, Shield, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useSetLang, useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { InstallBanner } from "./InstallPrompt";
@@ -40,6 +41,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { user, isAdmin } = useAuth();
   const pathname = usePathname();
   const unread = useUnreadCount();
+  const { t, lang } = useT();
+  const setLang = useSetLang();
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
 
   return (
@@ -62,24 +65,34 @@ export function AppShell({ children }: { children: ReactNode }) {
                     : "border-transparent text-paper/70 hover:text-paper",
                 )}
               >
-                {n.label}
+                {t(n.label)}
               </Link>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setLang(lang === "xh" ? "en" : "xh")}
+              lang={lang === "xh" ? "en" : "xh"}
+              aria-label={lang === "xh" ? "Switch to English" : "Tshintshela kwisiXhosa"}
+              className="flex h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-paper/80 transition-colors hover:bg-paper/10 hover:text-paper"
+            >
+              <Languages className="size-4" aria-hidden="true" />
+              <span>{lang === "xh" ? "English" : "isiXhosa"}</span>
+            </button>
             <Link
               href={isAdmin ? "/admin" : "/admin/login"}
               aria-label="Admin"
               className="flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 transition-colors hover:bg-paper/10 hover:text-paper"
             >
               <Shield className="size-4" aria-hidden="true" />
-              <span>Admin</span>
+              <span className="hidden sm:inline">Admin</span>
             </Link>
             {user ? (
               <Link
                 href="/notifications"
                 className="relative grid size-11 place-items-center rounded-md transition-colors hover:bg-paper/10"
-                aria-label={`Notifications (${unread.data ?? 0} unread)`}
+                aria-label={t("Notifications ({n} unread)", { n: unread.data ?? 0 })}
               >
                 <Bell className="size-5" />
                 {!!unread.data && (
@@ -91,7 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ) : (
               pathname !== "/auth" && (
                 <Button asChild size="sm" variant="gold">
-                  <Link href="/auth">Log in</Link>
+                  <Link href="/auth">{t("Log in")}</Link>
                 </Button>
               )
             )}
@@ -111,13 +124,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="space-y-1.5">
             <p className="font-bold">KasiPool</p>
-            <FooterLink href="/how-it-works">How it works</FooterLink>
-            <FooterLink href="/help">Help & contact</FooterLink>
+            <FooterLink href="/how-it-works">{t("How it works")}</FooterLink>
+            <FooterLink href="/help">{t("Help & contact")}</FooterLink>
           </div>
           <div className="space-y-1.5">
-            <p className="font-bold">Legal (draft)</p>
-            <FooterLink href="/terms">Terms of use</FooterLink>
-            <FooterLink href="/privacy">Privacy notice</FooterLink>
+            <p className="font-bold">{t("Legal (draft)")}</p>
+            <FooterLink href="/terms">{t("Terms of use")}</FooterLink>
+            <FooterLink href="/privacy">{t("Privacy notice")}</FooterLink>
           </div>
         </div>
       </footer>
@@ -143,7 +156,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             />
             <n.icon className={cn("size-6", isActive(n.to) && "stroke-[2.5]")} aria-hidden="true" />
-            {n.label}
+            {t(n.label)}
           </Link>
         ))}
       </nav>

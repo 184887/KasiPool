@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mapsUrl, NOMINATIM } from "@/lib/delivery";
+import { useT } from "@/i18n";
 
 export type PickedLocation = { latitude: number; longitude: number; address: string };
 
@@ -14,8 +15,8 @@ export function LocationPicker({
   longitude,
   address,
   onPick,
-  title = "Map pin",
-  hint = "Many places have no street number, so the pin is how the driver finds you. Best: stand at your business and tap “Use my current location”. Not there now? You can do it later, but you need it to confirm an order.",
+  title,
+  hint,
 }: {
   latitude: number | null;
   longitude: number | null;
@@ -24,12 +25,13 @@ export function LocationPicker({
   title?: string;
   hint?: string;
 }) {
+  const { t, rich } = useT();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
   const [busy, setBusy] = useState(false);
 
   async function search() {
-    if (q.trim().length < 3) return toast.error("Type a street, suburb or township");
+    if (q.trim().length < 3) return toast.error(t("Type a street, suburb or township"));
     setBusy(true);
     try {
       const res = await fetch(
@@ -39,9 +41,10 @@ export function LocationPicker({
       if (!res.ok) throw new Error();
       const data: Hit[] = await res.json();
       setHits(data);
-      if (!data.length) toast.error("No matching places found. Try a nearby suburb or landmark.");
+      if (!data.length)
+        toast.error(t("No matching places found. Try a nearby suburb or landmark."));
     } catch {
-      toast.error("Search is not working now. Try again, or use where you are now.");
+      toast.error(t("Search is not working now. Try again, or use where you are now."));
     } finally {
       setBusy(false);
     }
@@ -54,7 +57,7 @@ export function LocationPicker({
   }
 
   function useCurrent() {
-    if (!navigator.geolocation) return toast.error("Location is not available on this device");
+    if (!navigator.geolocation) return toast.error(t("Location is not available on this device"));
     setBusy(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -71,7 +74,7 @@ export function LocationPicker({
       },
       () => {
         setBusy(false);
-        toast.error("We could not find where you are. Allow location on your phone, or search.");
+        toast.error(t("We could not find where you are. Allow location on your phone, or search."));
       },
       { timeout: 10000 },
     );
@@ -79,12 +82,12 @@ export function LocationPicker({
 
   return (
     <div className="space-y-2 rounded-lg border p-3">
-      <p className="text-sm font-semibold">{title}</p>
+      <p className="text-sm font-semibold">{title ?? t("Map pin")}</p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           className="h-12"
-          aria-label="Search your street or area"
-          placeholder="Street or area, like Site C"
+          aria-label={t("Search your street or area")}
+          placeholder={t("Street or area, like Site C")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
@@ -95,11 +98,11 @@ export function LocationPicker({
           }}
         />
         <Button type="button" variant="outline" className="h-12" disabled={busy} onClick={search}>
-          <Search className="size-4" /> Search
+          <Search className="size-4" /> {t("Search")}
         </Button>
       </div>
       <Button type="button" variant="ghost" disabled={busy} onClick={useCurrent}>
-        <LocateFixed className="size-4" /> Use my current location
+        <LocateFixed className="size-4" /> {t("Use my current location")}
       </Button>
       {hits.length > 0 && (
         <ul className="divide-y rounded-lg border bg-card text-sm">
@@ -120,7 +123,7 @@ export function LocationPicker({
         <p className="flex gap-2 text-sm">
           <MapPin className="size-4 shrink-0 text-leaf" />
           <span>
-            <b>Pin added.</b> {address}
+            <b>{t("Pin added.")}</b> {address}
             <br />
             <a
               href={mapsUrl(latitude, longitude) ?? undefined}
@@ -128,14 +131,22 @@ export function LocationPicker({
               rel="noopener noreferrer"
               className="inline-flex min-h-11 items-center font-semibold text-ember underline underline-offset-4"
             >
-              Check it on the map
+              {t("Check it on the map")}
             </a>
           </span>
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground">{hint}</p>
+        <p className="text-sm text-muted-foreground">
+          {hint ??
+            rich(
+              "Many places have no street number, so the pin is how the driver finds you. Best: stand at your business and tap <b>Use my current location</b>. Not there now? You can do it later, but you need it to confirm an order.",
+              { b: (c) => <b>{c}</b> },
+            )}
+        </p>
       )}
-      <p className="text-sm text-muted-foreground">We use OpenStreetMap to search for places.</p>
+      <p className="text-sm text-muted-foreground">
+        {t("We use OpenStreetMap to search for places.")}
+      </p>
     </div>
   );
 }

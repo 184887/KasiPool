@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import {
   Inbox,
@@ -12,6 +14,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 import type { Tone } from "@/lib/status";
 
 const toneCls: Record<Tone, string> = {
@@ -33,6 +36,8 @@ export function StatusBadge({
   children: ReactNode;
   className?: string;
 }) {
+  // Labels come in English (the icon is picked from them) and are translated for display
+  const { t } = useT();
   const label = typeof children === "string" ? children.toLowerCase() : "";
   const completed = label === "completed" || label === "received";
   const Icon =
@@ -86,7 +91,7 @@ export function StatusBadge({
       )}
     >
       <Icon className="size-3.5" aria-hidden="true" />
-      {children}
+      {typeof children === "string" ? t(children) : children}
     </span>
   );
 }
@@ -114,7 +119,8 @@ export function EmptyState({
  * Grey blocks in the shape of a page while data loads, so the layout doesn't jump when it
  * arrives. `inline` is for a list inside a page that is already showing.
  */
-export function Loading({ label = "Loading…", inline }: { label?: string; inline?: boolean }) {
+export function Loading({ label, inline }: { label?: string; inline?: boolean }) {
+  const { t } = useT();
   const block = "rounded-md bg-ink/10 animate-pulse";
   return (
     <div
@@ -122,7 +128,7 @@ export function Loading({ label = "Loading…", inline }: { label?: string; inli
       aria-live="polite"
       className={cn(!inline && "mx-auto max-w-3xl px-4 py-6", "animate-fade-in")}
     >
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{label ?? t("Loading…")}</span>
       {!inline && <div className={cn(block, "mb-2 h-11 w-2/3 max-w-xs")} />}
       {!inline && <div className={cn(block, "mb-6 h-4 w-1/2 max-w-[14rem]")} />}
       <div className="space-y-3" aria-hidden="true">

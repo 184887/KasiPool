@@ -19,9 +19,10 @@ import { useAuth } from "@/lib/auth";
 import { missingPin } from "@/lib/delivery";
 import { supabase } from "@/integrations/supabase/client";
 import { settingsQuery, errMsg } from "@/lib/queries";
-import { money, dateTime, qty } from "@/lib/format";
+import { money, dateTime } from "@/lib/format";
 import { PAYMENT_STATUS, PAYMENT_METHOD, ORDER_STATUS, timelineStep } from "@/lib/status";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 type Method = "cash" | "eft";
 
@@ -49,12 +50,13 @@ export function OrderPage() {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const [ask, confirmDialog] = useConfirm();
+  const { t, rich, server, qty } = useT();
 
   if (isLoading) return <Loading />;
   if (!o)
     return (
       <Container>
-        <EmptyState title="Order not found" />
+        <EmptyState title={t("Order not found")} />
       </Container>
     );
   const pool = o.pools!;
@@ -64,7 +66,9 @@ export function OrderPage() {
   )[0];
   const payMethod: Method = o.payment_method === "cash" ? "cash" : "eft";
   const failed = ["declined", "expired", "cancelled", "failed"].includes(o.status)
-    ? (o.failure_reason ?? ORDER_STATUS[o.status].label)
+    ? o.failure_reason
+      ? server(o.failure_reason)
+      : t(ORDER_STATUS[o.status].label)
     : null;
 
   async function confirm() {
@@ -75,15 +79,15 @@ export function OrderPage() {
       _method: method ?? undefined,
     });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
-    toast.success("Order confirmed");
+    if (error) return toast.error(server(errMsg(error)));
+    toast.success(t("Order confirmed"));
     qc.invalidateQueries();
   }
   async function changeMethod(m: Method) {
     setBusy(true);
     const { error } = await supabase.rpc("choose_payment_method", { _order: orderId, _method: m });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) return toast.error(server(errMsg(error)));
     setChanging(false);
     qc.invalidateQueries();
   }
@@ -91,8 +95,8 @@ export function OrderPage() {
     setBusy(true);
     const { error } = await supabase.rpc("confirm_delivery_received", { _order: orderId });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
-    toast.success("Thank you");
+    if (error) return toast.error(server(errMsg(error)));
+    toast.success(t("Thank you"));
     qc.invalidateQueries();
   }
   async function reportProblem() {
@@ -102,23 +106,23 @@ export function OrderPage() {
       _note: problem ?? "",
     });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
-    toast.success("Sent. KasiPool will contact you soon.");
+    if (error) return toast.error(server(errMsg(error)));
+    toast.success(t("Sent. KasiPool will contact you soon."));
     setProblem(null);
     qc.invalidateQueries();
   }
   async function decline() {
     const ok = await ask({
-      title: "Decline this order?",
-      body: "You won't get this stock, and you can't undo this.",
-      confirmLabel: "Decline order",
-      cancelLabel: "Keep my order",
+      title: t("Decline this order?"),
+      body: t("You won't get this stock, and you can't undo this."),
+      confirmLabel: t("Decline order"),
+      cancelLabel: t("Keep my order"),
       danger: true,
     });
     if (ok === false) return;
     const { error } = await supabase.rpc("decline_order", { _order: orderId });
-    if (error) return toast.error(errMsg(error));
-    toast.success("Order cancelled");
+    if (error) return toast.error(server(errMsg(error)));
+    toast.success(t("Order cancelled"));
     qc.invalidateQueries();
   }
 
@@ -128,7 +132,7 @@ export function OrderPage() {
         href="/my-pools"
         className="-ml-2 inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-ink"
       >
-        <ArrowLeft className="size-4" aria-hidden="true" /> My Pools
+        <ArrowLeft className="size-4" aria-hidden="true" /> {t("My Pools")}
       </Link>
       <div className="flex items-center gap-3">
         <ProductImage
@@ -142,20 +146,20 @@ export function OrderPage() {
         <div>
           <h1 className="font-headline text-4xl sm:text-5xl">{pool.products?.name}</h1>
           <p className="text-sm text-muted-foreground">
-            {o.ref ? `Order ${o.ref}` : "Please confirm"}
+            {o.ref ? t("Order {ref}", { ref: o.ref }) : t("Please confirm")}
           </p>
         </div>
       </div>
 
       {o.status === "awaiting_confirmation" && (
-        <Section title="Confirm your order" className="border-4">
-          <p className="text-sm">The pool reached its target. Please review and confirm.</p>
+        <Section title={t("Confirm your order")} className="border-4">
+          <p className="text-sm">{t("The pool reached its target. Please review and confirm.")}</p>
           <dl className="mt-3 space-y-1.5 text-sm">
             <Row k="Product" v={`${pool.products?.name} (${pool.products?.pack_size})`} />
             <Row k="Quantity" v={qty(o.quantity, pool.unit)} />
             <Row k="Price for each" v={money(o.unit_price)} />
             <Row k="Goods" v={money(o.quantity * Number(o.unit_price))} />
-            <Row k="Delivery" v={Number(o.delivery_fee) > 0 ? money(o.delivery_fee) : "Free"} />
+            <Row k="Delivery" v={Number(o.delivery_fee) > 0 ? money(o.delivery_fee) : t("Free")} />
             <Row k="Order total" v={<b className="text-lg">{money(o.total)}</b>} />
             <Row k="Deliver to" v={o.delivery_address ?? "-"} />
             <Row
@@ -168,25 +172,32 @@ export function OrderPage() {
             />
           </dl>
           <p className="mt-3 rounded-md bg-muted p-3 text-sm text-muted-foreground">
-            When you confirm, you agree to buy this amount at this price. KasiPool buys the stock
-            first. You pay when your stock arrives. Your price will not change.
+            {t(
+              "When you confirm, you agree to buy this amount at this price. KasiPool buys the stock first. You pay when your stock arrives. Your price will not change.",
+            )}
           </p>
           <PinPrompt business={business} className="mt-4" />
-          <p className="mt-4 text-sm font-bold">How will you pay?</p>
+          <p className="mt-4 text-sm font-bold">{t("How will you pay?")}</p>
           <MethodChoice value={method} onChange={setMethod} />
           <label className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm">
             <Checkbox checked={accept} onCheckedChange={(v) => setAccept(!!v)} className="mt-0.5" />
             <span>
-              I accept the{" "}
-              <a href="/terms" target="_blank" className="font-semibold underline">
-                purchase terms
-              </a>{" "}
-              ({settings.data?.terms?.version ?? "v0.2-draft"}).
+              {rich(
+                "I accept the <terms>purchase terms</terms> ({version}, in English).",
+                {
+                  terms: (c) => (
+                    <a href="/terms" target="_blank" className="font-semibold underline">
+                      {c}
+                    </a>
+                  ),
+                },
+                { version: settings.data?.terms?.version ?? "v0.2-draft" },
+              )}
             </span>
           </label>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <Button variant="outline" size="lg" onClick={decline}>
-              Decline
+              {t("Decline")}
             </Button>
             <Button
               size="lg"
@@ -194,16 +205,16 @@ export function OrderPage() {
               onClick={confirm}
               disabled={!accept || !method || busy || !!missingPin(business)}
             >
-              {busy ? "Please wait…" : "Confirm my order"}
+              {busy ? t("Please wait…") : t("Confirm my order")}
             </Button>
           </div>
         </Section>
       )}
 
       {o.status === "confirmed" && o.payment_status !== "paid" && (
-        <Section title="Payment">
+        <Section title={t("Payment")}>
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Status</span>
+            <span className="text-sm text-muted-foreground">{t("Status")}</span>
             <StatusBadge tone={PAYMENT_STATUS[o.payment_status].tone}>
               {PAYMENT_STATUS[o.payment_status].label}
             </StatusBadge>
@@ -217,12 +228,12 @@ export function OrderPage() {
             {Number(o.amount_paid) > 0 && <Row k="Paid so far" v={money(o.amount_paid)} />}
           </dl>
           <div className="mt-3 flex items-center justify-between gap-2 text-sm">
-            <span className="text-muted-foreground">How you pay</span>
+            <span className="text-muted-foreground">{t("How you pay")}</span>
             <span className="flex items-center gap-2 font-medium">
-              {PAYMENT_METHOD[payMethod]}
+              {t(PAYMENT_METHOD[payMethod])}
               {o.payment_status !== "under_review" && !changing && (
                 <Button size="sm" variant="ghost" onClick={() => setChanging(true)}>
-                  Change
+                  {t("Change")}
                 </Button>
               )}
             </span>
@@ -231,19 +242,21 @@ export function OrderPage() {
             <div className="mt-2">
               <MethodChoice value={payMethod} onChange={changeMethod} disabled={busy} />
               <Button variant="ghost" className="mt-1 w-full" onClick={() => setChanging(false)}>
-                Keep {PAYMENT_METHOD[payMethod].toLowerCase()}
+                {payMethod === "cash" ? t("Keep paying in cash") : t("Keep paying by EFT")}
               </Button>
             </div>
           )}
           {payMethod === "cash" ? (
             <div className="mt-4 rounded-md border-2 border-ink bg-muted p-4 text-sm">
               <p className="font-bold">
-                Have {money(Number(o.total) - Number(o.amount_paid))} ready in cash when your stock
-                arrives.
+                {t("Have {amount} ready in cash when your stock arrives.", {
+                  amount: money(Number(o.total) - Number(o.amount_paid)),
+                })}
               </p>
               <p className="mt-2 text-muted-foreground">
-                Count the stock first, then pay. KasiPool marks your order “Paid” when we get the
-                money.
+                {t(
+                  "Count the stock first, then pay. KasiPool marks your order “Paid” when we get the money.",
+                )}
               </p>
             </div>
           ) : pay?.configured ? (
@@ -257,16 +270,16 @@ export function OrderPage() {
               </dl>
               <div className="mt-3 flex items-center justify-between rounded-md border-2 border-ink bg-card p-3">
                 <div>
-                  <p className="text-sm text-muted-foreground">Use this payment reference</p>
+                  <p className="text-sm text-muted-foreground">{t("Use this payment reference")}</p>
                   <p className="font-headline text-3xl tabular">{o.payment_reference}</p>
                 </div>
                 <Button
                   size="icon"
                   variant="outline"
-                  aria-label="Copy reference"
+                  aria-label={t("Copy reference")}
                   onClick={() => {
                     navigator.clipboard.writeText(o.payment_reference ?? "");
-                    toast.success("Reference copied");
+                    toast.success(t("Reference copied"));
                   }}
                 >
                   <Copy />
@@ -274,15 +287,18 @@ export function OrderPage() {
               </div>
               {pay.notes && <p className="mt-2 text-sm">{pay.notes}</p>}
               <p className="mt-2 text-sm text-muted-foreground">
-                Pay before or when your stock arrives. Then send us your proof of payment. Your
-                order shows “Paid” when we find the money in our bank account.
+                {t(
+                  "Pay before or when your stock arrives. Then send us your proof of payment. Your order shows “Paid” when we find the money in our bank account.",
+                )}
               </p>
               <ProofUpload orderId={o.id} latest={latestProof} />
             </div>
           ) : (
             <div className="mt-4 rounded-md border-2 border-warning/40 bg-warning-soft p-4 text-sm text-warning">
-              <b>We don't have bank details for you yet.</b> Please do not pay by EFT yet. We will
-              tell you when you can, or tap Change to pay in cash when your stock arrives.
+              {rich(
+                "<b>We don't have bank details for you yet.</b> Please do not pay by EFT yet. We will tell you when you can, or tap Change to pay in cash when your stock arrives.",
+                { b: (c) => <b>{c}</b> },
+              )}
             </div>
           )}
         </Section>
@@ -292,22 +308,22 @@ export function OrderPage() {
         <Section
           title={
             o.fulfilment_status === "received"
-              ? "Received"
+              ? t("Received")
               : o.fulfilment_status === "delivered"
-                ? "Delivered"
-                : "Out for delivery"
+                ? t("Delivered")
+                : t("Out for delivery")
           }
           className={o.fulfilment_status === "received" ? undefined : "border-4 border-leaf"}
         >
           {o.fulfilment_status === "received" ? (
             <p className="flex items-center gap-2 font-headline text-3xl text-leaf">
-              <BadgeCheck className="size-7" aria-hidden="true" /> Completed
+              <BadgeCheck className="size-7" aria-hidden="true" /> {t("Completed")}
             </p>
           ) : (
             <p className="text-sm">
               {o.fulfilment_status === "delivered"
-                ? "The courier says they delivered your stock. Did you get it?"
-                : "Your stock is on its way."}
+                ? t("The courier says they delivered your stock. Did you get it?")
+                : t("Your stock is on its way.")}
             </p>
           )}
           <dl className="mt-3 space-y-1.5 text-sm">
@@ -324,43 +340,45 @@ export function OrderPage() {
               onClick={received}
               disabled={busy}
             >
-              <PackageCheck /> I received my stock
+              <PackageCheck /> {t("I received my stock")}
             </Button>
           )}
           {o.problem_reported_at ? (
             <p className="mt-3 rounded-md bg-warning-soft p-3 text-sm text-warning">
-              You reported a problem on {dateTime(o.problem_reported_at)}: {o.problem_note}.
-              KasiPool will contact you.
+              {t("You reported a problem on {date}: {note}. KasiPool will contact you.", {
+                date: dateTime(o.problem_reported_at),
+                note: o.problem_note ?? "",
+              })}
             </p>
           ) : problem === null ? (
             <Button variant="ghost" className="mt-2 w-full" onClick={() => setProblem("")}>
-              Report a problem with this delivery
+              {t("Report a problem with this delivery")}
             </Button>
           ) : (
             <div className="mt-3 space-y-2">
-              <Label htmlFor="problem">What went wrong?</Label>
+              <Label htmlFor="problem">{t("What went wrong?")}</Label>
               <textarea
                 id="problem"
                 rows={3}
                 className="w-full rounded-md border-2 border-input bg-card px-3 py-2 text-base"
-                placeholder="e.g. 2 cases missing, or nothing arrived"
+                placeholder={t("e.g. 2 cases missing, or nothing arrived")}
                 value={problem}
                 onChange={(e) => setProblem(e.target.value)}
               />
               <Button variant="outline" className="w-full" onClick={reportProblem} disabled={busy}>
-                Send to KasiPool
+                {t("Send to KasiPool")}
               </Button>
             </div>
           )}
         </Section>
       )}
 
-      <Section title="Order tracking">
+      <Section title={t("Order tracking")}>
         <OrderTimeline step={timelineStep(o)} failed={failed} />
       </Section>
 
       {(o.refunds ?? []).length > 0 && (
-        <Section title="Refunds">
+        <Section title={t("Refunds")}>
           {o.refunds!.map((r) => (
             <div
               key={r.id}
@@ -368,7 +386,7 @@ export function OrderPage() {
             >
               <div>
                 <p className="font-semibold">{money(r.amount)}</p>
-                <p className="text-sm text-muted-foreground">{r.reason}</p>
+                <p className="text-sm text-muted-foreground">{server(r.reason)}</p>
               </div>
               <StatusBadge tone={r.status === "completed" ? "success" : "warning"}>
                 {r.status === "completed" ? "Refunded" : "Refund due"}
@@ -376,14 +394,19 @@ export function OrderPage() {
             </div>
           ))}
           <p className="mt-2 text-sm text-muted-foreground">
-            We pay refunds back to the account you paid from. Contact KasiPool if you need help.
+            {t(
+              "We pay refunds back to the account you paid from. Contact KasiPool if you need help.",
+            )}
           </p>
         </Section>
       )}
 
       {o.confirmed_at && (
         <p className="text-center text-sm text-muted-foreground">
-          Confirmed {dateTime(o.confirmed_at)} · terms {o.terms_version}
+          {t("Confirmed {date} · terms {version}", {
+            date: dateTime(o.confirmed_at),
+            version: o.terms_version ?? "",
+          })}
         </p>
       )}
       {confirmDialog}
@@ -400,6 +423,7 @@ function MethodChoice({
   onChange: (m: Method) => void;
   disabled?: boolean;
 }) {
+  const { t } = useT();
   const options = [
     {
       id: "cash" as const,
@@ -417,7 +441,7 @@ function MethodChoice({
   return (
     <div
       role="radiogroup"
-      aria-label="How will you pay?"
+      aria-label={t("How will you pay?")}
       className="mt-2 grid gap-2 sm:grid-cols-2"
     >
       {options.map(({ id, icon: Icon, title, body }) => (
@@ -435,8 +459,8 @@ function MethodChoice({
         >
           <Icon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
           <span>
-            <span className="block font-bold">{title}</span>
-            <span className="block text-sm text-muted-foreground">{body}</span>
+            <span className="block font-bold">{t(title)}</span>
+            <span className="block text-sm text-muted-foreground">{t(body)}</span>
           </span>
         </button>
       ))}
@@ -444,10 +468,12 @@ function MethodChoice({
   );
 }
 
+/** A label and value; the label is English and translated here */
 function Row({ k, v }: { k: string; v: React.ReactNode }) {
+  const { t } = useT();
   return (
     <div className="flex justify-between gap-4">
-      <dt className="text-muted-foreground">{k}</dt>
+      <dt className="text-muted-foreground">{t(k)}</dt>
       <dd className="text-right font-medium">{v}</dd>
     </div>
   );

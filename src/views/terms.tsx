@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/kp/LegalPage";
 
 export function Terms() {
   return (
-    <LegalPage title="Terms of use">
+    <LegalPage title="Terms of use" englishOnly>
       <p>Version v0.2-draft.</p>
       <h2>1. What KasiPool does</h2>
       <p>
