@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, safeRedirect } from "@/lib/auth";
 import { errMsg, FriendlyError, settingsQuery } from "@/lib/queries";
 import { isValidPin, phoneToLogin } from "@/lib/phone-auth";
+import { useT } from "@/i18n";
 
 type Search = { redirect?: string; mode?: "login" | "register" };
 
@@ -45,6 +46,7 @@ export function AuthPage() {
   const [pin2, setPin2] = useState("");
   const [busy, setBusy] = useState(false);
   const [forgot, setForgot] = useState(false);
+  const { t, rich, server } = useT();
 
   useEffect(() => {
     if (search.redirect) sessionStorage.setItem(REDIRECT_KEY, safeRedirect(search.redirect));
@@ -61,9 +63,10 @@ export function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const login = phoneToLogin(phone);
-    if (!login) return toast.error("Enter a valid South African mobile number, e.g. 072 123 4567");
-    if (!isValidPin(pin)) return toast.error("Your PIN must be 6 digits");
-    if (mode === "register" && pin !== pin2) return toast.error("The two PINs don't match");
+    if (!login)
+      return toast.error(t("Enter a valid South African mobile number, e.g. 072 123 4567"));
+    if (!isValidPin(pin)) return toast.error(t("Your PIN must be 6 digits"));
+    if (mode === "register" && pin !== pin2) return toast.error(t("The two PINs don't match"));
     setBusy(true);
     try {
       if (mode === "login") {
@@ -81,7 +84,7 @@ export function AuthPage() {
           throw new FriendlyError("You can't register right now. Please try again later.");
       }
     } catch (err) {
-      toast.error(authError(err));
+      toast.error(server(authError(err)));
     } finally {
       setBusy(false);
     }
@@ -101,16 +104,16 @@ export function AuthPage() {
           <Logo />
         </div>
         <h1 className="mt-4 text-center font-headline text-4xl sm:text-5xl">
-          {mode === "login" ? "Welcome back" : "Register your business"}
+          {mode === "login" ? t("Welcome back") : t("Register your business")}
         </h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">
           {mode === "login"
-            ? "Log in with your mobile number and PIN."
-            : "Step 1 of 2: choose a PIN with 6 numbers."}
+            ? t("Log in with your mobile number and PIN.")
+            : t("Step 1 of 2: choose a PIN with 6 numbers.")}
         </p>
         <form onSubmit={submit} className="mt-6 space-y-3">
           <div>
-            <Label htmlFor="phone">Mobile number</Label>
+            <Label htmlFor="phone">{t("Mobile number")}</Label>
             <Input
               id="phone"
               type="tel"
@@ -123,7 +126,7 @@ export function AuthPage() {
             />
           </div>
           <div>
-            <Label htmlFor="pin">{mode === "login" ? "PIN" : "Choose a PIN (6 numbers)"}</Label>
+            <Label htmlFor="pin">{mode === "login" ? "PIN" : t("Choose a PIN (6 numbers)")}</Label>
             <Input
               id="pin"
               type="password"
@@ -138,7 +141,7 @@ export function AuthPage() {
           </div>
           {mode === "register" && (
             <div>
-              <Label htmlFor="pin2">Enter the PIN again</Label>
+              <Label htmlFor="pin2">{t("Enter the PIN again")}</Label>
               <Input
                 id="pin2"
                 type="password"
@@ -151,12 +154,12 @@ export function AuthPage() {
                 onChange={(e) => setPin2(digits(e.target.value))}
               />
               <p className="mt-1 text-sm text-muted-foreground">
-                Keep your PIN secret. Do not use your birthday or 123456.
+                {t("Keep your PIN secret. Do not use your birthday or 123456.")}
               </p>
             </div>
           )}
           <Button type="submit" size="xl" variant="gold" className="w-full" disabled={busy}>
-            {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
+            {busy ? t("Please wait…") : mode === "login" ? t("Log in") : t("Create account")}
           </Button>
         </form>
         {mode === "login" &&
@@ -168,30 +171,36 @@ export function AuthPage() {
               className="mt-3 w-full text-sm font-semibold text-ember underline underline-offset-4"
               onClick={() => setForgot(true)}
             >
-              Forgot your PIN?
+              {t("Forgot your PIN?")}
             </button>
           ))}
         <p className="mt-4 text-center text-sm">
-          {mode === "login" ? "New to KasiPool? " : "Already registered? "}
+          {mode === "login" ? t("New to KasiPool?") : t("Already registered?")}{" "}
           <button
             type="button"
             className="font-semibold text-ember underline underline-offset-4"
             onClick={switchMode}
           >
-            {mode === "login" ? "Register" : "Log in"}
+            {mode === "login" ? t("Register") : t("Log in")}
           </button>
         </p>
       </div>
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        If you continue, you agree to the{" "}
-        <Link href="/terms" className="underline">
-          draft terms
-        </Link>{" "}
-        and{" "}
-        <Link href="/privacy" className="underline">
-          privacy notice
-        </Link>
-        .
+        {rich(
+          "If you continue, you agree to the <terms>draft terms</terms> and <privacy>privacy notice</privacy> (in English).",
+          {
+            terms: (c) => (
+              <Link href="/terms" className="underline">
+                {c}
+              </Link>
+            ),
+            privacy: (c) => (
+              <Link href="/privacy" className="underline">
+                {c}
+              </Link>
+            ),
+          },
+        )}
       </p>
     </Container>
   );
@@ -199,21 +208,29 @@ export function AuthPage() {
 
 /** PIN resets are done by KasiPool staff for now, so point people at the contact details. */
 function ForgotPin() {
+  const { t, rich } = useT();
   const { data } = useQuery(settingsQuery);
   const c = data?.contact;
   const reach = c?.whatsapp
-    ? `WhatsApp ${c.whatsapp}`
+    ? t("WhatsApp {n}", { n: c.whatsapp })
     : c?.phone
-      ? `call ${c.phone}`
+      ? t("call {n}", { n: c.phone })
       : c?.email
-        ? `email ${c.email}`
+        ? t("email {n}", { n: c.email })
         : null;
   return (
     <p className="mt-3 rounded-md bg-muted p-3 text-sm">
-      To get a new PIN, {reach ? <b>{reach}</b> : "contact KasiPool"} from the number you registered
-      with. We will check it is you and give you a new PIN.{" "}
+      {reach
+        ? rich(
+            "To get a new PIN, <b>{reach}</b> from the number you registered with. We will check it is you and give you a new PIN.",
+            { b: (x) => <b>{x}</b> },
+            { reach },
+          )
+        : t(
+            "To get a new PIN, contact KasiPool from the number you registered with. We will check it is you and give you a new PIN.",
+          )}{" "}
       <Link href="/help" className="font-semibold text-ember underline">
-        Help & contact
+        {t("Help & contact")}
       </Link>
     </p>
   );

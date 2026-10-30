@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/kp/LegalPage";
 
 export function Privacy() {
   return (
-    <LegalPage title="Privacy notice">
+    <LegalPage title="Privacy notice" englishOnly>
       <h2>What we collect</h2>
       <p>
         Your business name, representative name, mobile number, optional email, business category,

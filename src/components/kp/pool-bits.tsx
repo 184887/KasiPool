@@ -3,6 +3,7 @@ import { Minus, Plus, Users, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pct, plural } from "@/lib/format";
 import { TIMELINE } from "@/lib/status";
+import { useT } from "@/i18n";
 
 /** The deck's two interlocking rings: orange passes over green at the top crossing. */
 export function LogoMark({ className }: { className?: string }) {
@@ -88,6 +89,7 @@ export function PoolProgress({
   size?: "sm" | "md" | "lg";
   label?: string;
 }) {
+  const { t } = useT();
   const p = pct(pledged, target);
   const reached = pledged >= target;
   const [w, setW] = useState(0);
@@ -106,7 +108,7 @@ export function PoolProgress({
         >
           {pledged}{" "}
           <span className="font-sans text-sm font-medium text-muted-foreground">
-            of {target} {plural(unit, target)} {label}
+            {t("of {target} {units}", { target, units: t(plural(unit, target)) })} {t(label)}
           </span>
         </p>
         <span
@@ -127,7 +129,7 @@ export function PoolProgress({
         aria-valuenow={p}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Pool progress"
+        aria-label={t("Pool progress")}
       >
         <div
           className="h-full bg-leaf transition-[width] duration-1000 ease-out"
@@ -138,12 +140,14 @@ export function PoolProgress({
         <span>
           <Users className="mr-1 inline size-3.5" aria-hidden="true" />
           {participants === 0
-            ? "Be the first business to join"
-            : `${participants} ${participants === 1 ? "business" : "businesses"} joined`}
+            ? t("Be the first business to join")
+            : participants === 1
+              ? t("1 business joined")
+              : t("{n} businesses joined", { n: participants })}
         </span>
         {!reached && size !== "sm" && (
           <span className="ml-auto whitespace-nowrap tabular">
-            {Math.max(target - pledged, 0)} more needed
+            {t("{n} more needed", { n: Math.max(target - pledged, 0) })}
           </span>
         )}
       </div>
@@ -152,6 +156,7 @@ export function PoolProgress({
 }
 
 export function Countdown({ to, className }: { to: string; className?: string }) {
+  const { t } = useT();
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     setNow(Date.now());
@@ -160,7 +165,7 @@ export function Countdown({ to, className }: { to: string; className?: string })
   }, []);
   if (now === null) return <span className={className}>…</span>;
   const ms = new Date(to).getTime() - now;
-  if (ms <= 0) return <span className={className}>Closed</span>;
+  if (ms <= 0) return <span className={className}>{t("Closed")}</span>;
   const d = Math.floor(ms / 86400000),
     h = Math.floor((ms % 86400000) / 3600000),
     m = Math.floor((ms % 3600000) / 60000),
@@ -184,11 +189,12 @@ export function QuantityStepper({
   min?: number;
   max?: number;
 }) {
+  const { t } = useT();
   return (
     <div className="flex items-center rounded-md border-2 border-ink bg-card">
       <button
         type="button"
-        aria-label="Decrease quantity"
+        aria-label={t("Decrease quantity")}
         className="grid size-14 place-items-center text-primary disabled:opacity-30"
         disabled={value <= min}
         onClick={() => onChange(Math.max(min, value - 1))}
@@ -196,7 +202,7 @@ export function QuantityStepper({
         <Minus className="size-5" />
       </button>
       <input
-        aria-label="Quantity"
+        aria-label={t("Quantity")}
         inputMode="numeric"
         className="h-14 w-16 border-x-2 border-ink bg-transparent text-center font-headline text-3xl tabular outline-none"
         value={value}
@@ -208,7 +214,7 @@ export function QuantityStepper({
       />
       <button
         type="button"
-        aria-label="Increase quantity"
+        aria-label={t("Increase quantity")}
         className="grid size-14 place-items-center text-primary disabled:opacity-30"
         disabled={value >= max}
         onClick={() => onChange(Math.min(max, value + 1))}
@@ -220,6 +226,7 @@ export function QuantityStepper({
 }
 
 export function OrderTimeline({ step, failed }: { step: number; failed?: string | null }) {
+  const { t } = useT();
   return (
     <ol className="relative space-y-0">
       {TIMELINE.map((label, i) => {
@@ -253,10 +260,10 @@ export function OrderTimeline({ step, failed }: { step: number; failed?: string 
                 current ? "font-bold" : done ? "font-medium" : "text-muted-foreground",
               )}
             >
-              {label}
+              {t(label)}
               {current && (
                 <span className="ml-2 rounded bg-gold-soft px-1.5 py-0.5 text-xs font-bold text-gold-foreground">
-                  Current
+                  {t("Current")}
                 </span>
               )}
             </span>

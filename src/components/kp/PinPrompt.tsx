@@ -11,6 +11,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { missingPin } from "@/lib/delivery";
 import { errMsg } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 /** Phone locations rougher than this (in metres) would send the driver to the wrong place */
 const MAX_ERROR_M = 200;
@@ -27,20 +28,23 @@ export function PinPrompt({
   className?: string;
 }) {
   const qc = useQueryClient();
+  const { t, server } = useT();
   const [busy, setBusy] = useState(false);
   const missing = missingPin(business);
   if (!business || !missing) return null;
-  const place = missing === "other" ? "the other address" : "your business";
 
   function setHere() {
-    if (!navigator.geolocation) return toast.error("Location is not available on this device");
+    if (!navigator.geolocation) return toast.error(t("Location is not available on this device"));
     setBusy(true);
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         if (coords.accuracy > MAX_ERROR_M) {
           setBusy(false);
           return toast.error(
-            `Your phone only knows roughly where you are (about ${Math.round(coords.accuracy)} m). Go outside and try again.`,
+            t(
+              "Your phone only knows roughly where you are (about {m} m). Go outside and try again.",
+              { m: Math.round(coords.accuracy) },
+            ),
           );
         }
         const pin =
@@ -49,14 +53,16 @@ export function PinPrompt({
             : { latitude: coords.latitude, longitude: coords.longitude };
         const { error } = await supabase.from("businesses").update(pin).eq("id", business!.id);
         setBusy(false);
-        if (error) return toast.error(errMsg(error));
-        toast.success("Map pin saved. Thank you!");
+        if (error) return toast.error(server(errMsg(error)));
+        toast.success(t("Map pin saved. Thank you!"));
         qc.invalidateQueries({ queryKey: ["my-business"] });
         qc.invalidateQueries({ queryKey: ["pool-distances"] });
       },
       () => {
         setBusy(false);
-        toast.error("We could not find where you are. Allow location on your phone and try again.");
+        toast.error(
+          t("We could not find where you are. Allow location on your phone and try again."),
+        );
       },
       { enableHighAccuracy: true, timeout: 15000 },
     );
@@ -65,24 +71,29 @@ export function PinPrompt({
   return (
     <div className={cn("rounded-md border-2 border-ink bg-gold-soft p-4 text-ink", className)}>
       <p className="flex items-center gap-2 font-display text-lg font-bold">
-        <MapPin className="size-5 shrink-0" aria-hidden="true" /> Set your map pin
+        <MapPin className="size-5 shrink-0" aria-hidden="true" /> {t("Set your map pin")}
       </p>
       <p className="mt-1 text-sm">
-        The driver uses the pin to find {place}. When you are there, tap the button. You need the
-        pin to confirm an order.
+        {missing === "other"
+          ? t(
+              "The driver uses the pin to find the other address. When you are there, tap the button. You need the pin to confirm an order.",
+            )
+          : t(
+              "The driver uses the pin to find your business. When you are there, tap the button. You need the pin to confirm an order.",
+            )}
       </p>
       <Button size="lg" variant="gold" className="mt-3 w-full" disabled={busy} onClick={setHere}>
         {busy
-          ? "Finding you…"
+          ? t("Finding you…")
           : missing === "other"
-            ? "I am at the other address now"
-            : "I am at my business now"}
+            ? t("I am at the other address now")
+            : t("I am at my business now")}
       </Button>
       <Link
         href="/profile"
         className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline"
       >
-        Not there? Search for the place in your profile
+        {t("Not there? Search for the place in your profile")}
       </Link>
     </div>
   );

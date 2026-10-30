@@ -9,10 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { dateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 export function Notifications() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { t, server } = useT();
   const { data, isLoading } = useQuery({
     queryKey: ["notifications", user?.id],
     enabled: !!user,
@@ -39,11 +41,11 @@ export function Notifications() {
   if (isLoading) return <Loading />;
   return (
     <Container className="max-w-2xl">
-      <PageHeader title="Notifications" />
+      <PageHeader title={t("Notifications")} />
       {!data?.length ? (
         <EmptyState
-          title="No notifications yet"
-          body="We will tell you here when something changes in your pools."
+          title={t("No notifications yet")}
+          body={t("We will tell you here when something changes in your pools.")}
         />
       ) : (
         <div className="space-y-2">
@@ -56,8 +58,8 @@ export function Notifications() {
                 !n.read_at && "border-ink bg-gold-soft",
               )}
             >
-              <p className="font-semibold">{n.title}</p>
-              {n.body && <p className="text-sm text-muted-foreground">{n.body}</p>}
+              <p className="font-semibold">{server(n.title)}</p>
+              {n.body && <p className="text-sm text-muted-foreground">{server(n.body)}</p>}
               <p className="mt-1 text-sm text-muted-foreground">{dateTime(n.created_at)}</p>
             </Link>
           ))}

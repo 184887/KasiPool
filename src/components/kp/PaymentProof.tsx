@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { errMsg } from "@/lib/queries";
 import { dateTime } from "@/lib/format";
+import { useT } from "@/i18n";
 
 export const PROOF_BUCKET = "payment-proofs";
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -44,26 +45,28 @@ export function ProofUpload({ orderId, latest }: { orderId: string; latest?: Pro
   const qc = useQueryClient();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const { t, server } = useT();
 
   async function send(file: File) {
     if (!user) return;
     setBusy(true);
     try {
       const body = await shrink(file);
-      if (body.size > MAX_BYTES) return toast.error("This file is too big. Please send a photo.");
+      if (body.size > MAX_BYTES)
+        return toast.error(t("This file is too big. Please send a photo."));
       const ext =
         body.type === "application/pdf" ? "pdf" : body.type === "image/png" ? "png" : "jpg";
       const path = `${user.id}/${orderId}-${Date.now()}.${ext}`;
       const up = await supabase.storage
         .from(PROOF_BUCKET)
         .upload(path, body, { contentType: body.type || "image/jpeg" });
-      if (up.error) return toast.error(errMsg(up.error));
+      if (up.error) return toast.error(server(errMsg(up.error)));
       const { error } = await supabase.rpc("submit_payment_proof", {
         _order: orderId,
         _path: path,
       });
-      if (error) return toast.error(errMsg(error));
-      toast.success("Sent. We will check it in our bank account.");
+      if (error) return toast.error(server(errMsg(error)));
+      toast.success(t("Sent. We will check it in our bank account."));
       qc.invalidateQueries();
     } finally {
       setBusy(false);
@@ -75,13 +78,17 @@ export function ProofUpload({ orderId, latest }: { orderId: string; latest?: Pro
     <div className="mt-4 space-y-2">
       {latest?.status === "pending" && (
         <p className="rounded-md bg-info-soft p-3 text-sm text-info">
-          We got your proof of payment ({dateTime(latest.created_at)}). We are checking our bank
-          account. Your order shows “Paid” when we find the money.
+          {t(
+            "We got your proof of payment ({date}). We are checking our bank account. Your order shows “Paid” when we find the money.",
+            { date: dateTime(latest.created_at) },
+          )}
         </p>
       )}
       {latest?.status === "rejected" && (
         <p className="rounded-md bg-warning-soft p-3 text-sm text-warning">
-          We could not accept your last proof: {latest.note}. Please check it and send it again.
+          {t("We could not accept your last proof: {note}. Please check it and send it again.", {
+            note: latest.note ?? "",
+          })}
         </p>
       )}
       <input
@@ -101,13 +108,13 @@ export function ProofUpload({ orderId, latest }: { orderId: string; latest?: Pro
       >
         <Upload />
         {busy
-          ? "Sending…"
+          ? t("Sending…")
           : latest?.status === "pending"
-            ? "Send a different proof"
-            : "Upload proof of payment"}
+            ? t("Send a different proof")
+            : t("Upload proof of payment")}
       </Button>
       <p className="text-sm text-muted-foreground">
-        A photo or screenshot of your payment slip is fine. You can send it later.
+        {t("A photo or screenshot of your payment slip is fine. You can send it later.")}
       </p>
     </div>
   );

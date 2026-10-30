@@ -112,6 +112,9 @@ when their stock arrives (pilot), so in the later pools nobody has paid until de
     the Share steps. The app opens full-screen from the home screen icon. Turn on airplane mode
     and open it: it shows "No internet connection" with **Try again**. The steps are also under
     Help → Get the app.
+11. **isiXhosa:** tap **isiXhosa** in the top bar. Every shop page, button, message and
+    notification switches; product names and the Terms and Privacy pages stay English. Switch
+    back with **English** in the top bar or under Profile → Language.
 
 ### Admin
 
