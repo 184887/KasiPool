@@ -389,7 +389,7 @@ export function OrderPage() {
                 <p className="text-sm text-muted-foreground">{server(r.reason)}</p>
               </div>
               <StatusBadge tone={r.status === "completed" ? "success" : "warning"}>
-                {r.status === "completed" ? t("Refunded") : t("Refund due")}
+                {r.status === "completed" ? "Refunded" : "Refund due"}
               </StatusBadge>
             </div>
           ))}

@@ -572,8 +572,8 @@ export const xh: Dictionary = {
     Install: "Faka",
     "Open this page in <b>Safari</b> to add KasiPool to your home screen.":
       "Vula eli phepha kwi-<b>Safari</b> ukuze ufake iKasiPool kwisikrini sakho sasekhaya.",
-    "Tap <share>Share</share> in Safari, then <b>Add to Home Screen</b>.":
-      "Cofa <share>Yabelana</share> kwi-Safari, emva koko <b>Add to Home Screen</b>.",
+    "Tap <share>Share</share> in Safari, then <b>Add to Home Screen</b> <plus>+</plus>.":
+      "Cofa <share>Yabelana</share> kwi-Safari, emva koko <b>Add to Home Screen</b> <plus>+</plus>.",
     "You are using the KasiPool app. It is on your home screen.":
       "Usebenzisa i-app yeKasiPool. Ikwisikrini sakho sasekhaya.",
     "Put KasiPool on your phone's home screen and open it like any other app. It is free and you do not need the Play Store or App Store.":
@@ -585,8 +585,8 @@ export const xh: Dictionary = {
     "Tap <b>Install app</b> or <b>Add to Home screen</b>.":
       "Cofa <b>Install app</b> okanye <b>Add to Home screen</b>.",
     "Open KasiPool in Safari.": "Vula iKasiPool kwi-Safari.",
-    "Tap the Share button": "Cofa iqhosha lokwabelana",
-    "at the bottom.": "ezantsi.",
+    "Tap the Share button <share>Share</share> at the bottom.":
+      "Cofa iqhosha lokwabelana <share>Yabelana</share> ezantsi.",
     "Tap <b>Add to Home Screen</b>, then <b>Add</b>.":
       "Cofa <b>Add to Home Screen</b>, emva koko <b>Add</b>.",
 
@@ -738,5 +738,18 @@ export const xh: Dictionary = {
     "Pool not found": "Iqela alifumanekanga",
     "Invalid quantity": "Inani alichanekanga",
     "Not authorised": "Awuvumelekanga",
+    "Please add your business location (map pin) in your profile first":
+      "Nceda uqale ufake indawo yeshishini lakho (iphini yemephu) kwiprofayile yakho",
+
+    // Refunds and order reasons
+    "Money paid back": "Imali ibuyisiwe",
+    "We paid back R{amount} to you.": "Sikubuyisele iR{amount}.",
+    "Payment confirmed": "Intlawulo iqinisekisiwe",
+    "Not confirmed before the deadline": "Ayiqinisekiswanga phambi komhla wokuvala",
+    "Not enough shops confirmed": "Azonelanga iivenkile eziqinisekisileyo",
+    Overpayment: "Uhlawule ngaphezulu",
+    "Deal failed: full refund due": "Idili aliphumelelanga: uza kubuyiselwa yonke imali",
+    "Supplier short delivery: {n} unit(s) not received":
+      "Umthengisi uthumele ezimbalwa: ezi-{n} azifikanga",
   },
 };

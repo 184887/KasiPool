@@ -53,10 +53,13 @@ function makeT(lang: Lang, dict: Dictionary) {
     if (!en || lang === "en") return en ?? "";
     const exact = dict.server[en] ?? dict.ui[en];
     if (exact) return exact;
-    // Filled-in parts can be words we know too: "your shop", or "5 bales" (a number and a unit)
+    // Only two kinds of filled-in part are translated: "your shop" and "5 bales" (a number and
+    // a unit). Product names, addresses and notes stay as written, even when one is also a word
+    // we translate ("Rice").
     const part = (v: string) => {
-      const q = /^(\d+) (.+)$/.exec(v);
-      return q ? `${q[1]} ${dict.ui[q[2]] ?? q[2]}` : (dict.ui[v] ?? v);
+      if (v === "your shop") return dict.ui[v] ?? v;
+      const q = /^(\d+) (\w+)$/.exec(v);
+      return q ? `${q[1]} ${dict.ui[q[2]] ?? q[2]}` : v;
     };
     for (const p of patterns) {
       const m = p.re.exec(en);

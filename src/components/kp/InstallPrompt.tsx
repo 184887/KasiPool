@@ -78,16 +78,21 @@ export function InstallBanner() {
 
 function IosSteps() {
   const { rich } = useT();
-  const share = (
-    <Share className="inline size-4 align-text-bottom text-ink" role="img" aria-label="Share" />
-  );
   return (
     <p className="text-sm text-muted-foreground">
-      {rich("Tap <share>Share</share> in Safari, then <b>Add to Home Screen</b>.", {
-        share: () => share,
+      {rich("Tap <share>Share</share> in Safari, then <b>Add to Home Screen</b> <plus>+</plus>.", {
+        share: (c) => (
+          <Share
+            className="inline size-4 align-text-bottom text-ink"
+            role="img"
+            aria-label={String(c)}
+          />
+        ),
         b: (c) => <b className="text-ink">{c}</b>,
-      })}{" "}
-      <SquarePlus className="inline size-4 align-text-bottom text-ink" aria-hidden="true" />
+        plus: () => (
+          <SquarePlus className="inline size-4 align-text-bottom text-ink" aria-hidden="true" />
+        ),
+      })}
     </p>
   );
 }
@@ -121,9 +126,15 @@ export function InstallSteps() {
       <ol className="list-decimal pl-5">
         <li>{t("Open KasiPool in Safari.")}</li>
         <li>
-          {t("Tap the Share button")}{" "}
-          <Share className="inline size-4 align-text-bottom" role="img" aria-label="Share" />{" "}
-          {t("at the bottom.")}
+          {rich("Tap the Share button <share>Share</share> at the bottom.", {
+            share: (c) => (
+              <Share
+                className="inline size-4 align-text-bottom"
+                role="img"
+                aria-label={String(c)}
+              />
+            ),
+          })}
         </li>
         <li>{rich("Tap <b>Add to Home Screen</b>, then <b>Add</b>.", { b })}</li>
       </ol>
