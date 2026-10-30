@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { isUuid } from "./utils";
 
 export type PaymentSettings = {
   [key: string]: Json | undefined;
@@ -58,6 +59,8 @@ export const poolQuery = (id: string) =>
   queryOptions({
     queryKey: ["pool", id],
     queryFn: async () => {
+      // A link cut short in a chat is not a deal id; the database would reject it
+      if (!isUuid(id)) return null;
       await refresh();
       const { data, error } = await supabase
         .from("pools")

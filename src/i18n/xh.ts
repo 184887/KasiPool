@@ -561,8 +561,8 @@ export const xh: Dictionary = {
     "Contact KasiPool": "Qhagamshelana neKasiPool",
     "Phone:": "Ifowuni:",
     "Email:": "I-imeyile:",
-    "Contact details have not been configured yet.":
-      "Iinkcukacha zoqhagamshelwano azikafakwa okwangoku.",
+    "Ask the KasiPool team member who helped you sign up.":
+      "Buza ilungu leqela leKasiPool elikuncedileyo ukuba ubhalise.",
     Payments: "Iintlawulo",
     "Pay in cash when your stock arrives, or by bank transfer. For a bank transfer, use your order number as the reference and send your proof of payment in the app. KasiPool checks it in our bank account, then your order shows “Paid”.":
       "Hlawula ngekheshi xa isitokhwe sakho sifika, okanye ngokudlulisela ngebhanki. Xa udlulisela ngebhanki, sebenzisa inombolo yeodolo yakho njengesalathiso uze uthumele ubungqina bentlawulo kwi-app. IKasiPool iyabujonga kwi-akhawunti yethu yebhanki, emva koko iodolo yakho ibonisa “Kuhlawulwe”.",
