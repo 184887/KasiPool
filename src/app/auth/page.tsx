@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OG_IMAGE } from "@/lib/site";
 import { Suspense } from "react";
 import { Loading } from "@/components/kp/ui";
 import { AuthPage } from "@/views/auth";
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Log in to KasiPool",
     description: "Register your business and start pooling.",
+    images: [OG_IMAGE],
   },
 };
 

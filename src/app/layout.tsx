@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Archivo, Bricolage_Grotesque } from "next/font/google";
 import type { ReactNode } from "react";
+import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { Providers } from "./providers";
 import "@/styles.css";
 
@@ -14,6 +15,7 @@ const bricolage = Bricolage_Grotesque({
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: { default: "KasiPool | Collective Buying Alliance", template: "%s | KasiPool" },
   description:
     "KasiPool helps Cape Town township businesses coordinate pooled purchases for stock they already buy.",
@@ -22,6 +24,9 @@ export const metadata: Metadata = {
     description:
       "Join other local businesses to coordinate a larger purchase, with clear quantities, prices and deadlines.",
     type: "website",
+    siteName: "KasiPool",
+    locale: "en_ZA",
+    images: [OG_IMAGE],
   },
   twitter: { card: "summary_large_image" },
   // Home screen name and status bar on iPhone (Android reads the manifest)
