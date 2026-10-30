@@ -5,11 +5,19 @@ import { Providers } from "./providers";
 import "@/styles.css";
 
 // Self-hosted by next/font: no request to Google at runtime and no layout shift.
-const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
+// Only the body font is preloaded. Headline and heading fonts mostly appear after a page's data
+// loads, so preloading them only competes with the JS and data on slow prepaid connections.
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-anton",
+  preload: false,
+});
 const bricolage = Bricolage_Grotesque({
   weight: ["600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-bricolage",
+  preload: false,
 });
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 
