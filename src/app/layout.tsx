@@ -2,19 +2,29 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Archivo, Bricolage_Grotesque } from "next/font/google";
 import type { ReactNode } from "react";
 import { getDictionary, getLang } from "@/i18n/server";
+import { SITE_URL } from "@/lib/site";
 import { Providers } from "./providers";
 import "@/styles.css";
 
 // Self-hosted by next/font: no request to Google at runtime and no layout shift.
-const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
+// Only the body font is preloaded. The heading fonts load when a page uses them, so pages that
+// show "Loading" first don't download fonts they don't need yet (data costs money).
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-anton",
+  preload: false,
+});
 const bricolage = Bricolage_Grotesque({
   weight: ["600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-bricolage",
+  preload: false,
 });
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: { default: "KasiPool | Collective Buying Alliance", template: "%s | KasiPool" },
   description:
     "KasiPool helps Cape Town township businesses coordinate pooled purchases for stock they already buy.",

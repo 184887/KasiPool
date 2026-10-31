@@ -111,7 +111,7 @@ To add a team member:
 1. In the Supabase dashboard: Authentication → Users → Add user → Create new user, with their
    real email and a password, and tick **Auto Confirm User**.
 2. An existing admin enters that email in **Admin → Settings → Administrators** and taps Grant.
-3. They log in at `/admin/login` (or tap **Admin** in the top banner).
+3. They log in at `/admin/login` (bookmark it: the **Admin** button in the top banner only shows once you are logged in as an admin).
 
 The very first admin is set once in the database (SQL editor, after creating their user as in
 step 1): `insert into user_roles (user_id, role) select id, 'admin' from auth.users where email =

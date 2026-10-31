@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Container } from "@/components/kp/AppShell";
 import { Logo } from "@/components/kp/pool-bits";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, safeRedirect } from "@/lib/auth";
+import { contactHref } from "@/lib/contact";
 import { errMsg, FriendlyError, settingsQuery } from "@/lib/queries";
 import { isValidPin, phoneToLogin } from "@/lib/phone-auth";
 import { useT } from "@/i18n";
@@ -212,19 +213,33 @@ function ForgotPin() {
   const { data } = useQuery(settingsQuery);
   const c = data?.contact;
   const reach = c?.whatsapp
-    ? t("WhatsApp {n}", { n: c.whatsapp })
+    ? { text: t("WhatsApp {n}", { n: c.whatsapp }), href: contactHref.whatsapp(c.whatsapp) }
     : c?.phone
-      ? t("call {n}", { n: c.phone })
+      ? { text: t("call {n}", { n: c.phone }), href: contactHref.phone(c.phone) }
       : c?.email
-        ? t("email {n}", { n: c.email })
+        ? { text: t("email {n}", { n: c.email }), href: contactHref.email(c.email) }
         : null;
+  // The button that opened this is gone, so move focus here and let screen readers read it
+  const ref = useRef<HTMLParagraphElement>(null);
+  useEffect(() => ref.current?.focus(), []);
   return (
-    <p className="mt-3 rounded-md bg-muted p-3 text-sm">
+    <p
+      ref={ref}
+      tabIndex={-1}
+      role="status"
+      className="mt-3 rounded-md bg-muted p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ink"
+    >
       {reach
         ? rich(
             "To get a new PIN, <b>{reach}</b> from the number you registered with. We will check it is you and give you a new PIN.",
-            { b: (x) => <b>{x}</b> },
-            { reach },
+            {
+              b: (x) => (
+                <a href={reach.href} className="font-semibold text-ember underline">
+                  {x}
+                </a>
+              ),
+            },
+            { reach: reach.text },
           )
         : t(
             "To get a new PIN, contact KasiPool from the number you registered with. We will check it is you and give you a new PIN.",

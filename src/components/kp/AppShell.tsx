@@ -80,14 +80,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Languages className="size-4" aria-hidden="true" />
               <span>{lang === "xh" ? "English" : "isiXhosa"}</span>
             </button>
-            <Link
-              href={isAdmin ? "/admin" : "/admin/login"}
-              aria-label="Admin"
-              className="flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 transition-colors hover:bg-paper/10 hover:text-paper"
-            >
-              <Shield className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Admin</span>
-            </Link>
+            {/* Only the KasiPool team sees this; they go to /admin/login directly */}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                aria-label="Admin"
+                className="flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-semibold text-paper/80 transition-colors hover:bg-paper/10 hover:text-paper"
+              >
+                <Shield className="size-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            )}
             {user ? (
               <Link
                 href="/notifications"

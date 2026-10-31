@@ -9,7 +9,7 @@ export function Terms() {
       <h2>1. What KasiPool does</h2>
       <p>
         KasiPool aggregates purchasing demand from registered businesses and buys stock from
-        wholesalers once enough paid demand is secured. KasiPool resells the products to
+        wholesalers once enough confirmed orders are secured. KasiPool resells the products to
         participating businesses at the stated KasiPool price.
       </p>
       <h2>2. Joining a pool</h2>

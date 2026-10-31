@@ -4,8 +4,11 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { InstallSteps } from "@/components/kp/InstallPrompt";
 import { LegalPage } from "@/components/kp/LegalPage";
+import { contactHref } from "@/lib/contact";
 import { settingsQuery } from "@/lib/queries";
 import { useT } from "@/i18n";
+
+const LINK = "font-semibold text-ember underline";
 
 export function Help() {
   const { t, rich } = useT();
@@ -27,21 +30,34 @@ export function Help() {
       <h2>{t("Contact KasiPool")}</h2>
       {c?.phone || c?.email || c?.whatsapp ? (
         <ul className="list-disc pl-5">
-          {c.phone && (
+          {c.whatsapp && (
             <li>
-              {t("Phone:")} {c.phone}
+              WhatsApp:{" "}
+              <a href={contactHref.whatsapp(c.whatsapp)} className={LINK}>
+                {c.whatsapp}
+              </a>
             </li>
           )}
-          {c.whatsapp && <li>WhatsApp: {c.whatsapp}</li>}
+          {c.phone && (
+            <li>
+              {t("Phone:")}{" "}
+              <a href={contactHref.phone(c.phone)} className={LINK}>
+                {c.phone}
+              </a>
+            </li>
+          )}
           {c.email && (
             <li>
-              {t("Email:")} {c.email}
+              {t("Email:")}{" "}
+              <a href={contactHref.email(c.email)} className={LINK}>
+                {c.email}
+              </a>
             </li>
           )}
         </ul>
       ) : (
         <p className="text-muted-foreground">
-          {t("Contact details have not been configured yet.")}
+          {t("Ask the KasiPool team member who helped you sign up.")}
         </p>
       )}
       <h2>{t("Payments")}</h2>
