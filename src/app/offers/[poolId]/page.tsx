@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Offer } from "@/views/offer";
 import { money, savings } from "@/lib/format";
 import { isUuid } from "@/lib/utils";
-import { getPublicPool } from "@/lib/site";
+import { getPublicPool, OG_IMAGE } from "@/lib/site";
 
 type Props = { params: Promise<{ poolId: string }> };
 
@@ -13,6 +13,7 @@ const FALLBACK: Metadata = {
   openGraph: {
     title: "Join this KasiPool deal",
     description: "Pool with other local businesses to get a better bulk price.",
+    images: [OG_IMAGE],
   },
 };
 
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "website",
       url: `/offers/${pool.id}`,
-      ...(image ? { images: [{ url: image, alt: name }] } : {}),
+      images: image ? [{ url: image, alt: name }] : [OG_IMAGE],
     },
   };
 }

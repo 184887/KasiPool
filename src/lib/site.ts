@@ -3,6 +3,17 @@ import { isUuid } from "./utils";
 /** The public address, for share previews, the sitemap and canonical links */
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kasipool.co.za";
 
+/**
+ * Link preview picture (1200x630) for WhatsApp, Facebook and X. A page that sets its own
+ * `openGraph` replaces the root layout's, so each one lists this image again.
+ */
+export const OG_IMAGE = {
+  url: "/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: "KasiPool: Buy Together. Profit Better.",
+};
+
 export type PublicPool = {
   id: string;
   status: string;

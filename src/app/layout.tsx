@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Archivo, Bricolage_Grotesque } from "next/font/google";
 import type { ReactNode } from "react";
 import { getDictionary, getLang } from "@/i18n/server";
-import { SITE_URL } from "@/lib/site";
+import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { Providers } from "./providers";
 import "@/styles.css";
 
@@ -33,6 +33,9 @@ export const metadata: Metadata = {
     description:
       "Join other local businesses to coordinate a larger purchase, with clear quantities, prices and deadlines.",
     type: "website",
+    siteName: "KasiPool",
+    locale: "en_ZA",
+    images: [OG_IMAGE],
   },
   twitter: { card: "summary_large_image" },
   // Home screen name and status bar on iPhone (Android reads the manifest)
