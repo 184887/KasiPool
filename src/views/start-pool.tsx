@@ -13,11 +13,13 @@ import { Loading, PageHeader, Section } from "@/components/kp/ui";
 import { Field, inputCls } from "@/components/kp/admin";
 import { useAuth } from "@/lib/auth";
 import { activePoolsQuery, errMsg, poolDistancesQuery } from "@/lib/queries";
-import { DEFAULT_RADIUS_KM, distanceText } from "@/lib/delivery";
+import { DEFAULT_RADIUS_KM } from "@/lib/delivery";
 import { sastLocalToIso, isoToSastLocal } from "@/lib/format";
+import { useT } from "@/i18n";
 
 export function StartPool() {
   const nav = useRouter();
+  const { t, rich, server } = useT();
   // "Suggest a pool" on the Deals page links here with ?product=<id>
   const suggested = useSearchParams().get("product") ?? "";
   const { user, business } = useAuth();
@@ -72,9 +74,9 @@ export function StartPool() {
     .sort((a, b) => a.d!.distance_km - b.d!.distance_km)[0];
 
   async function submit() {
-    if (!f.product_id) return toast.error("Choose a product");
-    if (!f.unit.trim()) return toast.error("Say how it is sold, like bag or box");
-    if (!(+f.min_qty > 0)) return toast.error("Enter how many are needed in total");
+    if (!f.product_id) return toast.error(t("Choose a product"));
+    if (!f.unit.trim()) return toast.error(t("Say how it is sold, like bag or box"));
+    if (!(+f.min_qty > 0)) return toast.error(t("Enter how many are needed in total"));
     setBusy(true);
     const { error } = await supabase.rpc("propose_pool", {
       _product: f.product_id,
@@ -89,20 +91,19 @@ export function StartPool() {
       _private: f.is_private,
     });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
-    toast.success("Sent. We will check the price with the supplier, then open the deal.");
+    if (error) return toast.error(server(errMsg(error)));
+    toast.success(t("Sent. We will check the price with the supplier, then open the deal."));
     nav.push("/my-pools");
   }
 
   if (!business)
     return (
       <Container className="max-w-2xl">
-        <PageHeader title="Ask for a deal" />
+        <PageHeader title={t("Ask for a deal")} />
         <p className="text-sm">
           <Link href="/onboarding" className="font-semibold underline">
-            Add your business details
-          </Link>{" "}
-          to ask for a deal.
+            {t("Add your business details to ask for a deal.")}
+          </Link>
         </p>
       </Container>
     );
@@ -110,14 +111,16 @@ export function StartPool() {
   return (
     <Container className="max-w-2xl">
       <PageHeader
-        title="Ask for a deal"
-        subtitle="Tell us what you want to buy with other businesses. We get the price from the supplier, then open the deal."
+        title={t("Ask for a deal")}
+        subtitle={t(
+          "Tell us what you want to buy with other businesses. We get the price from the supplier, then open the deal.",
+        )}
       />
       <Section>
         <div className="space-y-4">
-          <Field label="Product *">
+          <Field label={t("Product *")}>
             <select className={inputCls} value={f.product_id} onChange={set("product_id")}>
-              <option value="">Select…</option>
+              <option value="">{t("Select…")}</option>
               {ref.data.products.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name} · {p.pack_size}
@@ -126,12 +129,12 @@ export function StartPool() {
             </select>
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Sold per (bag, box, case) *">
+            <Field label={t("Sold per (bag, box, case) *")}>
               <input className={inputCls} value={f.unit} onChange={set("unit")} />
             </Field>
             <Field
-              label="How many are needed in total? *"
-              hint="All the businesses together. We check this with the supplier."
+              label={t("How many are needed in total? *")}
+              hint={t("All the businesses together. We check this with the supplier.")}
             >
               <input
                 type="number"
@@ -142,7 +145,7 @@ export function StartPool() {
                 onChange={set("min_qty")}
               />
             </Field>
-            <Field label="Last day to join">
+            <Field label={t("Last day to join")}>
               <input
                 type="datetime-local"
                 className={inputCls}
@@ -153,14 +156,14 @@ export function StartPool() {
           </div>
           <details className="group rounded-md border-2 border-ink/20">
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-3 font-semibold [&::-webkit-details-marker]:hidden">
-              More options (not needed)
+              {t("More options (not needed)")}
               <ChevronDown
                 className="size-5 transition-transform group-open:rotate-180"
                 aria-hidden="true"
               />
             </summary>
             <div className="grid gap-4 border-t-2 border-ink/20 p-3 sm:grid-cols-2">
-              <Field label="Most the pool can take">
+              <Field label={t("Most the pool can take")}>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -170,7 +173,7 @@ export function StartPool() {
                   onChange={set("max_qty")}
                 />
               </Field>
-              <Field label="Smallest order per business">
+              <Field label={t("Smallest order per business")}>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -180,7 +183,7 @@ export function StartPool() {
                   onChange={set("min_per_customer")}
                 />
               </Field>
-              <Field label="Biggest order per business">
+              <Field label={t("Biggest order per business")}>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -190,7 +193,7 @@ export function StartPool() {
                   onChange={set("max_per_customer")}
                 />
               </Field>
-              <Field label="Opens">
+              <Field label={t("Opens")}>
                 <input
                   type="datetime-local"
                   className={inputCls}
@@ -202,25 +205,32 @@ export function StartPool() {
           </details>
           {nearby && (
             <p className="rounded-md bg-gold-soft p-3 text-sm text-ink">
-              <b>There is already a deal for this product {distanceText(nearby.d!)} away.</b> Join
-              it instead, so it fills up faster.{" "}
+              {rich(
+                nearby.d!.distance_km < 1
+                  ? "<b>There is already a deal for this product under 1 km away.</b> Join it instead, so it fills up faster."
+                  : "<b>There is already a deal for this product {km} km away.</b> Join it instead, so it fills up faster.",
+                { b: (c) => <b>{c}</b> },
+                { km: nearby.d!.distance_km },
+              )}{" "}
               <Link
                 href={`/offers/${nearby.pool.id}`}
                 className="font-semibold text-ember underline"
               >
-                See the deal
+                {t("See the deal")}
               </Link>
             </p>
           )}
           <p className="text-sm text-muted-foreground">
-            Your business is the centre of this deal. Businesses within {DEFAULT_RADIUS_KM} km of
-            you can join, so the driver can deliver to all of you.
+            {t(
+              "Your business is the centre of this deal. Businesses within {km} km of you can join, so the driver can deliver to all of you.",
+              { km: DEFAULT_RADIUS_KM },
+            )}
           </p>
-          <Field label="Note (optional)">
+          <Field label={t("Note (optional)")}>
             <textarea
               className={inputCls + " h-24 py-2"}
               rows={3}
-              placeholder="e.g. We need it before month end"
+              placeholder={t("e.g. We need it before month end")}
               value={f.note}
               onChange={set("note")}
             />
@@ -233,8 +243,10 @@ export function StartPool() {
               onChange={(e) => setF({ ...f, is_private: e.target.checked })}
             />
             <span>
-              <b>Private group:</b> other businesses can't see this deal. Only businesses you give
-              the code to can join.
+              {rich(
+                "<b>Private group:</b> other businesses can't see this deal. Only businesses you give the code to can join.",
+                { b: (c) => <b>{c}</b> },
+              )}
             </span>
           </label>
           <Button
@@ -244,7 +256,7 @@ export function StartPool() {
             onClick={submit}
             disabled={busy}
           >
-            {busy ? "Sending…" : "Send my request"}
+            {busy ? t("Sending…") : t("Send my request")}
           </Button>
         </div>
       </Section>

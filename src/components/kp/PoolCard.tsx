@@ -5,7 +5,7 @@ import { Clock, MapPin, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { money, savings, dateTime } from "@/lib/format";
 import { POOL_STATUS } from "@/lib/status";
-import { distanceLabel } from "@/lib/delivery";
+import { english, useT, type TFn } from "@/i18n";
 import type { PoolDistance } from "@/lib/queries";
 import { StatusBadge } from "./ui";
 import { PoolProgress, Countdown, ProductImage } from "./pool-bits";
@@ -26,20 +26,34 @@ export type PoolWithProduct = {
   products: { name: string; pack_size: string | null; image_url: string | null } | null;
 };
 
-export function whatsappShareUrl(p: PoolWithProduct) {
+/** "Under 1 km away", "4 km away" */
+export function awayLabel(t: TFn, d: PoolDistance) {
+  return d.distance_km < 1 ? t("Under 1 km away") : t("{km} km away", { km: d.distance_km });
+}
+
+export function whatsappShareUrl(p: PoolWithProduct, t: TFn = english) {
   const s = savings(Number(p.price), p.reference_price);
   const link =
     typeof window !== "undefined" ? `${window.location.origin}/offers/${p.id}` : `/offers/${p.id}`;
   const msg = [
-    `KasiPool deal: ${p.products?.name ?? ""}.`,
-    `${money(p.price)} per ${p.unit}${s ? ` (you save ${money(s.amount)})` : ""}.`,
-    `Closes ${dateTime(p.closes_at)}.`,
-    `Order together with other businesses and pay the bulk price. See the deal: ${link}`,
+    t("KasiPool deal: {product}.", { product: p.products?.name ?? "" }),
+    s
+      ? t("{price} per {unit} (you save {amount}).", {
+          price: money(p.price),
+          unit: t(p.unit),
+          amount: money(s.amount),
+        })
+      : t("{price} per {unit}.", { price: money(p.price), unit: t(p.unit) }),
+    t("Closes {date}.", { date: dateTime(p.closes_at) }),
+    t("Order together with other businesses and pay the bulk price. See the deal: {link}", {
+      link,
+    }),
   ].join(" ");
   return `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
 
 export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?: PoolDistance }) {
+  const { t } = useT();
   const s = savings(Number(pool.price), pool.reference_price ? Number(pool.reference_price) : null);
   const st = POOL_STATUS[pool.status];
   const tooFar = !!distance && !distance.in_range;
@@ -67,7 +81,7 @@ export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?:
         </div>
         {s && (
           <span className="absolute bottom-3 left-3 rounded-sm bg-leaf px-2 py-1 text-sm font-bold text-paper">
-            Save {money(s.amount)}
+            {t("Save {amount}", { amount: money(s.amount) })}
           </span>
         )}
       </Link>
@@ -75,7 +89,7 @@ export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?:
         <div>
           <h3 className="font-display text-lg font-bold leading-tight">{pool.products?.name}</h3>
           <p className="text-sm text-muted-foreground">
-            {pool.products?.pack_size} · per {pool.unit}
+            {pool.products?.pack_size} · {t("per {unit}", { unit: t(pool.unit) })}
           </p>
         </div>
         <div className="flex items-baseline gap-2">
@@ -101,23 +115,25 @@ export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?:
             className={`flex items-center gap-1.5 text-sm ${tooFar ? "font-semibold text-warning" : "text-muted-foreground"}`}
           >
             <MapPin className="size-4" aria-hidden="true" />
-            {tooFar ? `Too far for you (${distanceLabel(distance)})` : distanceLabel(distance)}
+            {tooFar
+              ? t("Too far for you ({distance})", { distance: awayLabel(t, distance) })
+              : awayLabel(t, distance)}
           </p>
         )}
         {pool.status === "open" && (
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock className="size-4" aria-hidden="true" /> Closes in{" "}
+            <Clock className="size-4" aria-hidden="true" /> {t("Closes in")}{" "}
             <Countdown to={pool.closes_at} className="font-semibold text-ink" />
           </p>
         )}
         <div className="mt-auto flex gap-2 pt-1">
           <Button asChild className="flex-1" variant={open ? "gold" : "outline"}>
             <Link href={`/offers/${pool.id}`}>
-              {open ? "Join pool" : pool.is_sample ? "View sample" : "View deal"}
+              {open ? t("Join pool") : pool.is_sample ? t("View sample") : t("View deal")}
             </Link>
           </Button>
-          <Button asChild variant="outline" size="icon" aria-label="Share on WhatsApp">
-            <a href={whatsappShareUrl(pool)} target="_blank" rel="noopener noreferrer">
+          <Button asChild variant="outline" size="icon" aria-label={t("Share on WhatsApp")}>
+            <a href={whatsappShareUrl(pool, t)} target="_blank" rel="noopener noreferrer">
               <Share2 />
             </a>
           </Button>
@@ -128,11 +144,12 @@ export function PoolCard({ pool, distance }: { pool: PoolWithProduct; distance?:
 }
 
 export function SampleBadge({ className }: { className?: string }) {
+  const { t } = useT();
   return (
     <span
       className={`inline-flex h-7 items-center rounded-sm bg-sun px-2 text-sm font-bold text-ink ${className ?? ""}`}
     >
-      Sample deal
+      {t("Sample deal")}
     </span>
   );
 }

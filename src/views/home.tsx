@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth";
 import { PinPrompt } from "@/components/kp/PinPrompt";
 import { activePoolsQuery, myOrdersQuery, poolDistancesQuery, settingsQuery } from "@/lib/queries";
 import { nextAction } from "@/lib/status";
+import { useT } from "@/i18n";
 
 export const STEPS = [
   {
@@ -33,6 +34,7 @@ export const STEPS = [
 ];
 
 export function Home() {
+  const { t } = useT();
   const { user, business } = useAuth();
   const pools = useQuery(activePoolsQuery);
   const dist = useQuery(poolDistancesQuery(user?.id)).data ?? new Map();
@@ -62,20 +64,21 @@ export function Home() {
             </span>
           </h1>
           <p className="mt-5 max-w-md animate-rise text-lg text-paper/85 [animation-delay:260ms]">
-            For local businesses: shops, salons, car washes, bakeries and more. Order together and
-            pay the bulk price. You pay only when your stock arrives.
+            {t(
+              "For local businesses: shops, salons, car washes, bakeries and more. Order together and pay the bulk price. You pay only when your stock arrives.",
+            )}
           </p>
           <div className="mt-7 flex animate-rise flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:340ms]">
             <Button asChild size="xl" variant="gold">
               <Link href="/offers">
-                See deals <ArrowRight />
+                {t("See deals")} <ArrowRight />
               </Link>
             </Button>
             <Link
               href="/how-it-works"
               className="inline-flex h-12 items-center font-semibold underline underline-offset-4"
             >
-              How it works
+              {t("How it works")}
             </Link>
           </div>
         </div>
@@ -86,20 +89,20 @@ export function Home() {
       <Container className="pt-8">
         <PinPrompt business={business} className="mb-6" />
         <div className="mb-4 flex items-end justify-between gap-4 border-b-4 border-ink pb-2">
-          <h2 className="font-headline text-3xl">Closing soon</h2>
+          <h2 className="font-headline text-3xl">{t("Closing soon")}</h2>
           <Link
             href="/offers"
             className="-mb-2 inline-flex min-h-11 items-center gap-1 font-semibold text-ember hover:underline"
           >
-            See all deals <ArrowRight className="size-4" aria-hidden="true" />
+            {t("See all deals")} <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
         {pools.isLoading ? (
           <Loading inline />
         ) : closingSoon.length === 0 ? (
           <EmptyState
-            title="No open deals right now"
-            body="We add new deals often. Come back soon."
+            title={t("No open deals right now")}
+            body={t("We add new deals often. Come back soon.")}
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -111,13 +114,13 @@ export function Home() {
       </Container>
 
       <Container className="py-12">
-        <h2 className="border-b-4 border-ink pb-2 font-headline text-3xl">How it works</h2>
+        <h2 className="border-b-4 border-ink pb-2 font-headline text-3xl">{t("How it works")}</h2>
         <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <li key={s.title} className="border-t-2 border-ink pt-3">
               <span className="font-headline text-5xl text-ember">{i + 1}</span>
-              <p className="mt-2 font-display text-xl font-bold">{s.title}</p>
-              <p className="mt-1 text-muted-foreground">{s.body}</p>
+              <p className="mt-2 font-display text-xl font-bold">{t(s.title)}</p>
+              <p className="mt-1 text-muted-foreground">{t(s.body)}</p>
             </li>
           ))}
         </ol>
@@ -126,12 +129,12 @@ export function Home() {
       {!user && (
         <Container className="pb-4">
           <div className="rounded-md bg-ink p-8 text-paper md:p-12">
-            <h2 className="font-headline text-4xl">Do you run a local business?</h2>
+            <h2 className="font-headline text-4xl">{t("Do you run a local business?")}</h2>
             <p className="mt-2 max-w-md text-paper/85">
-              Register your business to join pools and get bulk prices.
+              {t("Register your business to join pools and get bulk prices.")}
             </p>
             <Button asChild size="xl" variant="gold" className="mt-6">
-              <Link href="/auth?mode=register">Register your business</Link>
+              <Link href="/auth?mode=register">{t("Register your business")}</Link>
             </Button>
           </div>
         </Container>
@@ -142,6 +145,7 @@ export function Home() {
 
 /** Banner for signed-in shops when an order is waiting on them (confirm, pay or confirm delivery). */
 function NextStep({ userId }: { userId: string }) {
+  const { t } = useT();
   const orders = useQuery(myOrdersQuery(userId));
   const settings = useQuery(settingsQuery);
   const payCfg = !!settings.data?.payment?.configured;
@@ -152,20 +156,21 @@ function NextStep({ userId }: { userId: string }) {
     <div className="border-b-4 border-ink bg-gold">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 text-ink">
         <p className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold">Your next step</span>
+          <span className="block text-sm font-semibold">{t("Your next step")}</span>
           <span className="font-display text-xl font-bold">
-            {nextAction(first, payCfg)}: {first.pools?.products?.name}
+            {t(nextAction(first, payCfg) ?? "")}: {first.pools?.products?.name}
           </span>
           {waiting.length > 1 && (
             <span className="block text-sm">
-              and {waiting.length - 1} more {waiting.length === 2 ? "order needs" : "orders need"}{" "}
-              you
+              {waiting.length === 2
+                ? t("and 1 more order needs you")
+                : t("and {n} more orders need you", { n: waiting.length - 1 })}
             </span>
           )}
         </p>
         <Button asChild>
           <Link href={waiting.length > 1 ? "/my-pools" : `/orders/${first.id}`}>
-            {waiting.length > 1 ? "Open My Pools" : "Open order"} <ArrowRight />
+            {waiting.length > 1 ? t("Open My Pools") : t("Open order")} <ArrowRight />
           </Link>
         </Button>
       </div>

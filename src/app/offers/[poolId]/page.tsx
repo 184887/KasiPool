@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { supabase } from "@/integrations/supabase/client";
-import { dateTime, money, savings } from "@/lib/format";
-import { OG_IMAGE } from "@/lib/site";
-import { POOL_STATUS } from "@/lib/status";
+import { notFound } from "next/navigation";
 import { Offer } from "@/views/offer";
+import { money, savings } from "@/lib/format";
+import { isUuid } from "@/lib/utils";
+import { getPublicPool, OG_IMAGE } from "@/lib/site";
 
 type Props = { params: Promise<{ poolId: string }> };
 
-const fallback: Metadata = {
+const FALLBACK: Metadata = {
   title: "Deal details",
   description: "See price, pool progress and closing time, then join the pool.",
   openGraph: {
@@ -17,49 +17,45 @@ const fallback: Metadata = {
   },
 };
 
-// The deal renders in the browser, so link previews (WhatsApp) only see what is fetched here.
-async function getDeal(poolId: string) {
-  try {
-    const { data } = await supabase
-      .from("pools")
-      .select("price, reference_price, unit, status, closes_at, products(name, image_url)")
-      .eq("id", poolId)
-      .maybeSingle();
-    return data;
-  } catch {
-    return null;
-  }
-}
+const closes = (v: string) =>
+  new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Johannesburg",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(v));
 
+/** The deal's name, price and picture, so a link shared on WhatsApp shows them */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { poolId } = await params;
-  const pool = await getDeal(poolId);
+  const pool = await getPublicPool(poolId);
   const name = pool?.products?.name;
-  if (!pool || !name) return { ...fallback, alternates: { canonical: `/offers/${poolId}` } };
-
+  // Private, test and draft deals can't be read without a session: the page still opens for
+  // shops allowed to see them, but search engines should not keep it
+  if (!pool || !name) return { ...FALLBACK, robots: { index: false } };
   const s = savings(Number(pool.price), pool.reference_price ? Number(pool.reference_price) : null);
-  const save = s ? ` (save ${money(s.amount)})` : "";
-  const title = `${name}: ${money(pool.price)} per ${pool.unit}${save}`;
-  const when =
-    pool.status === "open"
-      ? `Closes ${dateTime(pool.closes_at)}.`
-      : `${POOL_STATUS[pool.status]?.customer ?? "Deal"}.`;
-  const description = `${when} Pool with other local businesses to get the bulk price.`;
+  const title = `${name}: ${money(pool.price)} a ${pool.unit}${s ? ` (save ${money(s.amount)})` : ""}`;
+  const description =
+    pool.status === "open" || pool.status === "scheduled"
+      ? `Pool with other local businesses for a better price. Join before ${closes(pool.closes_at)}.`
+      : "Pool with other local businesses to get a better bulk price.";
   const image = pool.products?.image_url;
-
   return {
     title,
     description,
-    alternates: { canonical: `/offers/${poolId}` },
+    alternates: { canonical: `/offers/${pool.id}` },
+    robots: pool.is_private || pool.is_test ? { index: false } : undefined,
     openGraph: {
-      title: `${title} | KasiPool`,
+      title,
       description,
       type: "website",
+      url: `/offers/${pool.id}`,
       images: image ? [{ url: image, alt: name }] : [OG_IMAGE],
     },
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: Props) {
+  // A link cut short in a chat: a real 404 instead of an empty deal page
+  if (!isUuid((await params).poolId)) notFound();
   return <Offer />;
 }

@@ -15,7 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { PinPrompt } from "@/components/kp/PinPrompt";
 import { settingsQuery, errMsg, myOrdersQuery, type MyOrder } from "@/lib/queries";
-import { money, date, dateTime, qty } from "@/lib/format";
+import { money, date, dateTime } from "@/lib/format";
+import { useT } from "@/i18n";
 import { POOL_STATUS, ORDER_STATUS, nextAction, FULFIL_STATUS, PAYMENT_STATUS } from "@/lib/status";
 
 const PSEL =
@@ -23,6 +24,7 @@ const PSEL =
 
 function JoinWithCode() {
   const nav = useRouter();
+  const { t, server } = useT();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   async function go() {
@@ -30,19 +32,19 @@ function JoinWithCode() {
     setBusy(true);
     const { data, error } = await supabase.rpc("claim_pool_invite", { _code: code });
     setBusy(false);
-    if (error || !data) return toast.error(errMsg(error));
+    if (error || !data) return toast.error(server(errMsg(error)));
     nav.push(`/offers/${data}`);
   }
   return (
     <div className="mb-6">
       <label htmlFor="group-code" className="text-sm font-semibold">
-        Got a private group code?
+        {t("Got a private group code?")}
       </label>
       <div className="mt-1 flex gap-2">
         <Input
           id="group-code"
           className="h-12 min-w-0 uppercase placeholder:normal-case"
-          placeholder="e.g. AB12CD"
+          placeholder={t("e.g. AB12CD")}
           autoCapitalize="characters"
           autoComplete="off"
           value={code}
@@ -50,7 +52,7 @@ function JoinWithCode() {
           onKeyDown={(e) => e.key === "Enter" && go()}
         />
         <Button variant="outline" className="shrink-0" disabled={busy || !code.trim()} onClick={go}>
-          {busy ? "Checking…" : "Join group"}
+          {busy ? t("Checking…") : t("Join group")}
         </Button>
       </div>
     </div>
@@ -58,6 +60,7 @@ function JoinWithCode() {
 }
 
 export function MyPools() {
+  const { t, qty } = useT();
   const { user, business } = useAuth();
   const settings = useQuery(settingsQuery);
   const payCfg = !!settings.data?.payment?.configured;
@@ -90,13 +93,12 @@ export function MyPools() {
 
   return (
     <Container className="max-w-3xl">
-      <PageHeader title="My Pools" subtitle={business?.trading_name} />
+      <PageHeader title={t("My Pools")} subtitle={business?.trading_name} />
       {!business && (
         <div className="mb-4 rounded-md bg-warning-soft p-4 text-sm text-warning">
           <Link href="/onboarding" className="font-semibold underline">
-            Add your business details
-          </Link>{" "}
-          to join a pool.
+            {t("Add your business details to join a pool.")}
+          </Link>
         </div>
       )}
       <PinPrompt business={business} className="mb-4" />
@@ -108,7 +110,7 @@ export function MyPools() {
               className="mr-2 inline size-7 align-[-3px] text-ember"
               aria-hidden="true"
             />
-            Your next steps
+            {t("Your next steps")}
           </SectionTitle>
           <div className="space-y-3">
             {action.map((o) => (
@@ -129,17 +131,18 @@ export function MyPools() {
                   <p className="font-bold">{o.pools?.products?.name}</p>
                   <p className="text-sm">
                     {o.quantity} × {money(o.unit_price)}
-                    {Number(o.delivery_fee) > 0 && ` + ${money(o.delivery_fee)} delivery`} ={" "}
-                    <b>{money(o.total)}</b>
+                    {Number(o.delivery_fee) > 0 &&
+                      ` + ${t("{fee} delivery", { fee: money(o.delivery_fee) })}`}{" "}
+                    = <b>{money(o.total)}</b>
                   </p>
                   {o.status === "awaiting_confirmation" && o.pools?.payment_deadline && (
                     <p className="text-sm text-muted-foreground">
-                      Confirm by {dateTime(o.pools.payment_deadline)}
+                      {t("Confirm by {date}", { date: dateTime(o.pools.payment_deadline) })}
                     </p>
                   )}
                 </div>
                 <span className="rounded-md bg-ink px-3 py-2 text-sm font-bold text-paper">
-                  {nextAction(o, payCfg)}
+                  {t(nextAction(o, payCfg) ?? "")}
                 </span>
               </Link>
             ))}
@@ -148,13 +151,13 @@ export function MyPools() {
       )}
 
       <section className="mb-8">
-        <SectionTitle>Active pools</SectionTitle>
+        <SectionTitle>{t("Active pools")}</SectionTitle>
         {(parts.data ?? []).length === 0 ? (
           <EmptyState
-            title="You are not in any open pools"
+            title={t("You are not in any open pools")}
             action={
               <Button asChild variant="gold">
-                <Link href="/offers">Find a deal</Link>
+                <Link href="/offers">{t("Find a deal")}</Link>
               </Button>
             }
           />
@@ -181,13 +184,14 @@ export function MyPools() {
                     <div className="min-w-0 flex-1">
                       <p className="font-bold">{pool.products?.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        You ordered: <b className="text-foreground">{qty(p.quantity, pool.unit)}</b>{" "}
-                        · about {money(p.quantity * Number(pool.price))}
+                        {t("You ordered:")}{" "}
+                        <b className="text-foreground">{qty(p.quantity, pool.unit)}</b> ·{" "}
+                        {t("about {amount}", { amount: money(p.quantity * Number(pool.price)) })}
                       </p>
                       <div className="mt-1 flex items-center gap-2">
                         <StatusBadge tone={st.tone}>{st.customer}</StatusBadge>
                         <span className="text-sm text-muted-foreground">
-                          Closes {date(pool.closes_at)}
+                          {t("Closes {date}", { date: date(pool.closes_at) })}
                         </span>
                       </div>
                     </div>
@@ -203,7 +207,9 @@ export function MyPools() {
                     />
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Next: wait for the pool to fill up. You can change your order until it closes.
+                    {t(
+                      "Next: wait for the pool to fill up. You can change your order until it closes.",
+                    )}
                   </p>
                 </Link>
               );
@@ -214,25 +220,25 @@ export function MyPools() {
 
       {inProgress.length > 0 && (
         <section className="mb-8">
-          <SectionTitle>Orders in progress</SectionTitle>
+          <SectionTitle>{t("Orders in progress")}</SectionTitle>
           <OrderList list={inProgress} />
         </section>
       )}
 
       {previous.length > 0 && (
         <section className="mb-8">
-          <SectionTitle>Previous orders</SectionTitle>
+          <SectionTitle>{t("Previous orders")}</SectionTitle>
           <OrderList list={previous} />
         </section>
       )}
 
       <section>
-        <SectionTitle>More</SectionTitle>
+        <SectionTitle>{t("More")}</SectionTitle>
         <JoinWithCode />
-        <p className="text-sm font-semibold">Need a product that has no deal near you?</p>
+        <p className="text-sm font-semibold">{t("Need a product that has no deal near you?")}</p>
         <Button asChild variant="outline" className="mt-1 w-full sm:w-auto">
           <Link href="/start-pool">
-            <Plus aria-hidden="true" /> Ask for a deal
+            <Plus aria-hidden="true" /> {t("Ask for a deal")}
           </Link>
         </Button>
       </section>
@@ -241,6 +247,7 @@ export function MyPools() {
 }
 
 function OrderList({ list }: { list: MyOrder[] }) {
+  const { t, qty } = useT();
   return (
     <div className="divide-y-2 divide-ink/10 rounded-md border-2 border-ink bg-card">
       {list.map((o) => {
@@ -255,9 +262,11 @@ function OrderList({ list }: { list: MyOrder[] }) {
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{o.pools?.products?.name}</p>
               <p className="text-sm text-muted-foreground">
-                {o.ref ?? "No reference"} · {qty(o.quantity, o.pools?.unit ?? "")} ·{" "}
-                {o.payment_status === "paid" ? `Paid ${money(o.amount_paid)}` : money(o.total)}
-                {o.received_at && ` · Received ${date(o.received_at)}`}
+                {o.ref ?? t("No reference")} · {qty(o.quantity, o.pools?.unit ?? "")} ·{" "}
+                {o.payment_status === "paid"
+                  ? t("Paid {amount}", { amount: money(o.amount_paid) })
+                  : money(o.total)}
+                {o.received_at && ` · ${t("Received {date}", { date: date(o.received_at) })}`}
               </p>
             </div>
             <StatusBadge tone={label.tone}>{label.label}</StatusBadge>

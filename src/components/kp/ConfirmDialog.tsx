@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Field, inputCls } from "./admin";
+import { useT } from "@/i18n";
 
 type Ask = {
   title: string;
@@ -29,6 +30,7 @@ type Ask = {
  * Render the returned `dialog` once in the page.
  */
 export function useConfirm() {
+  const { t } = useT();
   const [req, setReq] = useState<Ask | null>(null);
   const [text, setText] = useState("");
   const resolver = useRef<(v: string | false) => void>(undefined);
@@ -69,7 +71,7 @@ export function useConfirm() {
         )}
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => finish(false)}>
-            {req?.cancelLabel ?? "Go back"}
+            {req?.cancelLabel ?? t("Go back")}
           </Button>
           <Button
             variant={req?.danger ? "destructive" : "default"}
